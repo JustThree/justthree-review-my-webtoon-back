@@ -19,9 +19,9 @@ public class UsersService {
 
     public UsersDTO insertUsers(JoinDTO joinDTO){
         Users user = Users.builder()
-                .users_email(joinDTO.getUsers_email())
-                .users_pw(bCryptPasswordEncoder.encode(joinDTO.getUsers_pw()))
-                .users_nickname(joinDTO.getUsers_nickname())
+                .usersEmail(joinDTO.getUsersEmail())
+                .usersPw(bCryptPasswordEncoder.encode(joinDTO.getUsersPw()))
+                .usersNickname(joinDTO.getUsersNickname())
                 .build();
 
         ur.save(user);

@@ -8,9 +8,9 @@ import lombok.ToString;
 @Builder
 @ToString
 public class JoinDTO {
-    private String users_email;
-    private String users_nickname;
-    private String users_pw;
-    private String check_pw;
+    private String usersEmail;
+    private String usersNickname;
+    private String usersPw;
+    private String checkPw;
 
 }

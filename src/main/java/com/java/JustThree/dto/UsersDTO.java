@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsersDTO {
-    private Integer users_id;
-    private String users_nickname;
-    private String users_email;
-    private String profile_url;
+    private Integer usersId;
+    private String usersNickname;
+    private String usersEmail;
+    private String profileUrl;
     private LocalDateTime created;
-    private int status_code;
+    private int statusCode;
 }

@@ -21,38 +21,38 @@ import java.time.LocalDateTime;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "users_id")
-    private Integer users_id;
+    @Column
+    private Integer usersId;
 
     @Enumerated(EnumType.ORDINAL)
-    private RoleType users_role;
+    private RoleType usersRole;
 
     @Column(nullable = false)
-    private String users_nickname;
+    private String usersNickname;
 
     @Column(nullable = false)
-    private String users_pw;
+    private String usersPw;
 
     @Column(nullable = false, unique = true)
-    private String users_email;
+    private String usersEmail;
 
     @CreatedDate
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime created;
 
     @Builder.Default
-    private String profile_url = "https://just-three.s3.ap-northeast-2.amazonaws.com/HDcat.png";
+    private String profileUrl = "https://just-three.s3.ap-northeast-2.amazonaws.com/HDcat.png";
 
     @Builder.Default
-    private int status_code = 1;
+    private int statusCode = 1;
 
     public UsersDTO toDto() {
         return UsersDTO.builder()
-                .users_id(users_id)
-                .users_nickname(users_nickname)
-                .users_email(users_email)
-                .profile_url(profile_url)
-                .status_code(status_code)
+                .usersId(usersId)
+                .usersNickname(usersNickname)
+                .usersEmail(usersEmail)
+                .profileUrl(profileUrl)
+                .statusCode(statusCode)
                 .build();
     }
 }
