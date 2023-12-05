@@ -44,4 +44,5 @@ public class Webtoon {
 
     @Column(name = "orginl_nation_cd_nm")
     private String orginlNationCdNm;// 원작국가코드명
+
 }

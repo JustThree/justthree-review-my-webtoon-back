@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Builder(toBuilder = true)
 @Entity
+@Data
+@Setter
 
 public class Users {
     @Id
