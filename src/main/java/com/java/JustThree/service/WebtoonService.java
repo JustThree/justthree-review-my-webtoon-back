@@ -19,10 +19,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -102,30 +99,39 @@ public class WebtoonService {
                         if (mapJson.containsKey(tittlePicWriSnWri)) {
                             String oldLink = mapJson.get(tittlePicWriSnWri).getUrls();
                             newLink = oldLink + "_" + js.get("pltfomCdNm") + "$" + link;
+                            Optional<Webtoon> byId = webtoonRepository.findById(mapJson.get(tittlePicWriSnWri).getMastrId());
+                            if (byId.isPresent()){
+                                Webtoon webtoon = byId.get();
+                                webtoon.setUrls(newLink);
+                                webtoonRepository.saveAndFlush(webtoon);
+                            }  else {
+                                System.out.println("1");
+                            }
                         }
                         else {
                             newLink = js.get("pltfomCdNm") + "$" + link;
+                            Webtoon webtoon = Webtoon.builder()
+                                    .mastrId(Long.parseLong(js.get("mastrId").toString()))
+                                    .title(js.get("title").toString())
+                                    .pictrWritrNm(js.get("pictrWritrNm").toString())
+                                    .sntncWritrNm(js.get("sntncWritrNm").toString())
+                                    .mainGenreCdNm(js.get("mainGenreCdNm").toString())
+                                    .outline(js.get("outline").toString())
+                                    .pltfomCdNm(js.get("pltfomCdNm").toString())
+                                    .ageGradCd(js.get("ageGradCd").toString())
+                                    .ageGradCdNm(js.get("ageGradCdNm").toString())
+                                    .pusryBeginDe(js.get("pusryBeginDe").toString())
+                                    .pusryEndDe(js.get("pusryEndDe").toString())
+                                    .fnshYn(js.get("fnshYn").toString())
+                                    .webtoonPusryYn(js.get("webtoonPusryYn").toString())
+                                    .orginlNationCdNm(js.get("orginlNationCdNm").toString())
+                                    .urls(newLink) // 성인일 경우 url ... 로그인 해야댐.. 나중에 url 넣기
+                                    .imageUrl(js.get("imageDownloadUrl").toString())
+                                    .build();
+                            webtoonRepository.saveAndFlush(webtoon);
                         }
                         // 엔티티 생성
-                        Webtoon webtoon = Webtoon.builder()
-                                .mastrId(Long.parseLong(js.get("mastrId").toString()))
-                                .title(js.get("title").toString())
-                                .pictrWritrNm(js.get("pictrWritrNm").toString())
-                                .sntncWritrNm(js.get("sntncWritrNm").toString())
-                                .mainGenreCdNm(js.get("mainGenreCdNm").toString())
-                                .outline(js.get("outline").toString())
-                                .pltfomCdNm(js.get("pltfomCdNm").toString())
-                                .ageGradCd(js.get("ageGradCd").toString())
-                                .ageGradCdNm(js.get("ageGradCdNm").toString())
-                                .pusryBeginDe(js.get("pusryBeginDe").toString())
-                                .pusryEndDe(js.get("pusryEndDe").toString())
-                                .fnshYn(js.get("fnshYn").toString())
-                                .webtoonPusryYn(js.get("webtoonPusryYn").toString())
-                                .orginlNationCdNm(js.get("orginlNationCdNm").toString())
-                                .urls(newLink) // 성인일 경우 url ... 로그인 해야댐.. 나중에 url 넣기
-                                .imageUrl(js.get("imageDownloadUrl").toString())
-                                .build();
-                        mapJson.put(tittlePicWriSnWri, webtoon);
+
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -135,13 +141,12 @@ public class WebtoonService {
             // 마지막으로 성인분류 됬으면 => 성인 코드 변경
         for (String key:
              setNotNormal) {
-            mapJson.get(key).setAgeGradCd("4");
-            mapJson.get(key).setAgeGradCdNm("19세 이상");
-        }
-        // 리포지토리에 저장
-        for (String key:
-             mapJson.keySet()) {
-            webtoonRepository.save(mapJson.get(key));
+            Optional<Webtoon> byId = webtoonRepository.findById(mapJson.get(key).getMastrId());
+            if (byId.isPresent()) {
+                byId.get().setAgeGradCd("4");
+                byId.get().setAgeGradCd("19세 이상");
+                webtoonRepository.saveAndFlush(byId.get());
+            }
         }
     }
 }
