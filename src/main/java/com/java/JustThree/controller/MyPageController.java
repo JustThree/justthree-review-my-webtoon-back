@@ -3,6 +3,7 @@ package com.java.JustThree.controller;
 import com.java.JustThree.domain.Users;
 import com.java.JustThree.domain.Webtoon;
 import com.java.JustThree.dto.CudResponse;
+import com.java.JustThree.dto.InterestedWebtoonResponse;
 import com.java.JustThree.dto.RatedWebtoonResponse;
 import com.java.JustThree.service.MyPageService;
 import lombok.RequiredArgsConstructor;
@@ -29,12 +30,13 @@ public class MyPageController {
         return ResponseEntity.ok(ratedWebtoonList);
     }
     //////////////////////////////////////////////////리뷰 웹툰 목록/////////////////////////////////////////////////////////////
-    // @GetMapping("/reviewed/{usersId}")
-    // public ResponseEntity<List<ReviewedWebtoonResponse>>reviewedWebtoon(@PathVariable Integer usersId){
-//      List
-//  }
+//     @GetMapping("/reviewed/{usersId}")
     //////////////////////////////////////////////////관심 웹툰 목록/////////////////////////////////////////////////////////////
-    // @GetMapping("/liked/")gi
+    @GetMapping("/interested/{usersId}")
+    public ResponseEntity<List<InterestedWebtoonResponse>> interestedWebtoon(@PathVariable Long usersId){
+        List<InterestedWebtoonResponse> interestedWebtoonList=service.interestedWebtoonlist(usersId);
+        return ResponseEntity.ok(interestedWebtoonList);
+    }
     //////////////////////////////////////////////////유저 정보 업뎃/////////////////////////////////////////////////////////////
     @PutMapping("/update")
     public ResponseEntity<CudResponse> updateUser(@RequestHeader(value="Authorization",required = false)String token, @RequestBody Users user){
