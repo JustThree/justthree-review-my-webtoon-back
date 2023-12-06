@@ -1,20 +1,27 @@
 package com.java.JustThree.service;
 
+import com.java.JustThree.domain.Star;
 import com.java.JustThree.domain.Users;
+import com.java.JustThree.dto.RatedWebtoonResponse;
+import com.java.JustThree.repository.StarRepository;
 import com.java.JustThree.repository.UsersRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.tool.schema.spi.ScriptTargetOutput;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class MyPageService {
 
     private final UsersRepository usersRepository;
-
+    private final StarRepository starRepository;
     //회원 정보 수정 Update
     @Transactional
     public boolean updateUser(Users user,int usersId){
@@ -31,7 +38,14 @@ public class MyPageService {
         return result;
     }
     //관심 웹툰 리스트
+    public List<RatedWebtoonResponse>ratedWebtoonlist(Long usersId){
 
+        List<Star> list = starRepository.findByUsers(usersId);
+        List<RatedWebtoonResponse> listDTO= new ArrayList<>();
+        RatedWebtoonResponse dto;
+
+        }
+    }
     //평가 웹툰 리스트
 
     //리뷰 웹툰 리스트
