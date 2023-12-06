@@ -37,17 +37,20 @@ public class MyPageService {
         }
         return result;
     }
-    //관심 웹툰 리스트
-    public List<RatedWebtoonResponse>ratedWebtoonlist(Long usersId){
-
-        List<Star> list = starRepository.findByUsers(usersId);
-        List<RatedWebtoonResponse> listDTO= new ArrayList<>();
-        RatedWebtoonResponse dto;
-
-        }
-    }
     //평가 웹툰 리스트
+    public List<RatedWebtoonResponse>ratedWebtoonlist(Integer usersId){
+        List<Star> list = starRepository.findByUsers_UsersId(usersId);
+        List<RatedWebtoonResponse> ratedWebtoonList= new ArrayList<>();
+        for (Star star : list) {
+            RatedWebtoonResponse dto = new RatedWebtoonResponse(star.getWebtoon(), star.getStarVal());
+            ratedWebtoonList.add(dto);
+        }
 
+        return ratedWebtoonList;
+
+    }
+
+    //관심 웹툰 리스트
     //리뷰 웹툰 리스트
 
     //팔로워 리스트

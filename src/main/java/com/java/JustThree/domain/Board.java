@@ -40,6 +40,6 @@ public class Board {
     private boolean noticeYn;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "users_id", referencedColumnName = "users_id")
     private Users users;
 }

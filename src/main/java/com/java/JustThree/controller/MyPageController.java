@@ -24,14 +24,17 @@ public class MyPageController {
 
     //////////////////////////////////////////////////평가 웹툰 목록/////////////////////////////////////////////////////////////
     @GetMapping("/rated/{usersId}")
-    public ResponseEntity<List<RatedWebtoonResponse>>ratedWebtoon(@PathVariable Long usersId){
-        ResponseEntity<List<RatedWebtoonResponse>> entity = new ResponseEntity<>(service.ratedWebtoonlist(usersId))
-        return entity;
+    public ResponseEntity<List<RatedWebtoonResponse>> ratedWebtoon(@PathVariable Integer usersId) {
+        List<RatedWebtoonResponse> ratedWebtoonList = service.ratedWebtoonlist(usersId);
+        return ResponseEntity.ok(ratedWebtoonList);
     }
     //////////////////////////////////////////////////리뷰 웹툰 목록/////////////////////////////////////////////////////////////
-   // @GetMapping("/reviewed/")
+    // @GetMapping("/reviewed/{usersId}")
+    // public ResponseEntity<List<ReviewedWebtoonResponse>>reviewedWebtoon(@PathVariable Integer usersId){
+//      List
+//  }
     //////////////////////////////////////////////////관심 웹툰 목록/////////////////////////////////////////////////////////////
-    // @GetMapping("/liked/")
+    // @GetMapping("/liked/")gi
     //////////////////////////////////////////////////유저 정보 업뎃/////////////////////////////////////////////////////////////
     @PutMapping("/update")
     public ResponseEntity<CudResponse> updateUser(@RequestHeader(value="Authorization",required = false)String token, @RequestBody Users user){
