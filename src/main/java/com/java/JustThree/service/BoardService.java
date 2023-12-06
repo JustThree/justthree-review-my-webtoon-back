@@ -33,8 +33,12 @@ public class BoardService {
                 .users(addBoardRequest.getUsers())
                 .build();
         boardRepository.save(newBoard);
+        /*log.info("ADD BOARD");
+        log.info(""+addBoardRequest.getImageFiles()[0]);
+        log.info(""+addBoardRequest.getImageFiles()[0].getOriginalFilename());*/
+
         //첨부파일 있을 경우
-        if(addBoardRequest.getImageFiles() != null){
+        if(addBoardRequest.getImageFiles() != null && !addBoardRequest.getImageFiles()[0].isEmpty()){
             for(MultipartFile imgFile: addBoardRequest.getImageFiles()){
                 String storedName = boardImageService.uploadFile(imgFile);
                 String accessUrl = boardImageService.getAccessUrl(storedName);

@@ -28,7 +28,7 @@ public class AddBoardRequest {
     private int noticeYn;
     private Users users;
     //save image request dto
-    private MultipartFile[] imageFiles; //gpt
+    private MultipartFile[] imageFiles;
     //private List<MultipartFile> boardImgList = new ArrayList<>();
 
 
