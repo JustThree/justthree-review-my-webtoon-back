@@ -20,6 +20,7 @@ public class Webtoon {
     private String sntncWritrNm;    // 글작가
     @Column(name = "main_genre_cd_nm")
     private String mainGenreCdNm;   // 대표장르코드명
+    @Column(columnDefinition = "TEXT")
     private String outline;         // 줄거리
     @Column(name = "pltfom_cd_nm")
     private String pltfomCdNm;      // 플랫폼코드명
