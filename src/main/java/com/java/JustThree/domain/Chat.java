@@ -1,10 +1,7 @@
 package com.java.JustThree.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
+@Data
 public class Chat {
     @Id
     @Column(name = "chat_id")
@@ -29,4 +27,9 @@ public class Chat {
 
     @Column(name = "users_nickname")
     private String usersNickname;
+
+    public enum MessageType{
+        ENTER, TALK
+    }
+    private MessageType type;
 }

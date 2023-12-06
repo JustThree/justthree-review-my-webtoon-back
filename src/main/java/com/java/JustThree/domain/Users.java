@@ -22,7 +22,7 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "users_id")
-    private Integer usersId;
+    private Long usersId;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "users_role")

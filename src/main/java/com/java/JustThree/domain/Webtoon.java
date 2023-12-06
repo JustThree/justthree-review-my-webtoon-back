@@ -1,8 +1,10 @@
 package com.java.JustThree.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class Webtoon {
 
     @Id
