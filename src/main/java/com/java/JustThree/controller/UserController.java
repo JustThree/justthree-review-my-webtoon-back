@@ -14,11 +14,11 @@ public class UserController {
 
     private final UsersService usersService;
 
-    @PostMapping(value = "/join")
-    public Long join(JoinRequest joinDTO){
-
-        return usersService.insertUsers(joinDTO);
-    }
-
+//    @PostMapping(value = "/join")
+//    public Long join(JoinRequest joinDTO){
+//
+//        return usersService.insertUsers(joinDTO);
+//    }
+//
 
 }

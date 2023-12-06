@@ -18,14 +18,14 @@ public class UsersService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-    @Transactional(rollbackFor = Exception.class)
-    public Long insertUsers(JoinRequest joinDTO){
-        Users user = Users.builder()
-                .usersEmail(joinDTO.getUsersEmail())
-                .usersPw(bCryptPasswordEncoder.encode(joinDTO.getUsersPw()))
-                .usersNickname(joinDTO.getUsersNickname())
-                .usersRole(RoleType.USER)
-                .build();
-        return  ur.save(user).getUsersId();
-    }
+//    @Transactional(rollbackFor = Exception.class)
+//    public Long insertUsers(JoinRequest joinDTO){
+//        Users user = Users.builder()
+//                .usersEmail(joinDTO.getUsersEmail())
+//                .usersPw(bCryptPasswordEncoder.encode(joinDTO.getUsersPw()))
+//                .usersNickname(joinDTO.getUsersNickname())
+//                .usersRole(RoleType.USER)
+//                .build();
+//        return  ur.save(user).getUsersId();
+//    }
 }
