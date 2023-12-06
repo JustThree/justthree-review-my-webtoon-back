@@ -16,25 +16,28 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @Setter
-public class Review {
+public class Review_Reply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="review_id")
-    private Long reviewId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "master_id",referencedColumnName = "master_id")
-    private Webtoon webtoon;
+    @Column(name = "review_reply_id")
+    private Long reviewReplyId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id",referencedColumnName = "users_id")
     private Users users;
 
-    private String content;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "master_id",referencedColumnName = "master_id")
+    private Webtoon webtoon;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private LocalDateTime created;
 
+    private String content;
+
+    @Column(name = "parent_id")
+    private Long parentId;
 }
+
