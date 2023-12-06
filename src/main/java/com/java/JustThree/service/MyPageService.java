@@ -27,7 +27,7 @@ public class MyPageService {
     public boolean updateUser(Users user,int usersId){
         boolean result = true;
         try{
-            Users nuser = usersRepository.findById(usersId).get();
+            Users nuser = usersRepository.findById((long) usersId).get();
             nuser.setUsersEmail(user.getUsersEmail());
             nuser.setUsersPw(user.getUsersPw());
             nuser.setProfileUrl(user.getProfileUrl());
@@ -38,7 +38,7 @@ public class MyPageService {
         return result;
     }
     //평가 웹툰 리스트
-    public List<RatedWebtoonResponse>ratedWebtoonlist(Integer usersId){
+    public List<RatedWebtoonResponse>ratedWebtoonlist(Long usersId){
         List<Star> list = starRepository.findByUsers_UsersId(usersId);
         List<RatedWebtoonResponse> ratedWebtoonList= new ArrayList<>();
         for (Star star : list) {

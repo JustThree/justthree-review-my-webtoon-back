@@ -24,7 +24,7 @@ public class UsersService {
                 .usersEmail(joinDTO.getUsersEmail())
                 .usersPw(bCryptPasswordEncoder.encode(joinDTO.getUsersPw()))
                 .usersNickname(joinDTO.getUsersNickname())
-                .usersRole(RoleType.USER)
+                .usersRole(String.valueOf(RoleType.USER))
                 .build();
         return  ur.save(user).getUsersId();
     }

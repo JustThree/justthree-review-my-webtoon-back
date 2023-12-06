@@ -8,7 +8,6 @@ import java.util.List;
 public interface StarRepository extends JpaRepository<Star,Long> {
 
 
-    //User의 userID로 조회
-    public List<Star> findByUsers_UsersId(Integer usersId);
+    public List<Star> findByUsers_UsersId(Long usersId);
 
 }

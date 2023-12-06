@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.User;
 @Setter
 public class Star {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="star_id")
     private Long starId;
 

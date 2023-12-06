@@ -24,7 +24,7 @@ public class MyPageController {
 
     //////////////////////////////////////////////////평가 웹툰 목록/////////////////////////////////////////////////////////////
     @GetMapping("/rated/{usersId}")
-    public ResponseEntity<List<RatedWebtoonResponse>> ratedWebtoon(@PathVariable Integer usersId) {
+    public ResponseEntity<List<RatedWebtoonResponse>> ratedWebtoon(@PathVariable Long usersId) {
         List<RatedWebtoonResponse> ratedWebtoonList = service.ratedWebtoonlist(usersId);
         return ResponseEntity.ok(ratedWebtoonList);
     }
@@ -39,7 +39,7 @@ public class MyPageController {
     @PutMapping("/update")
     public ResponseEntity<CudResponse> updateUser(@RequestHeader(value="Authorization",required = false)String token, @RequestBody Users user){
         CudResponse response = new CudResponse();
-        int user_Id = user.getUsersId();//토큰으로 아이디 받아오는걸로 바꿔야하ㅁ
+        int user_Id = Math.toIntExact(user.getUsersId());//토큰으로 아이디 받아오는걸로 바꿔야하ㅁ
         //int user_Id = jwtService.getId(token);
         user.setUsersPw(passwordEncoder.encode(user.getUsersPw()));//시큐리띠
         boolean result = service.updateUser(user, user_Id);
