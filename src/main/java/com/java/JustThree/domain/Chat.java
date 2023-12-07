@@ -23,13 +23,9 @@ public class Chat {
     @Column(columnDefinition = "TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    private LocalDateTime created;
+    private LocalDateTime created = LocalDateTime.now();
 
-    @Column(name = "users_nickname")
-    private String usersNickname;
-
-    public enum MessageType{
-        ENTER, TALK
-    }
-    private MessageType type;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "users_id", referencedColumnName = "users_id")
+    private Users users;
 }
