@@ -23,9 +23,11 @@ public class ReviewedWebtoonResponse {
     private String pictrWritrNm;//그림작가
     private String sntncWritrNm;// 글작가
     //대댓글 개수
-    private Long reviewReplyCount;
+    private Long reviewReplyCount;//대댓글 개수
+    //좋아요 개수
+    private Long reviewHeartCount;//좋아요 개수
 
-    public ReviewedWebtoonResponse(Users users, Webtoon webtoon, Long reviewId, String content,Long reviewReplyCount){
+    public ReviewedWebtoonResponse(Users users, Webtoon webtoon, Long reviewId, String content,Long reviewReplyCount,Long reviewHeartCount){
         this.reviewId=reviewId;
         this.content=content;
 
@@ -37,5 +39,6 @@ public class ReviewedWebtoonResponse {
         this.pictrWritrNm=webtoon.getPictrWritrNm();
         this.sntncWritrNm=webtoon.getSntncWritrNm();
         this.reviewReplyCount=reviewReplyCount;
+        this.reviewHeartCount=reviewHeartCount;
     }
 }

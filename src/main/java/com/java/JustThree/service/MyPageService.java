@@ -7,10 +7,7 @@ import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.InterestedWebtoonResponse;
 import com.java.JustThree.dto.RatedWebtoonResponse;
 import com.java.JustThree.dto.ReviewedWebtoonResponse;
-import com.java.JustThree.repository.InterestRepository;
-import com.java.JustThree.repository.ReviewRepository;
-import com.java.JustThree.repository.StarRepository;
-import com.java.JustThree.repository.UsersRepository;
+import com.java.JustThree.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +23,8 @@ public class MyPageService {
     private final StarRepository starRepository;
     private final InterestRepository interestRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewReplyRepository reviewReplyRepository;
+    private final ReviewHeartRepository reviewHeartRepository;
     //////////////////////회원 정보 수정 Update////////////////////
     @Transactional
     public boolean updateUser(Users user,int usersId){
@@ -68,7 +67,9 @@ public class MyPageService {
         List<ReviewedWebtoonResponse> reviewedWebtoonList = new ArrayList<>();
 
         for (Review review :list){
-            ReviewedWebtoonResponse dto = new ReviewedWebtoonResponse(review.getUsers(),review.getWebtoon(), review.getReviewId(), review.getContent());
+            Long reviewReplyCount = reviewReplyRepository.countByReview_ReviewId(review.getReviewId());
+            Long reviewHeartCount = reviewHeartRepository.countByReview_ReviewId(review.getReviewId());
+            ReviewedWebtoonResponse dto = new ReviewedWebtoonResponse(review.getUsers(),review.getWebtoon(), review.getReviewId(), review.getContent(),reviewReplyCount,reviewHeartCount);
             reviewedWebtoonList.add(dto);
         }
         return reviewedWebtoonList;
