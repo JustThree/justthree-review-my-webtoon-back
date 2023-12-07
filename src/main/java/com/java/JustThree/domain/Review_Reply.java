@@ -39,5 +39,6 @@ public class Review_Reply {
 
     @Column(name = "parent_id")
     private Long parentId;
+    //count왜 이걸로 해야해
 }
 
