@@ -1,7 +1,6 @@
 package com.java.JustThree.jwt;
 
 import com.java.JustThree.domain.Users;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java.JustThree.dto.LoginRequest;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
@@ -39,13 +38,10 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         System.out.println("JwtAuthenticationFilter -- attemptAuthentication 진입");
 
         // Login request 정보 받기
-        ObjectMapper om = new ObjectMapper();
-        LoginRequest loginReq = new LoginRequest();
-        try {
-            loginReq = om.readValue(request.getInputStream(), LoginRequest.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        LoginRequest loginReq = LoginRequest.builder()
+                .usersEmail(request.getParameter("usersEmail"))
+                .usersPw(request.getParameter("usersPw"))
+                .build();
 
         // UsernamePasswordAuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -83,7 +79,6 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
                 .claim("id", userDetails.getUsersId())
                 .signWith(jwtProperties.getKEY())
                 .compact();
-
         response.addHeader(jwtProperties.getHEADER_STRING(), jwtProperties.getTOKEN_PREFIX() + jwt);
         setSuccessResponse(response, userDetails);
     }
