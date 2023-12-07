@@ -24,6 +24,7 @@ public class Board {
 
     private String title;
 
+    //@Column(columnDefinition = "LONGTEXT")
     private String content;
 
     @Column(name = "view_count")
