@@ -21,11 +21,11 @@ public class UsersService {
     @Transactional(rollbackFor = Exception.class)
     public Long insertUsers(JoinRequest joinDTO){
         Users user = Users.builder()
-                .usersEmail(joinDTO.getUsersEmail())
-                .usersPw(bCryptPasswordEncoder.encode(joinDTO.getUsersPw()))
-                .usersNickname(joinDTO.getUsersNickname())
-                .usersRole(RoleType.USER)
-                .build();
+            .usersEmail(joinDTO.getUsersEmail())
+            .usersPw(bCryptPasswordEncoder.encode(joinDTO.getUsersPw()))
+            .usersNickname(joinDTO.getUsersNickname())
+            .usersRole(RoleType.USER.name())
+            .build();
         return  ur.save(user).getUsersId();
     }
 }
