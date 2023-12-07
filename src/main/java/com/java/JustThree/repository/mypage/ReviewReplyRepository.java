@@ -1,4 +1,4 @@
-package com.java.JustThree.repository;
+package com.java.JustThree.repository.mypage;
 
 import com.java.JustThree.domain.Review_Reply;
 import org.springframework.data.jpa.repository.JpaRepository;
