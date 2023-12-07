@@ -23,6 +23,8 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 @Builder(toBuilder = true)
 @Entity
+@Data
+@Setter
 
 public class Users implements UserDetails {
     @Id
@@ -112,4 +114,5 @@ public class Users implements UserDetails {
     public boolean isEnabled() {
         return false;
     }
+
 }
