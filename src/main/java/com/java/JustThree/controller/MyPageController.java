@@ -5,6 +5,7 @@ import com.java.JustThree.domain.Webtoon;
 import com.java.JustThree.dto.CudResponse;
 import com.java.JustThree.dto.InterestedWebtoonResponse;
 import com.java.JustThree.dto.RatedWebtoonResponse;
+import com.java.JustThree.dto.ReviewedWebtoonResponse;
 import com.java.JustThree.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,8 +30,12 @@ public class MyPageController {
         List<RatedWebtoonResponse> ratedWebtoonList = service.ratedWebtoonlist(usersId);
         return ResponseEntity.ok(ratedWebtoonList);
     }
-    //////////////////////////////////////////////////리뷰 웹툰 목록/////////////////////////////////////////////////////////////
-//     @GetMapping("/reviewed/{usersId}")
+    //////////////////////////////////////////////////작성 리뷰 목록/////////////////////////////////////////////////////////////
+    @GetMapping("/reviewed/{usersId}")
+    public ResponseEntity<List<ReviewedWebtoonResponse>> reviewedWebtoon(@PathVariable Long usersId){
+        List<ReviewedWebtoonResponse> reviewedWebtoonList=service.reviewedWebtoonlist(usersId);
+        return ResponseEntity.ok(reviewedWebtoonList);
+    }
     //////////////////////////////////////////////////관심 웹툰 목록/////////////////////////////////////////////////////////////
     @GetMapping("/interested/{usersId}")
     public ResponseEntity<List<InterestedWebtoonResponse>> interestedWebtoon(@PathVariable Long usersId){
