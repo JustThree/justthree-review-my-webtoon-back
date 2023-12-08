@@ -3,6 +3,8 @@ package com.java.JustThree.config;
 import com.java.JustThree.jwt.JwtAuthenticationFilter;
 import com.java.JustThree.jwt.JwtAuthorizationFilter;
 import com.java.JustThree.jwt.JwtProperties;
+import com.java.JustThree.jwt.JwtProvider;
+import com.java.JustThree.repository.RefreshTokenRepository;
 import com.java.JustThree.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,9 +25,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UsersRepository usersRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final CorsConfig corsConfig;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtProperties jwtProperties;
+    private final JwtProvider jwtProvider;
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -59,7 +64,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
         System.out.println("등록");
-        return new JwtAuthenticationFilter(authenticationManagerBean(), jwtProperties);
+        return new JwtAuthenticationFilter(authenticationManagerBean(), jwtProperties, refreshTokenRepository, jwtProvider);
     }
 
     @Bean
