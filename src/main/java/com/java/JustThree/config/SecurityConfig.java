@@ -46,8 +46,8 @@ public class SecurityConfig {
                 )
                 .formLogin(AbstractHttpConfigurer :: disable)
                 .httpBasic(AbstractHttpConfigurer :: disable)
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilter(jwtAuthorizationFilter())
+//                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilter(jwtAuthorizationFilter())
                 .authorizeHttpRequests(
                         authorize -> authorize
                                 .requestMatchers("/**").permitAll()
