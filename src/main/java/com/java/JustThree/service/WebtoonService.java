@@ -25,128 +25,128 @@ import java.util.*;
 @Service
 public class WebtoonService {
     WebtoonRepository webtoonRepository;
-    @Transactional
-    public void webtoonInit(){
-            Map<String, Webtoon> mapJson = new HashMap<>();
-            Set<String> setNotNormal = new HashSet<>();
-            for (int idx=0; idx<=55000 ; idx+= 100) { // idx 상한선 나중에 바꾸기
-                HttpURLConnection conn = null;
-                String viewItemCntVal = "100";
-                String listSeCdVal = "1"; // 1  :  웹툰 2  :  도서(만화책) 3  :  잡지 4 :  영화 5  :  드라마 6  :  게임 7 :  공연,전시 8  :  행사(전시,행사,축제,컨퍼런스,공모전) 9  :  상품
-                String prvKeyVal =  "6477523599ca34f2624e4da94674db35"; // properties 적기
-                String page = String.valueOf(idx);// 페이지를 viewItemCntVal 씩 늘려야댐..
-                try {
-                    String openApiUrl = "https://kmas.or.kr/openapi/search/rgDtaMasterList";
-                    openApiUrl += "?";
-                    openApiUrl += "prvKey" + "=" + prvKeyVal + "&";
-                    openApiUrl += "listSeCd" + "=" + listSeCdVal + "&";
-                    openApiUrl += "viewItemCnt" + "=" + viewItemCntVal + "&";
-                    openApiUrl += "pageNo" + "=" + page;
-                    URL url = new URL(openApiUrl);
-                    conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("GET");
-                    conn.setDoOutput(true);
-                    BufferedReader bf = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
-                    // Read the response into a StringBuilder
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = bf.readLine()) != null) {
-                        response.append(line);
-                    }
-                    JSONObject jsonObject = null;
-                    try {
-                        jsonObject = new JSONObject(response.toString());
 
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                    JSONArray jsonArray = jsonObject.getJSONArray("itemList");
-                    conn.disconnect();
-                    for (Object ele :
-                            jsonArray) {
-                        JSONObject js = new JSONObject(ele.toString());
-                        // 중복 만화 체크 키
-                        String tittlePicWriSnWri = js.get("title").toString() + "_" + js.get("pictrWritrNm").toString() + "_" + js.get("sntncWritrNm").toString();
-                        String 규장각Url = "https://www.kmas.or.kr/archive/book/" + js.get("mastrId");
-                        String link = "";
-                        String newLink = "";
-                        // 필터
-                        if (js.get("ageGradCdNm").equals("19세 이상")||js.get("ageGradCdNm").equals("확인필요")// 함수화해서 리팩토링 하기
-                                ||js.get("pltfomCdNm").equals("레알코믹스")||js.get("pltfomCdNm").equals("셀툰")||js.get("pltfomCdNm").equals("야툰")
-                                ||js.get("title").toString().contains("개정판")||js.get("title").toString().contains("섹스")||js.get("title").toString().contains("섹기")||js.get("title").toString().contains("섹파")||js.get("title").toString().contains("야썰")
-                                ||js.get("mainGenreCdNm").equals("동성애") ||js.get("mainGenreCdNm").equals("BL")||js.get("mainGenreCdNm").equals("GL")
-                                ||js.get("outline").toString().contains("개정판")||js.get("outline").toString().contains("섹스")||js.get("outline").toString().contains("섹기")||js.get("outline").toString().contains("섹파")||js.get("outline").toString().contains("야썰")) {
-                            // 19세인경우 set에 추가
-                            setNotNormal.add(tittlePicWriSnWri);
-                        } else {
-                            // 아니면 jsoup연결후 주소 가져오기
-                            Connection jsoupConn = Jsoup.connect(규장각Url);
-                            Document document = jsoupConn.get();
-                            Elements elements = document.getElementsByClass("dv-table w100p vd-table");
-                            Elements aTags = elements.select("a");
-                            String[] split = aTags.toString().split(" ");
-                            for (String s:
-                                 split) {
-                                if (s.contains("https")) {
-                                    int front = s.indexOf("'");
-                                    int back = s.lastIndexOf("'");
-                                    link = s.substring(front+1,back);
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (mapJson.containsKey(tittlePicWriSnWri)) {
-                            String oldLink = mapJson.get(tittlePicWriSnWri).getUrls();
-                            newLink = oldLink + "_" + js.get("pltfomCdNm") + "$" + link;
-                            Optional<Webtoon> byId = webtoonRepository.findById(mapJson.get(tittlePicWriSnWri).getMastrId());
-                            if (byId.isPresent()){
-                                Webtoon webtoon = byId.get();
-                                webtoon.setUrls(newLink);
-                                webtoonRepository.saveAndFlush(webtoon);
-                            }  else {
-                                System.out.println("1");
-                            }
-                        }
-                        else {
-                            newLink = js.get("pltfomCdNm") + "$" + link;
-                            Webtoon webtoon = Webtoon.builder()
-                                    .mastrId(Long.parseLong(js.get("mastrId").toString()))
-                                    .title(js.get("title").toString())
-                                    .pictrWritrNm(js.get("pictrWritrNm").toString())
-                                    .sntncWritrNm(js.get("sntncWritrNm").toString())
-                                    .mainGenreCdNm(js.get("mainGenreCdNm").toString())
-                                    .outline(js.get("outline").toString())
-                                    .pltfomCdNm(js.get("pltfomCdNm").toString())
-                                    .ageGradCd(js.get("ageGradCd").toString())
-                                    .ageGradCdNm(js.get("ageGradCdNm").toString())
-                                    .pusryBeginDe(js.get("pusryBeginDe").toString())
-                                    .pusryEndDe(js.get("pusryEndDe").toString())
-                                    .fnshYn(js.get("fnshYn").toString())
-                                    .webtoonPusryYn(js.get("webtoonPusryYn").toString())
-                                    .orginlNationCdNm(js.get("orginlNationCdNm").toString())
-                                    .urls(newLink) // 성인일 경우 url ... 로그인 해야댐.. 나중에 url 넣기
-                                    .imageUrl(js.get("imageDownloadUrl").toString())
-                                    .build();
-                            webtoonRepository.saveAndFlush(webtoon);
-                        }
-                        // 엔티티 생성
-
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-
-                }
+    public void webtoonInit(Map<String, Webtoon> mapJson, Set<String> setNotNormal, int idx) {
+        List<Webtoon> webtoons = new ArrayList<>();
+        HttpURLConnection conn = null;
+        String viewItemCntVal = "100";
+        String listSeCdVal = "1"; // 1  :  웹툰 2  :  도서(만화책) 3  :  잡지 4 :  영화 5  :  드라마 6  :  게임 7 :  공연,전시 8  :  행사(전시,행사,축제,컨퍼런스,공모전) 9  :  상품
+        String prvKeyVal = "eac17881bfacb895a3b9ecae21af448d"; // properties 적기
+        String page = String.valueOf(idx);// 페이지를 viewItemCntVal 씩 늘려야댐..
+        try {
+            String openApiUrl = "https://kmas.or.kr/openapi/search/rgDtaMasterList";
+            openApiUrl += "?";
+            openApiUrl += "prvKey" + "=" + prvKeyVal + "&";
+            openApiUrl += "listSeCd" + "=" + listSeCdVal + "&";
+            openApiUrl += "viewItemCnt" + "=" + viewItemCntVal + "&";
+            openApiUrl += "pageNo" + "=" + page;
+            URL url = new URL(openApiUrl);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoOutput(true);
+            BufferedReader bf = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
+            // Read the response into a StringBuilder
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = bf.readLine()) != null) {
+                response.append(line);
             }
-            // 마지막으로 성인분류 됬으면 => 성인 코드 변경
-        for (String key:
-             setNotNormal) {
-            Optional<Webtoon> byId = webtoonRepository.findById(mapJson.get(key).getMastrId());
+            JSONObject jsonObject = null;
+            JSONArray jsonArray = null;
+            try {
+                jsonObject = new JSONObject(response.toString());
+                jsonArray = jsonObject.getJSONArray("itemList");
+            } catch (Exception e) {
+                System.out.println(jsonObject);
+                throw new RuntimeException(e);
+            }
+            conn.disconnect();
+            for (Object ele :
+                    jsonArray) {
+                JSONObject js = new JSONObject(ele.toString());
+                // 중복 만화 체크 키
+                String tittlePicWriSnWri = js.get("title").toString() + "_" + js.get("pictrWritrNm").toString() + "_" + js.get("sntncWritrNm").toString();
+                String 규장각Url = "https://www.kmas.or.kr/archive/book/" + js.get("mastrId");
+                String link = "";
+                String newLink = "";
+                // 필터
+                if (js.get("ageGradCdNm").equals("19세 이상") || js.get("ageGradCdNm").equals("확인필요")// 함수화해서 리팩토링 하기
+                        || js.get("pltfomCdNm").equals("레알코믹스") || js.get("pltfomCdNm").equals("셀툰") || js.get("pltfomCdNm").equals("야툰")
+                        || js.get("title").toString().contains("개정판") || js.get("title").toString().contains("섹스") || js.get("title").toString().contains("섹기") || js.get("title").toString().contains("섹파") || js.get("title").toString().contains("야썰")
+                        || js.get("mainGenreCdNm").equals("동성애") || js.get("mainGenreCdNm").equals("BL") || js.get("mainGenreCdNm").equals("GL")
+                        || js.get("outline").toString().contains("개정판") || js.get("outline").toString().contains("섹스") || js.get("outline").toString().contains("섹기") || js.get("outline").toString().contains("섹파") || js.get("outline").toString().contains("야썰")) {
+                    // 19세인경우 set에 추가
+                    setNotNormal.add(tittlePicWriSnWri);
+                } else {
+                    // 아니면 jsoup연결후 주소 가져오기
+                    Connection jsoupConn = Jsoup.connect(규장각Url);
+                    Document document = jsoupConn.get();
+                    Elements elements = document.getElementsByClass("dv-table w100p vd-table");
+                    Elements aTags = elements.select("a");
+                    String[] split = aTags.toString().split(" ");
+                    for (String s :
+                            split) {
+                        if (s.contains("https")) {
+                            int front = s.indexOf("'");
+                            int back = s.lastIndexOf("'");
+                            link = s.substring(front + 1, back);
+                            break;
+                        }
+                    }
+                }
+
+                if (mapJson.containsKey(tittlePicWriSnWri)) {
+                    String oldLink = mapJson.get(tittlePicWriSnWri).getUrls();
+                    newLink = oldLink + "_" + js.get("pltfomCdNm") + "$" + link;
+                    Optional<Webtoon> byId = webtoonRepository.findById(mapJson.get(tittlePicWriSnWri).getMastrId());
+                    if (byId.isPresent()) {
+                        Webtoon webtoon = byId.get();
+                        webtoon.setUrls(newLink);
+                        webtoons.add(webtoon);
+                    } else {
+                    }
+                } else {
+                    newLink = js.get("pltfomCdNm") + "$" + link;
+                    Webtoon webtoon = Webtoon.builder()
+                            .mastrId(Long.parseLong(js.get("mastrId").toString()))
+                            .title(js.get("title").toString())
+                            .pictrWritrNm(js.get("pictrWritrNm").toString())
+                            .sntncWritrNm(js.get("sntncWritrNm").toString())
+                            .mainGenreCdNm(js.get("mainGenreCdNm").toString())
+                            .outline(js.get("outline").toString())
+                            .pltfomCdNm(js.get("pltfomCdNm").toString())
+                            .ageGradCd(js.get("ageGradCd").toString())
+                            .ageGradCdNm(js.get("ageGradCdNm").toString())
+                            .pusryBeginDe(js.get("pusryBeginDe").toString())
+                            .pusryEndDe(js.get("pusryEndDe").toString())
+                            .fnshYn(js.get("fnshYn").toString())
+                            .webtoonPusryYn(js.get("webtoonPusryYn").toString())
+                            .orginlNationCdNm(js.get("orginlNationCdNm").toString())
+                            .urls(newLink) // 성인일 경우 url ... 로그인 해야댐.. 나중에 url 넣기
+                            .imageUrl(js.get("imageDownloadUrl").toString())
+                            .build();
+                    webtoons.add(webtoon);
+                    mapJson.put(tittlePicWriSnWri, webtoon);
+                }
+                // 엔티티 생성
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+        for (Webtoon webtoon:
+             webtoons) {
+            //js.get("title").toString() + "_" + js.get("pictrWritrNm").toString() + "_" + js.get("sntncWritrNm").toString()
+            if (setNotNormal.contains(webtoon.getTitle() + "_" + webtoon.getPictrWritrNm() + "_" + webtoon.getSntncWritrNm())){
+                Optional<Webtoon> byId = webtoonRepository.findById(webtoon.getMastrId());
             if (byId.isPresent()) {
                 byId.get().setAgeGradCd("4");
-                byId.get().setAgeGradCd("19세 이상");
-                webtoonRepository.saveAndFlush(byId.get());
+                byId.get().setAgeGradCdNm("19세 이상");
             }
+        }
+
+        webtoonRepository.saveAll(webtoons);
         }
     }
 }
