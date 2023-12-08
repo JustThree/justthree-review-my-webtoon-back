@@ -1,4 +1,4 @@
-package com.java.JustThree.config;
+package com.java.JustThree.config.chat;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

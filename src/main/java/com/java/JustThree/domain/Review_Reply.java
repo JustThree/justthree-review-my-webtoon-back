@@ -27,8 +27,8 @@ public class Review_Reply {
     private Users users;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "master_id",referencedColumnName = "master_id")
-    private Webtoon webtoon;
+    @JoinColumn(name = "review_id",referencedColumnName = "review_id")
+    private Review review;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)

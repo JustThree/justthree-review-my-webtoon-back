@@ -1,4 +1,4 @@
-package com.java.JustThree.dto;
+package com.java.JustThree.dto.mypage;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
