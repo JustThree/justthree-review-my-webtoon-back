@@ -21,7 +21,7 @@ public class ChatResponse {
 
     public ChatResponse(Chat chat, String senderNickname){
         this.contents = chat.getContents();
-        this.created = String.valueOf(chat.getCreated());
+        this.created = String.valueOf(chat.getCreated()).substring(0,19);
         this.senderNickname = senderNickname;
     }
 }
