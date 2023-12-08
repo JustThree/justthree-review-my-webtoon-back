@@ -1,9 +1,11 @@
 package com.java.JustThree.controller;
 
 import com.java.JustThree.dto.board.AddBoardRequest;
+import com.java.JustThree.dto.board.GetBoardOneResponse;
 import com.java.JustThree.dto.board.UpdateBoardRequest;
 import com.java.JustThree.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,14 @@ public class BoardController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    // 커뮤니티 글 상세 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<GetBoardOneResponse> getBoardOne(@PathVariable("id") long id){
+        log.info("찾아야할 id"+id);
+        GetBoardOneResponse boardOneRes = boardService.getBoardOne(id);
+        return ResponseEntity.ok().body(boardOneRes);
+    }
+
     // 커뮤니티 글 수정
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateBoard(@PathVariable("id") long boardId, @ModelAttribute UpdateBoardRequest updateBoardRequest){

@@ -3,6 +3,7 @@ package com.java.JustThree.service;
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardImage;
 import com.java.JustThree.dto.board.AddBoardRequest;
+import com.java.JustThree.dto.board.GetBoardOneResponse;
 import com.java.JustThree.dto.board.UpdateBoardRequest;
 import com.java.JustThree.repository.board.BoardImageRepository;
 import com.java.JustThree.repository.board.BoardRepository;
@@ -55,6 +56,20 @@ public class BoardService {
         }
         return newBoard.getBoardId();
     }
+    //커뮤니티 글 상세 조회
+    public GetBoardOneResponse getBoardOne(long boardId){
+        Board board = boardRepository.findById(boardId).orElseThrow(NoSuchElementException::new);
+        List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
+        //log.info("board1  >>"+board);
+        //log.info("boardImgList  >>"+boardImageList);
+        //조회수 증가
+        board.plusViewCount(board.getViewCount()+1);
+        boardRepository.save(board);
+        //log.info("board2  >>"+board);
+        return GetBoardOneResponse.entityToDTO(board, boardImageList);
+    }
+
+
     //커뮤니티 글 수정
     @Transactional
     public Long updateBoard(UpdateBoardRequest updateBoardReq){
