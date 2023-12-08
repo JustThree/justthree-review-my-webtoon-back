@@ -44,7 +44,8 @@ public class ChatService {
         List<ChatResponse> response = new ArrayList<>();
         chatRepository.findByWebtoon_mastrIdOrderByCreated(masterId)
                 .forEach(element -> response.add(
-                        new ChatResponse(element, element.getUsers().getUsersNickname())));
+                        new ChatResponse(element, element.getUsers().getUsersNickname())
+                ));
         return response;
     }
 
@@ -58,7 +59,6 @@ public class ChatService {
                 .genre(webtoon.getMainGenreCdNm())
                 .writer(webtoon.getSntncWritrNm())
                 .painter(webtoon.getPictrWritrNm())
-
                 .build();
     }
 

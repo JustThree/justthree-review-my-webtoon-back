@@ -16,6 +16,4 @@ public class ChatInfoResponse {
     private String painter;
     // 글작가
     private String writer;
-    // 현재 채팅 참여 인원
-    private Integer currentParticipants;
 }
