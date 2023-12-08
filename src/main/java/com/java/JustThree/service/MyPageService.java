@@ -67,10 +67,11 @@ public class MyPageService {
         List<Review> list = reviewRepository.findByUsers_UsersId(usersId);
         List<ReviewedWebtoonResponse> reviewedWebtoonList = new ArrayList<>();
 
-//        for (Review review :list){
-//            ReviewedWebtoonResponse dto = new ReviewedWebtoonResponse(review.getUsers(),review.getWebtoon(), review.getReviewId(), review.getContent());
-//            reviewedWebtoonList.add(dto);
-//        }
+
+        /*for (Review review :list){
+            ReviewedWebtoonResponse dto = new ReviewedWebtoonResponse(review.getUsers(),review.getWebtoon(), review.getReviewId(), review.getContent());
+            reviewedWebtoonList.add(dto);
+        }*/
         return reviewedWebtoonList;
     }
     //////////////////////팔로워 리스트//////////////////////
