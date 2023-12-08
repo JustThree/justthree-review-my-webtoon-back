@@ -1,6 +1,8 @@
 package com.java.JustThree.service;
 
 import com.java.JustThree.domain.Chat;
+import com.java.JustThree.domain.Webtoon;
+import com.java.JustThree.dto.chat.ChatInfoResponse;
 import com.java.JustThree.dto.chat.ChatResponse;
 import com.java.JustThree.repository.ChatRepository;
 import com.java.JustThree.repository.UsersRepository;
@@ -44,6 +46,20 @@ public class ChatService {
                 .forEach(element -> response.add(
                         new ChatResponse(element, element.getUsers().getUsersNickname())));
         return response;
+    }
+
+    public ChatInfoResponse findChatInfo(Long master_id){
+        Webtoon webtoon = webtoonRepository.findById(master_id)
+                .orElseThrow(() -> new IllegalArgumentException());
+
+
+        return ChatInfoResponse.builder()
+                .title(webtoon.getTitle())
+                .genre(webtoon.getMainGenreCdNm())
+                .writer(webtoon.getSntncWritrNm())
+                .painter(webtoon.getPictrWritrNm())
+
+                .build();
     }
 
 
