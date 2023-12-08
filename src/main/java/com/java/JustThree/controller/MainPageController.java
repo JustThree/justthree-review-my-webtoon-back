@@ -5,6 +5,7 @@ import com.java.JustThree.dto.main.response.WebtoonDetailResponse;
 import com.java.JustThree.service.WebtoonService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +21,6 @@ import java.util.Set;
 @RestController
 @AllArgsConstructor
 public class MainPageController {
-
     WebtoonService webtoonService;
 
 
@@ -42,6 +42,11 @@ public class MainPageController {
                     .header("error",e.getMessage())
                     .build();
         }
+    }
+    @GetMapping("api/webtoonlist")
+    public ResponseEntity<?> webtoonList(String keyword){
+
+     return null;
     }
 //    @GetMapping("/dbinit")
 //    public String init(){
