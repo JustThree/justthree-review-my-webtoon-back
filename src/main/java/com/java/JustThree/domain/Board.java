@@ -24,7 +24,7 @@ public class Board {
 
     private String title;
 
-    //@Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
 
     @Column(name = "view_count")
@@ -47,4 +47,10 @@ public class Board {
     @ManyToOne
     @JoinColumn(name = "users_id", referencedColumnName = "users_id")
     private Users users;
+
+
+    public void updateBoard(String title, String content){
+        this.title = title;
+        this.content = content;
+    }
 }

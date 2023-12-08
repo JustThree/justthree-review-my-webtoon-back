@@ -10,9 +10,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter @Setter @ToString
 @Builder
@@ -31,5 +28,13 @@ public class AddBoardRequest {
     private MultipartFile[] imageFiles;
     //private List<MultipartFile> boardImgList = new ArrayList<>();
 
+   /* public static Board toEntity(AddBoardRequest addBoardReq, Users users){
+        return Board.builder()
+                .users(users)
+                .title(addBoardReq.getTitle())
+                .content(addBoardReq.getContent())
+                .noticeYn(addBoardReq.getNoticeYn())
+                .build();
+    }*/
 
 }

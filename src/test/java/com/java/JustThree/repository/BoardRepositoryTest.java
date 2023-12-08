@@ -1,8 +1,10 @@
-/*
+
 package com.java.JustThree.repository;
 
 import com.java.JustThree.domain.Board;
+import com.java.JustThree.domain.BoardImage;
 import com.java.JustThree.domain.Users;
+import com.java.JustThree.repository.board.BoardImageRepository;
 import com.java.JustThree.repository.board.BoardRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -22,6 +25,9 @@ class BoardRepositoryTest {
     private BoardRepository boardRepo;
 
     @Autowired
+    private BoardImageRepository boardImageRepo;
+
+    @Autowired
     private UsersRepository userRepo;
 
 
@@ -29,7 +35,16 @@ class BoardRepositoryTest {
     void hr(){
         System.out.println("=".repeat(80));
     }
-
+    @Test
+    @Order(1)
+    void 게시물이미지조회(){
+        //long id = 7L;
+        //Board board = boardRepo.findById(id).get();
+        //System.out.println(board);
+        //List<BoardImage> list = boardImageRepo.findByBoard(board);
+        //list.stream().forEach(System.out::println);
+    }
+/*
     @Test
     @Order(1)
     void 커뮤니티_글_상세조회(){
@@ -68,4 +83,5 @@ class BoardRepositoryTest {
             System.out.println(bookone2.get());
         }
     }
-}*/
+    */
+}
