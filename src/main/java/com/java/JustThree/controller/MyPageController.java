@@ -1,10 +1,7 @@
 package com.java.JustThree.controller;
 
 import com.java.JustThree.domain.Users;
-import com.java.JustThree.dto.mypage.CudResponse;
-import com.java.JustThree.dto.mypage.InterestedWebtoonResponse;
-import com.java.JustThree.dto.mypage.RatedWebtoonResponse;
-import com.java.JustThree.dto.mypage.ReviewedWebtoonResponse;
+import com.java.JustThree.dto.mypage.*;
 import com.java.JustThree.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
