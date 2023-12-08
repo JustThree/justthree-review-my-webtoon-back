@@ -25,7 +25,12 @@ public class Chat {
     @CreatedDate
     private LocalDateTime created = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "users_id", referencedColumnName = "users_id")
     private Users users;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "master_id", referencedColumnName = "master_id")
+    private Webtoon webtoon;
+
 }
