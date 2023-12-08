@@ -1,6 +1,7 @@
 package com.java.JustThree.service;
 
 import com.java.JustThree.domain.Webtoon;
+import com.java.JustThree.dto.main.response.WebtoonDetailResponse;
 import com.java.JustThree.repository.WebtoonRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,17 @@ import java.util.*;
 @Service
 public class WebtoonService {
     WebtoonRepository webtoonRepository;
+
+    public WebtoonDetailResponse getWebtoonDetail(long id){
+        return WebtoonDetailResponse.fromEntity(
+                webtoonRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new));
+    }
+
+
+
+
+
 
     public void webtoonInit(Map<String, Webtoon> mapJson, Set<String> setNotNormal, int idx) {
         List<Webtoon> webtoons = new ArrayList<>();
@@ -86,7 +99,7 @@ public class WebtoonService {
                     String[] split = aTags.toString().split(" ");
                     for (String s :
                             split) {
-                        if (s.contains("https")) {
+                        if (s.contains("http")) {
                             int front = s.indexOf("'");
                             int back = s.lastIndexOf("'");
                             link = s.substring(front + 1, back);
