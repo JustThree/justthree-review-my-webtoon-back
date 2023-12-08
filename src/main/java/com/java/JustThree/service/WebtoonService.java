@@ -11,6 +11,8 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +25,16 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-@AllArgsConstructor
 @Service
 public class WebtoonService {
+    @Value("${gujang}")
+    private String gujang;
+    final
     WebtoonRepository webtoonRepository;
+
+    public WebtoonService(WebtoonRepository webtoonRepository) {
+        this.webtoonRepository = webtoonRepository;
+    }
 
     public WebtoonDetailResponse getWebtoonDetail(long id){
         return WebtoonDetailResponse.fromEntity(
@@ -44,7 +52,7 @@ public class WebtoonService {
         HttpURLConnection conn = null;
         String viewItemCntVal = "100";
         String listSeCdVal = "1"; // 1  :  웹툰 2  :  도서(만화책) 3  :  잡지 4 :  영화 5  :  드라마 6  :  게임 7 :  공연,전시 8  :  행사(전시,행사,축제,컨퍼런스,공모전) 9  :  상품
-        String prvKeyVal = "eac17881bfacb895a3b9ecae21af448d"; // properties 적기
+        String prvKeyVal = gujang; // properties 적기
         String page = String.valueOf(idx);// 페이지를 viewItemCntVal 씩 늘려야댐..
         try {
             String openApiUrl = "https://kmas.or.kr/openapi/search/rgDtaMasterList";
