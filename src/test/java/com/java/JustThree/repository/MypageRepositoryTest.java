@@ -1,14 +1,11 @@
 package com.java.JustThree.repository;
 
 import com.java.JustThree.domain.Star;
-import com.java.JustThree.dto.RatedWebtoonResponse;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import com.java.JustThree.domain.Users;
-import com.java.JustThree.dto.RatedWebtoonResponse;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -16,7 +13,7 @@ import java.util.List;
 @DataJpaTest
 public class MypageRepositoryTest {
     @Autowired
-    StarRepository StarRepository;
+    com.java.JustThree.repository.mypage.StarRepository StarRepository;
     @Autowired
     UsersRepository UsersRepository;
     @BeforeEach()
