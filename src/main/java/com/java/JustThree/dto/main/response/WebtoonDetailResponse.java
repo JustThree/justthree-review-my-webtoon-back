@@ -33,12 +33,12 @@ public class WebtoonDetailResponse {
     public static WebtoonDetailResponse fromEntity(Webtoon webtoon){
         return WebtoonDetailResponse.builder()
                 .title(webtoon.getTitle())
-                .writer("글:" + webtoon.getSntncWritrNm() + "그림:" + webtoon.getPictrWritrNm())
+                .writer("글:" + webtoon.getSntncWritrNm() + " /그림:" + webtoon.getPictrWritrNm())
                 .genre(webtoon.getMainGenreCdNm())
-                .avgRating(3.4f)
+                .avgRating(3.4f) // 수정필요
                 .outline(webtoon.getOutline())
                 .imgUrl(webtoon.getImageUrl())
-                .links(webtoon.getImageUrl())
+                .links(webtoon.getUrls())
                 .build();
     }
 }

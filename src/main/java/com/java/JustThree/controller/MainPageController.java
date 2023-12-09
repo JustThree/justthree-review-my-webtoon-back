@@ -7,10 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,16 +34,22 @@ public class MainPageController {
                     .header("error",e.getMessage())
                     .build();
         } catch (NullPointerException e){
+            System.out.println(1);
             return ResponseEntity
                     .status(404)
                     .header("error",e.getMessage())
                     .build();
         }
     }
-    @GetMapping("api/webtoonlist")
-    public ResponseEntity<?> webtoonList(String keyword){
-
-     return null;
+    @GetMapping("/webtoonlist")
+    public ResponseEntity<?> webtoonList(@RequestParam(name = "keyword") String keyword){
+        System.out.println(keyword);
+        try {
+            return ResponseEntity.ok()
+                            .body(webtoonService.getWebtoonMainPage(keyword));
+        } catch (Exception e){
+            return  null;
+        }
     }
 //    @GetMapping("/dbinit")
 //    public String init(){

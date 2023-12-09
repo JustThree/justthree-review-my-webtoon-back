@@ -2,6 +2,7 @@ package com.java.JustThree.service;
 
 import com.java.JustThree.domain.Webtoon;
 import com.java.JustThree.dto.main.response.WebtoonDetailResponse;
+import com.java.JustThree.dto.main.response.WebtoonMainResponse;
 import com.java.JustThree.repository.WebtoonRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,9 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,11 +39,47 @@ public class WebtoonService {
     public WebtoonService(WebtoonRepository webtoonRepository) {
         this.webtoonRepository = webtoonRepository;
     }
-
+    @Transactional
     public WebtoonDetailResponse getWebtoonDetail(long id){
-        return WebtoonDetailResponse.fromEntity(
-                webtoonRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new));
+        Webtoon webtoon = webtoonRepository.findById(id).orElseThrow(IllegalAccessError::new);
+        if (webtoon.getView()==null){
+            webtoon.setView(1L);
+        }else {
+            webtoon.setView(webtoon.getView() + 1);
+        }
+        return WebtoonDetailResponse.fromEntity(webtoon);
+    }
+    public List<WebtoonMainResponse> getWebtoonMainPage(String keyword){
+        List<WebtoonMainResponse> webtoonMainResponseList = null;
+        Pageable pageable = PageRequest.of(0,25);
+        switch (keyword){
+            case "recent":
+                webtoonMainResponseList = webtoonRepository.findByAgeGradCdNmIsNotOrderByPusryBeginDeDesc
+                        ("19세 이상", pageable)
+                        .stream().map((WebtoonMainResponse::fromEntity)).toList();
+                break;
+            case "recentend":
+                webtoonMainResponseList = webtoonRepository.findByAgeGradCdNmIsNotOrderByPusryEndDeDesc
+                        ("19세 이상", pageable)
+                        .stream().map((WebtoonMainResponse::fromEntity)).toList();
+                break;
+            case "fantasy":
+                webtoonMainResponseList = webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMastrIdDesc
+                                ("19세 이상","판타지" ,pageable)
+                        .stream().map((WebtoonMainResponse::fromEntity)).toList();
+                break;
+            case "love":
+                webtoonMainResponseList = webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMastrIdDesc
+                                ("19세 이상","이성애" ,pageable)
+                        .stream().map((WebtoonMainResponse::fromEntity)).toList();
+                break;
+            case "famous":
+                webtoonMainResponseList = webtoonRepository.findByAgeGradCdNmIsNotOrderByViewDesc
+                        ("19세 이상", pageable)
+                        .stream().map((WebtoonMainResponse::fromEntity)).toList();
+               break;
+        }
+        return webtoonMainResponseList;
     }
 
 
@@ -93,9 +133,9 @@ public class WebtoonService {
                 // 필터
                 if (js.get("ageGradCdNm").equals("19세 이상") || js.get("ageGradCdNm").equals("확인필요")// 함수화해서 리팩토링 하기
                         || js.get("pltfomCdNm").equals("레알코믹스") || js.get("pltfomCdNm").equals("셀툰") || js.get("pltfomCdNm").equals("야툰")
-                        || js.get("title").toString().contains("개정판") || js.get("title").toString().contains("섹스") || js.get("title").toString().contains("섹기") || js.get("title").toString().contains("섹파") || js.get("title").toString().contains("야썰")
+                        || js.get("title").toString().contains("에로")||js.get("title").toString().contains("개정판") || js.get("title").toString().contains("섹스") || js.get("title").toString().contains("섹기") || js.get("title").toString().contains("섹파") ||js.get("title").toString().contains("색툰")|| js.get("title").toString().contains("야썰")
                         || js.get("mainGenreCdNm").equals("동성애") || js.get("mainGenreCdNm").equals("BL") || js.get("mainGenreCdNm").equals("GL")
-                        || js.get("outline").toString().contains("개정판") || js.get("outline").toString().contains("섹스") || js.get("outline").toString().contains("섹기") || js.get("outline").toString().contains("섹파") || js.get("outline").toString().contains("야썰")) {
+                        || js.get("outline").toString().contains("에로")||js.get("outline").toString().contains("개정판") || js.get("outline").toString().contains("섹스") || js.get("outline").toString().contains("섹기") || js.get("outline").toString().contains("섹파") ||js.get("outline").toString().contains("색툰")|| js.get("outline").toString().contains("야썰")) {
                     // 19세인경우 set에 추가
                     setNotNormal.add(tittlePicWriSnWri);
                 } else {
@@ -118,7 +158,7 @@ public class WebtoonService {
 
                 if (mapJson.containsKey(tittlePicWriSnWri)) {
                     String oldLink = mapJson.get(tittlePicWriSnWri).getUrls();
-                    newLink = oldLink + "_" + js.get("pltfomCdNm") + "$" + link;
+                    newLink = oldLink + "+" + js.get("pltfomCdNm") + "$" + link;
                     Optional<Webtoon> byId = webtoonRepository.findById(mapJson.get(tittlePicWriSnWri).getMastrId());
                     if (byId.isPresent()) {
                         Webtoon webtoon = byId.get();

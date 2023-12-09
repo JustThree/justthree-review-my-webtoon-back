@@ -2,6 +2,7 @@ package com.java.JustThree.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.IdGeneratorType;
 
 @Getter
@@ -45,5 +46,9 @@ public class Webtoon {
     @Column(name = "urls")
     @Setter
     private String urls;
+    @Column(name = "view")
+    @Setter
+    @ColumnDefault("0")
+    private Long view;
 
 }
