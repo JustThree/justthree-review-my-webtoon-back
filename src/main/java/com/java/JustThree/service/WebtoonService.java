@@ -4,18 +4,15 @@ import com.java.JustThree.domain.Webtoon;
 import com.java.JustThree.dto.main.response.WebtoonDetailResponse;
 import com.java.JustThree.dto.main.response.WebtoonMainResponse;
 import com.java.JustThree.repository.WebtoonRepository;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,6 +36,7 @@ public class WebtoonService {
     public WebtoonService(WebtoonRepository webtoonRepository) {
         this.webtoonRepository = webtoonRepository;
     }
+    // 페이지 단건 조회
     @Transactional
     public WebtoonDetailResponse getWebtoonDetail(long id){
         Webtoon webtoon = webtoonRepository.findById(id).orElseThrow(IllegalAccessError::new);
@@ -49,44 +47,37 @@ public class WebtoonService {
         }
         return WebtoonDetailResponse.fromEntity(webtoon);
     }
-    public List<WebtoonMainResponse> getWebtoonMainPage(String keyword){
+    // webtoon 전체 조회
+    public Page<WebtoonMainResponse> getWebtoonPage(Pageable pageable){
+        return  webtoonRepository.findByAgeGradCdNmIsNotOrderByTitle
+                ("19세 이상",pageable)
+                .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+    }
+    // 웹툰 키워드로 리스트 조회
+    public List<WebtoonMainResponse> getWebtoonKeyword(Pageable pageable,String keyword){
         List<WebtoonMainResponse> webtoonMainResponseList = null;
-        Pageable pageable = PageRequest.of(0,25);
-        switch (keyword){
-            case "recent":
-                webtoonMainResponseList = webtoonRepository.findByAgeGradCdNmIsNotOrderByPusryBeginDeDesc
-                        ("19세 이상", pageable)
-                        .stream().map((WebtoonMainResponse::fromEntity)).toList();
-                break;
-            case "recentend":
-                webtoonMainResponseList = webtoonRepository.findByAgeGradCdNmIsNotOrderByPusryEndDeDesc
-                        ("19세 이상", pageable)
-                        .stream().map((WebtoonMainResponse::fromEntity)).toList();
-                break;
-            case "fantasy":
-                webtoonMainResponseList = webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMastrIdDesc
-                                ("19세 이상","판타지" ,pageable)
-                        .stream().map((WebtoonMainResponse::fromEntity)).toList();
-                break;
-            case "love":
-                webtoonMainResponseList = webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMastrIdDesc
-                                ("19세 이상","이성애" ,pageable)
-                        .stream().map((WebtoonMainResponse::fromEntity)).toList();
-                break;
-            case "famous":
-                webtoonMainResponseList = webtoonRepository.findByAgeGradCdNmIsNotOrderByViewDesc
-                        ("19세 이상", pageable)
-                        .stream().map((WebtoonMainResponse::fromEntity)).toList();
-               break;
-        }
+        webtoonMainResponseList = switch (keyword) {
+            case "recent" -> webtoonRepository.findByAgeGradCdNmIsNotOrderByPusryBeginDeDesc
+                            ("19세 이상", pageable)
+                    .stream().map((WebtoonMainResponse::fromEntity)).toList();
+            case "recentend" -> webtoonRepository.findByAgeGradCdNmIsNotOrderByPusryEndDeDesc
+                            ("19세 이상", pageable)
+                    .stream().map((WebtoonMainResponse::fromEntity)).toList();
+            case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMastrIdDesc
+                            ("19세 이상", "판타지", pageable)
+                    .stream().map((WebtoonMainResponse::fromEntity)).toList();
+            case "love" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMastrIdDesc
+                            ("19세 이상", "이성애", pageable)
+                    .stream().map((WebtoonMainResponse::fromEntity)).toList();
+            case "famous" -> webtoonRepository.findByAgeGradCdNmIsNotOrderByViewDesc
+                            ("19세 이상", pageable)
+                    .stream().map((WebtoonMainResponse::fromEntity)).toList();
+            default -> webtoonMainResponseList;
+        };
         return webtoonMainResponseList;
     }
 
-
-
-
-
-
+    // 웹툰 초기화
     public void webtoonInit(Map<String, Webtoon> mapJson, Set<String> setNotNormal, int idx) {
         List<Webtoon> webtoons = new ArrayList<>();
         HttpURLConnection conn = null;

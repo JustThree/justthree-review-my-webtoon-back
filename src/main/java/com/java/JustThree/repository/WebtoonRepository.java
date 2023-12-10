@@ -16,4 +16,5 @@ public interface WebtoonRepository extends JpaRepository<Webtoon,Long> {
     Page<Webtoon> findByAgeGradCdNmIsNotOrderByPusryEndDeDesc(String ageGradCdNm, Pageable pageable);
     Page<Webtoon> findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMastrIdDesc(String ageGradCdNm, String mainGenreCdNm, Pageable pageable);
     Page<Webtoon> findByAgeGradCdNmIsNotOrderByViewDesc(String ageGradCdNm, Pageable pageable);
+    Page<Webtoon> findByAgeGradCdNmIsNotOrderByTitle(String ageGradCdNm, Pageable pageable);
 }

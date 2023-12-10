@@ -1,18 +1,11 @@
 package com.java.JustThree.controller;
 
-import com.java.JustThree.domain.Webtoon;
-import com.java.JustThree.dto.main.response.WebtoonDetailResponse;
 import com.java.JustThree.service.WebtoonService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 @RequestMapping("/api/webtoon")
 @RestController
@@ -34,7 +27,6 @@ public class MainPageController {
                     .header("error",e.getMessage())
                     .build();
         } catch (NullPointerException e){
-            System.out.println(1);
             return ResponseEntity
                     .status(404)
                     .header("error",e.getMessage())
@@ -42,15 +34,31 @@ public class MainPageController {
         }
     }
     @GetMapping("/webtoonlist")
-    public ResponseEntity<?> webtoonList(@RequestParam(name = "keyword") String keyword){
-        System.out.println(keyword);
+    public ResponseEntity<?> webtoonKeywordList(@PageableDefault(size = 25) Pageable pageable,@RequestParam(name = "keyword") String keyword){
         try {
             return ResponseEntity.ok()
-                            .body(webtoonService.getWebtoonMainPage(keyword));
+                            .body(webtoonService.getWebtoonKeyword(pageable,keyword));
         } catch (Exception e){
-            return  null;
+            return ResponseEntity.status(404)
+                    .header("error",e.getMessage())
+                    .build();
         }
     }
+    @GetMapping("")
+    public ResponseEntity<?> webtoonList(@PageableDefault(size = 24)Pageable pageable) {
+        try {
+            System.out.println(webtoonService.getWebtoonPage(pageable));
+            return ResponseEntity.ok()
+                    .body(webtoonService.getWebtoonPage(pageable));
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+
+    }
+
+
 //    @GetMapping("/dbinit")
 //    public String init(){
 //        Map<String, Webtoon> mapJson = new HashMap<>();
