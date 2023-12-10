@@ -1,6 +1,7 @@
 package com.java.JustThree.controller;
 
 import com.java.JustThree.dto.chat.ChatInfoResponse;
+import com.java.JustThree.dto.chat.ChatListResponse;
 import com.java.JustThree.dto.chat.ChatResponse;
 import com.java.JustThree.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +28,11 @@ public class ChatController {
     @GetMapping("/info/{master_id}")
     public ResponseEntity<ChatInfoResponse> chatInfo(@PathVariable Long master_id){
         return ResponseEntity.ok(chatService.findChatInfo(master_id));
+    }
+
+
+    @GetMapping("/type/{type}")
+    public ResponseEntity<List<ChatListResponse>> chatRoom(@PathVariable Integer type){
+        return ResponseEntity.ok(chatService.findChatRoom(type));
     }
 }

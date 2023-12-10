@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 public class WebSocketService {
 
     // 현재 접속한 사람(세션) 리스트
-    public static Set<Session> clientSet =
+    private static Set<Session> clientSet =
             Collections.synchronizedSet(new HashSet<Session>());
 
     // 접속한 사람(세션)을 방 별로 나누기 위해 MAP 제작
@@ -102,10 +102,17 @@ public class WebSocketService {
             sessionMap.get(masterId).remove(s);
             if(!sessionMap.get(masterId).isEmpty()){
                 sendCurrentParticipants(masterId);
+            }else{
+                sessionMap.remove(masterId);
             }
 
             s.close();
         } catch(Exception e) {}
         clientSet.remove(s);
+    }
+
+    // 채팅방 리스트 조회 시, 현재 채팅 참여자가 있는 채팅방 조회
+    public static Set<Long> getRoomsHavingCurrentPart(){
+        return  sessionMap.isEmpty() ? null : sessionMap.keySet();
     }
 }
