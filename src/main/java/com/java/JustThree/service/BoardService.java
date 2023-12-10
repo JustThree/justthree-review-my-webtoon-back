@@ -56,21 +56,27 @@ public class BoardService {
         }
         return newBoard.getBoardId();
     }
-    //커뮤니티 글 상세 조회
+    //커뮤니티 글 상세 조회(댓글, 좋아요 구현 후 보완 필요)
     public GetBoardOneResponse getBoardOne(long boardId){
-        Board board = boardRepository.findById(boardId).orElseThrow(NoSuchElementException::new);
-        List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
-        //log.info("board1  >>"+board);
-        //log.info("boardImgList  >>"+boardImageList);
-        //조회수 증가
-        board.plusViewCount(board.getViewCount()+1);
-        boardRepository.save(board);
-        //log.info("board2  >>"+board);
-        return GetBoardOneResponse.entityToDTO(board, boardImageList);
+        //Board board = boardRepository.findById(boardId).orElseThrow(NoSuchElementException::new);
+        Optional<Board> optionalBoard = boardRepository.findById(boardId);
+        if(optionalBoard.isEmpty()){
+            return null;
+        }else {
+            Board board = optionalBoard.get();
+            List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
+            //log.info("board1  >>"+board);
+            //log.info("boardImgList  >>"+boardImageList);
+            //조회수 증가
+            board.plusViewCount(board.getViewCount() + 1);
+            boardRepository.save(board);
+            //log.info("board2  >>"+board);
+            return GetBoardOneResponse.entityToDTO(board, boardImageList);
+        }
     }
 
 
-    //커뮤니티 글 수정
+    //커뮤니티 글 수정 (추후 수정 필요)
     @Transactional
     public Long updateBoard(UpdateBoardRequest updateBoardReq){
         //Optional<Board> oldOptionalBoard = boardRepository.findById(updateBoardReq.getBoardId());
@@ -106,8 +112,8 @@ public class BoardService {
                 List<BoardImage> oldBImgList = boardImageRepository.findByBoard(oldBoard);
                 for(BoardImage oldBoardImg: oldBImgList){
                     String storedName = oldBoardImg.getStoredName();
-                    boardImageService.deleteFile(storedName);
-                    boardImageRepository.delete(oldBoardImg);
+                    boardImageService.deleteFile(storedName); //AWS S3에서 삭제
+                    boardImageRepository.delete(oldBoardImg); //DB Table(BoardImage)에서 삭제
                 }
                 // 수정요청 첨부파일 저장
                 for(MultipartFile imgFile: updateBoardReq.getImageFiles()) {
@@ -120,7 +126,6 @@ public class BoardService {
                             .originName(imgFile.getOriginalFilename())
                             .storedName(storedName)
                             .build();
-
                     boardImageRepository.save(boardImage);
                 }
             }

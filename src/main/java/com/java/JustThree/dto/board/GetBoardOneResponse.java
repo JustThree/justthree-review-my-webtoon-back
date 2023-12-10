@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,34 +22,48 @@ public class GetBoardOneResponse {
     private String title;
     private String content;
     private long viewCount;
-    private LocalDateTime created;
-    private LocalDateTime updated;
+    private String created;
+    private String updated;
     private int noticeYn;
     //작성자
-    //private Users users;
     private String userNickname;
     private String userEmail;
     //첨부파일
-    //private List<String> originNameList;
-    //private List<String> accessUrlList;
-    private List<Map<String, String>> boardImgMapList;
+    //private List<Map<String, String>> boardImgMapList;
+    private List<ImageDataResponse> boardImgMapList;
+    //댓글
+
+    //좋아요
+
 
     //Entity -> DTO
     public static GetBoardOneResponse entityToDTO(Board board, List<BoardImage> boardImageList){
-        List<Map<String, String>> fileMapList = new ArrayList<>();
+        /*List<Map<String, String>> fileMapList = new ArrayList<>();
         for(BoardImage boardImage : boardImageList){
             Map<String, String> fileMap = new HashMap<>();
             fileMap.put(boardImage.getOriginName(), boardImage.getAccessUrl());
             fileMapList.add(fileMap);
+        }*/
+        List<ImageDataResponse> fileMapList = new ArrayList<>();
+        for(BoardImage boardImage : boardImageList){
+            ImageDataResponse imageData = new ImageDataResponse(boardImage.getImgId(), boardImage.getAccessUrl(), boardImage.getOriginName());
+            fileMapList.add(imageData);
         }
+        System.out.println(board.getCreated());
+        System.out.println(board.getUpdated());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedCreated = board.getCreated().format(formatter);
+        String formattedUpdated = board.getUpdated().format(formatter);
+        System.out.println(formattedCreated);
+        System.out.println(formattedUpdated);
 
         return GetBoardOneResponse.builder()
                 .boardId(board.getBoardId())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .viewCount(board.getViewCount())
-                .created(board.getCreated())
-                .updated(board.getUpdated())
+                .created(formattedCreated)
+                .updated(formattedUpdated)
                 .noticeYn(board.getNoticeYn())
                 .userEmail(board.getUsers().getUsersEmail())
                 .userNickname(board.getUsers().getUsersNickname())

@@ -3,10 +3,12 @@ package com.java.JustThree.controller;
 import com.java.JustThree.dto.board.AddBoardRequest;
 import com.java.JustThree.dto.board.GetBoardOneResponse;
 import com.java.JustThree.dto.board.UpdateBoardRequest;
+import com.java.JustThree.exception.BoardNotFoundException;
 import com.java.JustThree.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,17 +28,28 @@ public class BoardController {
         System.out.println(addBoardRequest);
         try{
             Long res = boardService.addBoard(addBoardRequest);
-            return ResponseEntity.ok("글 등록 "+res);
+            log.info("글 등록 pk"+res);
+            return ResponseEntity.ok("1");
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
     // 커뮤니티 글 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<GetBoardOneResponse> getBoardOne(@PathVariable("id") long id){
+    public ResponseEntity<?> getBoardOne(@PathVariable("id") long id){
         log.info("찾아야할 id"+id);
-        GetBoardOneResponse boardOneRes = boardService.getBoardOne(id);
-        return ResponseEntity.ok().body(boardOneRes);
+        try{
+            GetBoardOneResponse boardOneRes = boardService.getBoardOne(id);
+            log.info(""+boardOneRes);
+            if( boardOneRes != null){
+                return ResponseEntity.status(HttpStatus.OK).body(boardOneRes);
+            }else{
+                throw new BoardNotFoundException(id+"Not Found");
+            }
+        }catch (BoardNotFoundException bnfe){
+            log.error(bnfe.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(bnfe.getMessage());
+        }
     }
 
     // 커뮤니티 글 수정
