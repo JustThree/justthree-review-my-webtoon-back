@@ -1,4 +1,4 @@
-package com.java.JustThree.dto.board;
+package com.java.JustThree.dto.board.response;
 
 import lombok.*;
 

@@ -1,12 +1,11 @@
 package com.java.JustThree.controller;
 
-import com.java.JustThree.dto.board.AddBoardRequest;
-import com.java.JustThree.dto.board.GetBoardOneResponse;
-import com.java.JustThree.dto.board.UpdateBoardRequest;
+import com.java.JustThree.dto.board.request.AddBoardRequest;
+import com.java.JustThree.dto.board.response.GetBoardOneResponse;
+import com.java.JustThree.dto.board.request.UpdateBoardRequest;
 import com.java.JustThree.exception.BoardNotFoundException;
 import com.java.JustThree.service.BoardService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

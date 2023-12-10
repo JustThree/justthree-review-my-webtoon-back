@@ -1,17 +1,12 @@
-package com.java.JustThree.dto.board;
+package com.java.JustThree.dto.board.response;
 
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardImage;
-import com.java.JustThree.domain.Users;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Getter @Setter @ToString
 @Builder

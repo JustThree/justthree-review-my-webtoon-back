@@ -2,9 +2,9 @@ package com.java.JustThree.service;
 
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardImage;
-import com.java.JustThree.dto.board.AddBoardRequest;
-import com.java.JustThree.dto.board.GetBoardOneResponse;
-import com.java.JustThree.dto.board.UpdateBoardRequest;
+import com.java.JustThree.dto.board.request.AddBoardRequest;
+import com.java.JustThree.dto.board.response.GetBoardOneResponse;
+import com.java.JustThree.dto.board.request.UpdateBoardRequest;
 import com.java.JustThree.repository.board.BoardImageRepository;
 import com.java.JustThree.repository.board.BoardRepository;
 import jakarta.transaction.Transactional;
