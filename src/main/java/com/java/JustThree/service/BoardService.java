@@ -3,6 +3,7 @@ package com.java.JustThree.service;
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardImage;
 import com.java.JustThree.dto.board.request.AddBoardRequest;
+import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
 import com.java.JustThree.dto.board.request.UpdateBoardRequest;
 import com.java.JustThree.repository.board.BoardImageRepository;
@@ -10,12 +11,16 @@ import com.java.JustThree.repository.board.BoardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -157,6 +162,22 @@ public class BoardService {
         }catch (Exception e){
             return e.getMessage();
         }
+    }
+    //커뮤니티 글 목록 조회
+    public List<GetBoardListResponse> getBoardsByPage(int page, int size){
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Board> boardPage = boardRepository.findAll(pageable);
+        List<Board> boardList = boardPage.getContent();
+
+        /*
+        return boardList.stream()
+                .map(board -> GetBoardListResponse.entityToDTO(board))
+                .collect(Collectors.toList());
+         */
+
+        return boardList.stream()
+                .map(GetBoardListResponse::entityToDTO)
+                .collect(Collectors.toList());
     }
 
 }
