@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -166,7 +167,13 @@ public class BoardService {
     //커뮤니티 글 목록 조회
     public List<GetBoardListResponse> getBoardsByPage(int page, int size){
         Pageable pageable = PageRequest.of(page-1, size);
-        Page<Board> boardPage = boardRepository.findAll(pageable);
+
+        // noticeYn이 0인 게시글만 조회하는 쿼리 작성
+        Specification<Board> specification = (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("noticeYn"), 0);
+
+
+        Page<Board> boardPage = boardRepository.findAll(specification, pageable);
         List<Board> boardList = boardPage.getContent();
 
         /*
