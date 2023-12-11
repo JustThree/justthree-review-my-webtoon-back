@@ -1,9 +1,7 @@
 package com.java.JustThree.jwt;
 
 import com.java.JustThree.domain.Users;
-import com.java.JustThree.exception.TimeIsOverException;
 import com.java.JustThree.repository.UsersRepository;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
