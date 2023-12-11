@@ -82,8 +82,16 @@ public class BoardController {
     @GetMapping
     List<GetBoardListResponse> getBoardList(@RequestParam(name = "page", defaultValue = "1") int page,
                                             @RequestParam(name = "size", defaultValue = "10") int size,
-                                            @RequestParam(name = "sortings", defaultValue = "sortDesc") String sortings){
+                                            @RequestParam(name = "sortings", defaultValue = "sortDesc") String sortings,
+                                            @RequestParam(name = "keyword", required = false) String keyword){
 
-        return boardService.getBoardsByPage(page, size, sortings);
+        return boardService.getBoardsByPage(page, size, sortings, keyword);
     }
+    //커뮤니티 게시글 목록 키워드 검색 조회
+    /*@GetMapping("/search")
+    List<GetBoardListResponse> getBoardsByKeyword(@RequestParam(name = "page", defaultValue = "1") int page,
+                                            @RequestParam(name = "size", defaultValue = "10") int size,
+                                            @RequestParam(name = "keyword", required = false) String keyword){
+        return boardService.searchBoardsByKeyword(keyword, page, size);
+    }*/
 }
