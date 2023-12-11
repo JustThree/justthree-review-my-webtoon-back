@@ -48,7 +48,7 @@ public class MyPageController {
     public ResponseEntity<CudResponse> updateUser(@RequestHeader(value="Authorization",required = false)String token, @RequestBody Users user){
         CudResponse response = new CudResponse();
         Long user_Id = user.getUsersId();//토큰으로 아이디 받아오는걸로 바꿔야하ㅁ
-        //int user_Id = jwtService.getId(token);
+//        int user_Id = jwtService.getId(token);
         user.setUsersPw(passwordEncoder.encode(user.getUsersPw()));//시큐리띠
         boolean result = service.updateUser(user,user_Id);
 

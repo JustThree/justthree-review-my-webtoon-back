@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.User;
 public class UserInfoResponse {
     private String profileUrl;//해당 유저 프사
     private String usersNickname;//해당 유저 닉네임
-
+    private String usersEmail;
     private Long ratedCount;//평가한 웹툰 수
     private Long reviewedCount;//남긴 리뷰 수
     private Long interestedCount;//관심 웹툰 수
@@ -24,10 +24,11 @@ public class UserInfoResponse {
     public UserInfoResponse(Users users, Long ratedCount, Long reviewedCount, Long interestedCount, Long followerCount, Long followingCount){
         this.profileUrl=users.getProfileUrl();
         this.usersNickname=users.getUsersNickname();
-
+        this.usersEmail=users.getUsersEmail();
         this.ratedCount=ratedCount;
         this.reviewedCount=reviewedCount;
         this.interestedCount=interestedCount;
+
         this.followerCount=followerCount;
         this.followingCount=followingCount;
     }

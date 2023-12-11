@@ -37,7 +37,7 @@ public class MyPageService {
         boolean result = true;
         try{
             Users nuser = usersRepository.findById(usersId).get();
-            nuser.setUsersEmail(user.getUsersEmail());
+            nuser.setUsersNickname(user.getUsersNickname());
             nuser.setUsersPw(user.getUsersPw());
             nuser.setProfileUrl(user.getProfileUrl());
         } catch (Exception e){
