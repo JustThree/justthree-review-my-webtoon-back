@@ -1,11 +1,11 @@
 package com.java.JustThree.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java.JustThree.domain.RefreshToken;
 import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.LoginRequest;
 import com.java.JustThree.dto.Token;
 import com.java.JustThree.repository.RefreshTokenRepository;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,10 +16,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.io.IOException;
-import java.util.Date;
+
 
 
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
@@ -47,14 +47,16 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         System.out.println("JwtAuthenticationFilter -- attemptAuthentication 진입");
 
         // Login request 정보 받기
-        LoginRequest loginReq = LoginRequest.builder()
-                .usersEmail(request.getParameter("usersEmail"))
-                .usersPw(request.getParameter("usersPw"))
-                .build();
-
+        ObjectMapper om = new ObjectMapper();
+        LoginRequest loginDTO = new LoginRequest();
+        try {
+            loginDTO = om.readValue(request.getInputStream(), LoginRequest.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // UsernamePasswordAuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginReq.getUsersEmail(), loginReq.getUsersPw());
+                new UsernamePasswordAuthenticationToken(loginDTO.getUsersEmail(), loginDTO.getUsersPw());
 
 		/*
 		=> AuthenticationManager 에게 인증 요청 (UserDetailsService 통해 DB에 존재하는 유저인지 확인)
@@ -89,7 +91,9 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
         insertRefreshToken(userDetails, refreshToken);
 
-        response.addHeader(jwtProperties.getHEADER_STRING(), jwtToken.toString()); // String 으로 만들어라
+        String jwtJson = new ObjectMapper().writeValueAsString(jwtToken);
+
+        response.addHeader(jwtProperties.getHEADER_STRING(), jwtJson); // String 으로 만들어라
         setSuccessResponse(response, userDetails);
     }
 
