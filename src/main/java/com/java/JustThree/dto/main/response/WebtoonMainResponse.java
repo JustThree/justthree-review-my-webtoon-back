@@ -13,7 +13,7 @@ public class WebtoonMainResponse {
     String imgUrl;
     public static WebtoonMainResponse fromEntity(Webtoon webtoon){
         return WebtoonMainResponse.builder()
-                .masterId(webtoon.getMastrId())
+                .masterId(webtoon.getMasterId())
                 .title(webtoon.getTitle())
                 .writer(webtoon.getPictrWritrNm().equals(webtoon.getSntncWritrNm()) ?
                         webtoon.getPictrWritrNm() :

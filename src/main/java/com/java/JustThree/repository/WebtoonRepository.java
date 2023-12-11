@@ -14,7 +14,9 @@ import java.util.Optional;
 public interface WebtoonRepository extends JpaRepository<Webtoon,Long> {
     Page<Webtoon> findByAgeGradCdNmIsNotOrderByPusryBeginDeDesc(String ageGradCdNm, Pageable pageable);
     Page<Webtoon> findByAgeGradCdNmIsNotOrderByPusryEndDeDesc(String ageGradCdNm, Pageable pageable);
-    Page<Webtoon> findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMastrIdDesc(String ageGradCdNm, String mainGenreCdNm, Pageable pageable);
+    Page<Webtoon> findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMasterIdDesc(String ageGradCdNm, String mainGenreCdNm, Pageable pageable);
     Page<Webtoon> findByAgeGradCdNmIsNotOrderByViewDesc(String ageGradCdNm, Pageable pageable);
-    Page<Webtoon> findByAgeGradCdNmIsNotOrderByTitle(String ageGradCdNm, Pageable pageable);
+    Page<Webtoon> findByAgeGradCdNmIsNot(String ageGradCdNm, Pageable pageable);
+
+    Page<Webtoon> findByAgeGradCdNmIsNotAndMainGenreCdNmIs(String ageGradCdNm, String mainGenreCdNm, Pageable pageable);
 }

@@ -13,7 +13,7 @@ import org.hibernate.annotations.IdGeneratorType;
 public class Webtoon {
     @Id
     @Column(name = "master_id")
-    private Long mastrId;           // 웹툰아이디
+    private Long masterId;           // 웹툰아이디
     private String title;           // 서명
     @Column(name = "pictr_writr_nm")
     private String pictrWritrNm;    //그림작가

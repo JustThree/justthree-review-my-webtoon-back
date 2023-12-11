@@ -45,11 +45,10 @@ public class MainPageController {
         }
     }
     @GetMapping("")
-    public ResponseEntity<?> webtoonList(@PageableDefault(size = 24)Pageable pageable) {
+    public ResponseEntity<?> webtoonList(@PageableDefault(size = 24)Pageable pageable, @RequestParam(name = "genre",required = false)String genre, @RequestParam(name = "order",required = false)String order) {
         try {
-            System.out.println(webtoonService.getWebtoonPage(pageable));
             return ResponseEntity.ok()
-                    .body(webtoonService.getWebtoonPage(pageable));
+                    .body(webtoonService.getWebtoonPage(pageable,genre,order));
         } catch (Exception e) {
             return ResponseEntity.status(404)
                     .header("error", e.getMessage())
