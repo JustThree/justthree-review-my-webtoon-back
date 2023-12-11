@@ -2,11 +2,13 @@ package com.java.JustThree.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@Builder
+@RequiredArgsConstructor
 public class LoginRequest {
-    public String usersEmail;
-    public String usersPw;
+    private String usersEmail;
+    private String usersPw;
 }
 //로그인 할때 사용
