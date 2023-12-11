@@ -23,13 +23,14 @@ public class Chat {
     @Column(columnDefinition = "TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    private LocalDateTime created;
+    private LocalDateTime created = LocalDateTime.now();
 
-    @Column(name = "users_nickname")
-    private String usersNickname;
+    @ManyToOne
+    @JoinColumn(name = "users_id", referencedColumnName = "users_id")
+    private Users users;
 
-    public enum MessageType{
-        ENTER, TALK
-    }
-    private MessageType type;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "master_id", referencedColumnName = "master_id")
+    private Webtoon webtoon;
+
 }

@@ -1,39 +1,51 @@
 package com.java.JustThree.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.java.JustThree.domain.ChatRoom;
-import com.java.JustThree.domain.Users;
-import com.java.JustThree.domain.Webtoon;
-import com.java.JustThree.repository.ChatRoomRepository;
+import com.java.JustThree.domain.Chat;
+import com.java.JustThree.dto.chat.ChatResponse;
+import com.java.JustThree.repository.ChatRepository;
 import com.java.JustThree.repository.UsersRepository;
-import jakarta.annotation.PostConstruct;
-import lombok.Data;
+import com.java.JustThree.repository.WebtoonRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-@Slf4j
-@Data
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ChatService {
-    private final ObjectMapper mapper;
-    private final ChatRoomRepository chatRoomRepository;
+
+    private final WebtoonRepository webtoonRepository;
     private final UsersRepository usersRepository;
+    private final ChatRepository chatRepository;
 
-//    public List<ChatRoom> findAllRoom() {
-//        return new ArrayList<>(chatRoomRepository.findAllById());
-//    }
+    public ChatResponse save(String msg, Long masterId, String token){
+        Chat chat = Chat.builder()
+                .contents(msg)
+                .webtoon(webtoonRepository.findById(masterId).get())
+                .users(usersRepository.findById(1L).get()) //  findById(jwtService.getId(token))
+                .created(LocalDateTime.now())
+                .build();
+        try{
+            chatRepository.save(chat);
+            return new ChatResponse(chat, chat.getUsers().getUsersNickname());
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-    public List<ChatRoom> findTop5ByUser(Long users_id){
-        Users users = usersRepository.findById(users_id)
-                .orElseThrow(() -> new IllegalArgumentException("not found : " + users_id));
-        return chatRoomRepository.findTop5ByUsers(users);
+    public List<ChatResponse> findChatInWebtoon(Long masterId){
+        List<ChatResponse> response = new ArrayList<>();
+        chatRepository.findByWebtoon_mastrIdOrderByCreated(masterId)
+                .forEach(element -> response.add(
+                        new ChatResponse(element, element.getUsers().getUsersNickname())));
+        return response;
     }
 
 
-//    public ChatRoom createRoom(Webtoon webtoon) {}
+
 }
