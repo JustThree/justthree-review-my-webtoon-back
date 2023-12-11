@@ -58,8 +58,6 @@ public class MyPageService {
         return ratedWebtoonList;
     }
 
-
-
     //////////////////////관심 웹툰 리스트////////////////////
 
     public List<InterestedWebtoonResponse>interestedWebtoonlist(Long usersId){
