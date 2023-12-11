@@ -1,10 +1,7 @@
 package com.java.JustThree.controller;
 
 import com.java.JustThree.domain.Users;
-import com.java.JustThree.dto.mypage.CudResponse;
-import com.java.JustThree.dto.mypage.InterestedWebtoonResponse;
-import com.java.JustThree.dto.mypage.RatedWebtoonResponse;
-import com.java.JustThree.dto.mypage.ReviewedWebtoonResponse;
+import com.java.JustThree.dto.mypage.*;
 import com.java.JustThree.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,11 +19,12 @@ public class MyPageController {
     private final MyPageService service;
     private final PasswordEncoder passwordEncoder;
     //////////////////////////////////////////////////유저 정보 페이지/////////////////////////////////////////////////////////////
-//    @GetMapping("/userinfo/{usersId}")
-//    public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable Long usersId){
-//        List
-//        return ResponseEntity.ok()
-//    }
+    @GetMapping("/userinfo/{usersId}")
+    public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable Long usersId){
+        UserInfoResponse userInfoResponse = service.userinfo(usersId);
+        return ResponseEntity.ok(userInfoResponse);
+    }
+
     //////////////////////////////////////////////////평가 웹툰 목록/////////////////////////////////////////////////////////////
     @GetMapping("/rated/{usersId}")
     public ResponseEntity<List<RatedWebtoonResponse>> ratedWebtoon(@PathVariable Long usersId) {

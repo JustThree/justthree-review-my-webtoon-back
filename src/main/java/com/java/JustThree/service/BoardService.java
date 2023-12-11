@@ -2,19 +2,26 @@ package com.java.JustThree.service;
 
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardImage;
-import com.java.JustThree.dto.board.AddBoardRequest;
-import com.java.JustThree.dto.board.UpdateBoardRequest;
+import com.java.JustThree.dto.board.request.AddBoardRequest;
+import com.java.JustThree.dto.board.response.GetBoardListResponse;
+import com.java.JustThree.dto.board.response.GetBoardOneResponse;
+import com.java.JustThree.dto.board.request.UpdateBoardRequest;
 import com.java.JustThree.repository.board.BoardImageRepository;
 import com.java.JustThree.repository.board.BoardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -50,13 +57,32 @@ public class BoardService {
                         .originName(imgFile.getOriginalFilename())
                         .storedName(storedName)
                         .build();
-
                 boardImageRepository.save(boardImage);
             }
         }
         return newBoard.getBoardId();
     }
-    //커뮤니티 글 수정
+    //커뮤니티 글 상세 조회(댓글, 좋아요 구현 후 보완 필요)
+    public GetBoardOneResponse getBoardOne(long boardId){
+        //Board board = boardRepository.findById(boardId).orElseThrow(NoSuchElementException::new);
+        Optional<Board> optionalBoard = boardRepository.findById(boardId);
+        if(optionalBoard.isEmpty()){
+            return null;
+        }else {
+            Board board = optionalBoard.get();
+            List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
+            //log.info("board1  >>"+board);
+            //log.info("boardImgList  >>"+boardImageList);
+            //조회수 증가
+            board.plusViewCount(board.getViewCount() + 1);
+            boardRepository.save(board);
+            //log.info("board2  >>"+board);
+            return GetBoardOneResponse.entityToDTO(board, boardImageList);
+        }
+    }
+
+
+    //커뮤니티 글 수정 (추후 수정 필요)
     @Transactional
     public Long updateBoard(UpdateBoardRequest updateBoardReq){
         //Optional<Board> oldOptionalBoard = boardRepository.findById(updateBoardReq.getBoardId());
@@ -68,11 +94,8 @@ public class BoardService {
         List<BoardImage> oldBoardImageList = boardImageRepository.findByBoard(oldBoard);
 
         if(oldBoardImageList.isEmpty()){//기존 첨부파일 없을 경우
-            System.out.println("비어있음");
-            //첨부파일 있을 경우
+            //수정요청에 첨부파일 있을 경우
             if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
-                //String res = boardImageService.updateFile(updateBoardReq.getBoardId(), updateBoardReq.getImageFiles());
-                //System.out.println("결과  >>" + res);
                 for(MultipartFile imgFile: updateBoardReq.getImageFiles()){
                     String storedName = boardImageService.uploadFile(imgFile);
                     String accessUrl = boardImageService.getAccessUrl(storedName);
@@ -87,35 +110,32 @@ public class BoardService {
                     boardImageRepository.save(boardImage);
                 }
             }
-        }else{ //기존 첨부파일 없을 경우
+        }else{ //기존 첨부파일 있을 경우
             log.info("기존 이미지파일  >>" + oldBoardImageList);
-
-        }
-
-/*
-      //첨부파일 있을 경우
-        if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()){
-            String res = boardImageService.updateFile(updateBoardReq.getBoardId(), updateBoardReq.getImageFiles());
-            System.out.println("결과  >>"+res);
-
- */
-            /*List<BoardImage> boardImageList = boardImageRepository.findByBoard_BoardIdIs(updateBoardReq.getBoardId());
-            //List<Long> boardimgIdList = boardImageRepository.findImgIdByBoardId(updateBoardReq.getBoardId());
-            for(BoardImage boardImg: boardImageList){
-                BoardImage oldBoardImage = boardImageRepository.findById(boardImg.getImgId()).get();
-                for(MultipartFile imgFile: updateBoardReq.getImageFiles()){
-
-                    String storedName = boardImageService.updateFile(boardImg.getImgId(), imgFile);
+            //수정요청에 첨부파일 있을 경우
+            if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
+                //DB & S3에서 기존 파일 삭제
+                List<BoardImage> oldBImgList = boardImageRepository.findByBoard(oldBoard);
+                for(BoardImage oldBoardImg: oldBImgList){
+                    String storedName = oldBoardImg.getStoredName();
+                    boardImageService.deleteFile(storedName); //AWS S3에서 삭제
+                    boardImageRepository.delete(oldBoardImg); //DB Table(BoardImage)에서 삭제
+                }
+                // 수정요청 첨부파일 저장
+                for(MultipartFile imgFile: updateBoardReq.getImageFiles()) {
+                    String storedName = boardImageService.uploadFile(imgFile);
                     String accessUrl = boardImageService.getAccessUrl(storedName);
 
-                    oldBoardImage.updateFile(accessUrl, imgFile.getOriginalFilename(), storedName);
-                    boardImageRepository.save(oldBoardImage);
-
+                    BoardImage boardImage = BoardImage.builder()
+                            .board(oldBoard)
+                            .accessUrl(accessUrl)
+                            .originName(imgFile.getOriginalFilename())
+                            .storedName(storedName)
+                            .build();
+                    boardImageRepository.save(boardImage);
                 }
-            }*/
-/*
+            }
         }
-*/
         return updateBoardReq.getBoardId();
     }
 
@@ -143,6 +163,28 @@ public class BoardService {
         }catch (Exception e){
             return e.getMessage();
         }
+    }
+    //커뮤니티 글 목록 조회
+    public List<GetBoardListResponse> getBoardsByPage(int page, int size){
+        Pageable pageable = PageRequest.of(page-1, size);
+
+        // noticeYn이 0인 게시글만 조회하는 쿼리 작성
+        Specification<Board> specification = (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("noticeYn"), 0);
+
+
+        Page<Board> boardPage = boardRepository.findAll(specification, pageable);
+        List<Board> boardList = boardPage.getContent();
+
+        /*
+        return boardList.stream()
+                .map(board -> GetBoardListResponse.entityToDTO(board))
+                .collect(Collectors.toList());
+         */
+
+        return boardList.stream()
+                .map(GetBoardListResponse::entityToDTO)
+                .collect(Collectors.toList());
     }
 
 }

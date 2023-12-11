@@ -1,4 +1,4 @@
-package com.java.JustThree.dto.board;
+package com.java.JustThree.dto.board.request;
 
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardImage;
