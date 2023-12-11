@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
     
-    public boolean existsByWebtoon_mastrId(Long masterId);
+    public boolean existsByWebtoon_masterId(Long masterId);
     
-    public List<Chat> findByWebtoon_mastrIdOrderByCreated(Long masterId);
+    public List<Chat> findByWebtoon_masterIdOrderByCreated(Long masterId);
 
 }

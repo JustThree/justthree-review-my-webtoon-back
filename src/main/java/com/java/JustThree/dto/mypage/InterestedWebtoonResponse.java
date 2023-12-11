@@ -8,14 +8,14 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class InterestedWebtoonResponse {
-    private Long   mastrId;
+    private Long   masterId;
     private String pictrWritrNm;
     private String sntncWritrNm;
     private String imageUrl;
     private String title;
 
     public InterestedWebtoonResponse(Webtoon webtoon){
-        this.mastrId = webtoon.getMastrId();
+        this.masterId = webtoon.getMasterId();
         this.pictrWritrNm = webtoon.getPictrWritrNm();
         this.sntncWritrNm = webtoon.getSntncWritrNm();
         this.imageUrl = webtoon.getImageUrl();

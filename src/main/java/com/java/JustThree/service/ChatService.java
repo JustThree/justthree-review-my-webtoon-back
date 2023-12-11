@@ -40,7 +40,7 @@ public class ChatService {
 
     public List<ChatResponse> findChatInWebtoon(Long masterId){
         List<ChatResponse> response = new ArrayList<>();
-        chatRepository.findByWebtoon_mastrIdOrderByCreated(masterId)
+        chatRepository.findByWebtoon_masterIdOrderByCreated(masterId)
                 .forEach(element -> response.add(
                         new ChatResponse(element, element.getUsers().getUsersNickname())));
         return response;
