@@ -81,8 +81,9 @@ public class BoardController {
     //커뮤니티 게시글 목록(noticeYn=0) 조회
     @GetMapping
     List<GetBoardListResponse> getBoardList(@RequestParam(name = "page", defaultValue = "1") int page,
-                                            @RequestParam(name = "size", defaultValue = "10") int size){
+                                            @RequestParam(name = "size", defaultValue = "10") int size,
+                                            @RequestParam(name = "sortings", defaultValue = "sortDesc") String sortings){
 
-        return boardService.getBoardsByPage(page, size);
+        return boardService.getBoardsByPage(page, size, sortings);
     }
 }
