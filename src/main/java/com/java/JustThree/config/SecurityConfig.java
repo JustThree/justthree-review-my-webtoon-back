@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer :: disable)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter(), JwtAuthorizationFilter.class)
+
                 .authorizeHttpRequests(
                         authorize -> authorize
                                 .requestMatchers("/**").permitAll()

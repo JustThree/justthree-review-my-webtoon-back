@@ -1,13 +1,19 @@
 package com.java.JustThree.controller;
 
-import com.java.JustThree.dto.board.AddBoardRequest;
-import com.java.JustThree.dto.board.UpdateBoardRequest;
+import com.java.JustThree.dto.board.request.AddBoardRequest;
+import com.java.JustThree.dto.board.response.GetBoardListResponse;
+import com.java.JustThree.dto.board.response.GetBoardOneResponse;
+import com.java.JustThree.dto.board.request.UpdateBoardRequest;
+import com.java.JustThree.exception.BoardNotFoundException;
 import com.java.JustThree.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Slf4j
@@ -24,14 +30,34 @@ public class BoardController {
         System.out.println(addBoardRequest);
         try{
             Long res = boardService.addBoard(addBoardRequest);
-            return ResponseEntity.ok("글 등록 "+res);
+            log.info("글 등록 pk"+res);
+            return ResponseEntity.ok("1");
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    // 커뮤니티 글 상세 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getBoardOne(@PathVariable("id") long id){
+        log.info("찾아야할 id"+id);
+        try{
+            GetBoardOneResponse boardOneRes = boardService.getBoardOne(id);
+            log.info(""+boardOneRes);
+            if( boardOneRes != null){
+                return ResponseEntity.status(HttpStatus.OK).body(boardOneRes);
+            }else{
+                throw new BoardNotFoundException(id+"Not Found");
+            }
+        }catch (BoardNotFoundException bnfe){
+            log.error(bnfe.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(bnfe.getMessage());
+        }
+    }
+
     // 커뮤니티 글 수정
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateBoard(@PathVariable("id") long boardId, @ModelAttribute UpdateBoardRequest updateBoardRequest){
+    public ResponseEntity<String> updateBoard(@PathVariable("id") long boardId,
+                                              @ModelAttribute UpdateBoardRequest updateBoardRequest){
         updateBoardRequest.setBoardId(boardId);
         log.info("수정요청  >>"+updateBoardRequest);
         try{
@@ -40,9 +66,7 @@ public class BoardController {
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-        
     }
-    
     //커뮤니티 글 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<String> removeBoard(@PathVariable("id")long id){
@@ -53,5 +77,12 @@ public class BoardController {
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+    //커뮤니티 게시글 목록(noticeYn=0) 조회
+    @GetMapping
+    List<GetBoardListResponse> getBoardList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                            @RequestParam(name = "size", defaultValue = "10") int size){
+
+        return boardService.getBoardsByPage(page, size);
     }
 }
