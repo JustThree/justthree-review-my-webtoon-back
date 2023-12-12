@@ -1,10 +1,12 @@
 package com.java.JustThree.controller;
 
 import com.java.JustThree.dto.board.request.AddBoardRequest;
+import com.java.JustThree.dto.board.request.AddBoardReplyReqeust;
 import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
 import com.java.JustThree.dto.board.request.UpdateBoardRequest;
 import com.java.JustThree.exception.BoardNotFoundException;
+import com.java.JustThree.service.BoardReplyService;
 import com.java.JustThree.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardReplyService boardReplyService;
 
     //커뮤니티 글 등록
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -94,4 +97,17 @@ public class BoardController {
                                             @RequestParam(name = "keyword", required = false) String keyword){
         return boardService.searchBoardsByKeyword(keyword, page, size);
     }*/
+
+    //커뮤니티 글 댓글 등록
+    @PostMapping("/reply")
+    public ResponseEntity<?> addBoardReply(@RequestBody AddBoardReplyReqeust addBoardReplyReq){
+        System.out.println(addBoardReplyReq);
+        try{
+            Long res = boardReplyService.addReply(addBoardReplyReq);
+            log.info("댓글 등록 pk"+res);
+            return ResponseEntity.ok("1");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
