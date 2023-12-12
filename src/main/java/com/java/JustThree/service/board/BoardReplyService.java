@@ -3,6 +3,7 @@ package com.java.JustThree.service.board;
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardReply;
 import com.java.JustThree.dto.board.request.AddBoardReplyReqeust;
+import com.java.JustThree.dto.board.request.UpdateBoardReplyReqeust;
 import com.java.JustThree.repository.board.BoardReplyRepository;
 import com.java.JustThree.repository.board.BoardRepository;
 import jakarta.transaction.Transactional;
@@ -40,7 +41,18 @@ public class BoardReplyService {
     }
 
     //댓글 수정
-
+    @Transactional
+    public Long updateBoardReply(UpdateBoardReplyReqeust updateBoardReplyReq){
+        Optional<BoardReply> optionalBoardReply = boardReplyRepository.findById(updateBoardReplyReq.getBoardReplyId());
+        if (optionalBoardReply.isEmpty()){
+           return null;
+        }else{
+            BoardReply oldBoardReply = optionalBoardReply.get();
+            oldBoardReply.updateBoardReply(updateBoardReplyReq.getBoardReplyContent());
+            boardReplyRepository.save(oldBoardReply);
+            return updateBoardReplyReq.getBoardReplyId();
+        }
+    }
 
     //댓글 삭제
     @Transactional

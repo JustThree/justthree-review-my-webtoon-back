@@ -2,6 +2,7 @@ package com.java.JustThree.controller;
 
 import com.java.JustThree.dto.board.request.AddBoardRequest;
 import com.java.JustThree.dto.board.request.AddBoardReplyReqeust;
+import com.java.JustThree.dto.board.request.UpdateBoardReplyReqeust;
 import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
 import com.java.JustThree.dto.board.request.UpdateBoardRequest;
@@ -105,6 +106,22 @@ public class BoardController {
         try{
             Long res = boardReplyService.addReply(addBoardReplyReq);
             log.info("댓글 등록 pk"+res);
+            return ResponseEntity.ok("1");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    //커뮤니티 글 댓글 수정
+    @PutMapping("/reply/{id}")
+    public ResponseEntity<?> addBoardReply(@PathVariable("id") long replyId,
+                                           @RequestBody UpdateBoardReplyReqeust updateBoardReplyReq){
+        System.out.println(replyId);
+        updateBoardReplyReq.setBoardReplyId(replyId);
+        System.out.println(updateBoardReplyReq);
+        try{
+            Long res = boardReplyService.updateBoardReply(updateBoardReplyReq);
+            log.info("댓글 수정 pk"+res);
             return ResponseEntity.ok("1");
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());

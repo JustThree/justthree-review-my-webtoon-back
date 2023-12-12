@@ -44,5 +44,8 @@ public class BoardReply {
     @Column(name = "parent_reply_id")
     private long parentReplyId; //부모 댓글 아이디
 
+    public void updateBoardReply(String boardReplyContent){
+        this.boardReplyContent = boardReplyContent;
+    }
 
 }
