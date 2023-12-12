@@ -18,12 +18,13 @@ public class RatedWebtoonResponse {
     private String title;
 
     public RatedWebtoonResponse(Webtoon webtoon,int starVal){
-        this.mastrId=webtoon.getMastrId();
+        this.mastrId=webtoon.getMasterId();
         this.pictrWritrNm=webtoon.getPictrWritrNm();
         this.sntncWritrNm=webtoon.getSntncWritrNm();
         this.imageUrl=webtoon.getImageUrl();
-        this.starVal=starVal;
         this.title=webtoon.getTitle();
+
+        this.starVal=starVal;
     }
 
 }

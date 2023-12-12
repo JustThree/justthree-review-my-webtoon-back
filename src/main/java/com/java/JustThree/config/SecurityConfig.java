@@ -1,9 +1,7 @@
 package com.java.JustThree.config;
 
-import com.java.JustThree.jwt.JwtAuthenticationFilter;
-import com.java.JustThree.jwt.JwtAuthorizationFilter;
-import com.java.JustThree.jwt.JwtProperties;
-import com.java.JustThree.jwt.JwtProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.java.JustThree.jwt.*;
 import com.java.JustThree.repository.RefreshTokenRepository;
 import com.java.JustThree.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +28,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtProperties jwtProperties;
     private final JwtProvider jwtProvider;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -52,7 +51,8 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer :: disable)
                 .httpBasic(AbstractHttpConfigurer :: disable)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilter(jwtAuthorizationFilter())
+                .addFilterBefore(jwtExceptionFilter(), JwtAuthorizationFilter.class)
+
                 .authorizeHttpRequests(
                         authorize -> authorize
                                 .requestMatchers("/**").permitAll()
@@ -69,7 +69,12 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
-        return new JwtAuthorizationFilter(authenticationManagerBean(), usersRepository, jwtProperties);
+        return new JwtAuthorizationFilter(authenticationManagerBean(), usersRepository, jwtProperties, jwtProvider);
+    }
+
+    @Bean
+    public JwtExceptionFilter jwtExceptionFilter() throws Exception{
+        return new JwtExceptionFilter(objectMapper);
     }
 
 }

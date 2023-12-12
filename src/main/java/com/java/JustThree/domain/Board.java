@@ -48,9 +48,14 @@ public class Board {
     @JoinColumn(name = "users_id", referencedColumnName = "users_id")
     private Users users;
 
-
     public void updateBoard(String title, String content){
         this.title = title;
         this.content = content;
     }
+
+    public void plusViewCount(int viewCount){
+        this.viewCount = viewCount;
+    }
+
+
 }
