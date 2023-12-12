@@ -9,13 +9,13 @@ import java.util.List;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
-    public boolean existsByWebtoon_mastrId(Long masterId);
+    public boolean existsByWebtoon_masterId(Long masterId);
 
-    public List<Chat> findByWebtoon_mastrIdOrderByCreated(Long masterId);
+    public List<Chat> findByWebtoon_masterIdOrderByCreated(Long masterId);
 
     @Query("SELECT NEW com.java.JustThree.dto.chat.ChatListResponse(" +
             "c.contents, " +
-            "c.webtoon.mastrId, " +
+            "c.webtoon.masterId, " +
             "c.webtoon.title, " +
             "c.created, " +
             "c.users.usersNickname, " +
