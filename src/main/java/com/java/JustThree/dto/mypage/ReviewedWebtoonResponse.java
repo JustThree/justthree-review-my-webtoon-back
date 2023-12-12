@@ -24,7 +24,6 @@ public class ReviewedWebtoonResponse {
     private String sntncWritrNm;// 글작가
     //대댓글 개수
     private Long reviewReplyCount;//대댓글 개수
-    //좋아요 개수
     private Long reviewHeartCount;//좋아요 개수
 
     public ReviewedWebtoonResponse(Users users, Webtoon webtoon, Long reviewId, String content,Long reviewReplyCount,Long reviewHeartCount){
