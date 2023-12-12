@@ -19,10 +19,11 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
             "c.webtoon.title, " +
             "c.created, " +
             "c.users.usersNickname, " +
-            "c.users.profileUrl) " +
+            "c.webtoon.imageUrl) " +
             "FROM Chat c " +
             "WHERE c.created = (SELECT MAX(c2.created) FROM Chat c2 " +
-            "WHERE c2.webtoon = c.webtoon AND c2.created = (SELECT MAX(c3.created) FROM Chat c3 WHERE c3.webtoon = c.webtoon))")
+            "WHERE c2.webtoon = c.webtoon AND c2.created = (SELECT MAX(c3.created) FROM Chat c3 WHERE c3.webtoon = c.webtoon)) " +
+            "ORDER BY c.created DESC")
     List<ChatListResponse> findLatestChats();
 
 
