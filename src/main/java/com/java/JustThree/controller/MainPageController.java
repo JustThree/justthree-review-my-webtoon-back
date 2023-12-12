@@ -1,5 +1,6 @@
 package com.java.JustThree.controller;
 
+import com.java.JustThree.service.UsersService;
 import com.java.JustThree.service.WebtoonService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +18,14 @@ public class MainPageController {
     // 단건 조회
     // 성인웹툰 거르기...
     @GetMapping("/{id}")
-    public ResponseEntity<?> webtoonDetail(@PathVariable(name = "id") Long id){
+    public ResponseEntity<?> webtoonDetail(
+//            @RequestHeader("Authorization") String token,
+                                           @PathVariable(name = "id") Long id){
+
+        String token = null;
         try {
             return ResponseEntity.ok()
-                    .body(webtoonService.getWebtoonDetail(id));
+                    .body(webtoonService.getWebtoonDetail(token,id));
         } catch (IllegalArgumentException e){
             return ResponseEntity
                     .notFound()
@@ -56,7 +61,42 @@ public class MainPageController {
         }
 
     }
-
+    @GetMapping("/search")
+    public ResponseEntity<?> searchList(@PageableDefault(size = 24)Pageable pageable, @RequestParam(name = "type")String type, @RequestParam(name = "word")String word){
+        try {
+            return ResponseEntity.ok()
+                    .body(webtoonService.searchWebtoon(pageable,type,word));
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
+    @PutMapping("/rating")
+    public ResponseEntity<?> ratingWebtoon(@RequestHeader("Authorization") String token,
+                                           @RequestParam(name = "masterId")Long masterId,
+                                           @RequestParam(name = "star")int star){
+        try {
+            webtoonService.ratingWebtoon(token,masterId,star);
+            return ResponseEntity.ok()
+                    .body("sucess");
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
+        @GetMapping("/reviews/{id}")
+    public ResponseEntity<?> reviewsWebtoon(@PathVariable(name = "id") Long id, @PageableDefault(size = 12)  Pageable pageable){
+        try {
+            return ResponseEntity.ok()
+                    .body(webtoonService.getWebtoonReviewsPage(id, pageable));
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
 
 //    @GetMapping("/dbinit")
 //    public String init(){
