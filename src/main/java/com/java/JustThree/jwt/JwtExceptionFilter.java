@@ -33,12 +33,12 @@ public class JwtExceptionFilter extends OncePerRequestFilter{
             log.info("ExpiredJwtException 발생함");
             Map<String, String> map = new HashMap<>();
             map.put("errortype", "Forbidden");
-            map.put("code", "402");
+            map.put("code", "409");
             map.put("refresh","true");
             map.put("message", "만료된 토큰입니다. Refresh 토큰이 필요합니다.");
             log.error("만료된 토큰");
 
-            response.setStatus(HttpServletResponse.SC_PAYMENT_REQUIRED);
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
             response.getWriter().write(objectMapper.writeValueAsString(map));
             log.info("생성된 response = {}", response);
         } catch (JwtException e){
