@@ -25,20 +25,25 @@ public class WebtoonDetailResponse {
     public String title;
     public String writer;
     public String genre;
-    public float avgRating;
+    public Float avgRating;
     public String outline;
     public String imgUrl;
     public String links;
+    public Integer countStar;
+    public Integer userStar;
 //    public List<Review> Reviews;
-    public static WebtoonDetailResponse fromEntity(Webtoon webtoon){
+    public static WebtoonDetailResponse fromEntity(Webtoon webtoon,Float starAvg,Integer countStar,Integer userStar){
         return WebtoonDetailResponse.builder()
                 .title(webtoon.getTitle())
                 .writer("글:" + webtoon.getSntncWritrNm() + " /그림:" + webtoon.getPictrWritrNm())
                 .genre(webtoon.getMainGenreCdNm())
-                .avgRating(3.4f) // 수정필요
+                .avgRating(starAvg) // 수정필요
                 .outline(webtoon.getOutline())
                 .imgUrl(webtoon.getImageUrl())
                 .links(webtoon.getUrls())
+                .countStar(countStar)
+                .userStar(userStar)
                 .build();
+
     }
 }
