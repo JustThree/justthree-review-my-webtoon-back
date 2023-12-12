@@ -1,4 +1,4 @@
-package com.java.JustThree.service;
+package com.java.JustThree.service.board;
 
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardImage;
@@ -6,14 +6,17 @@ import com.java.JustThree.dto.board.request.AddBoardRequest;
 import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
 import com.java.JustThree.dto.board.request.UpdateBoardRequest;
+import com.java.JustThree.dto.board.response.GetBoardReplyResponse;
 import com.java.JustThree.repository.board.BoardImageRepository;
 import com.java.JustThree.repository.board.BoardRepository;
+import com.java.JustThree.service.board.BoardImageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,9 +34,12 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
-    //이미지 파일 등록
+    //이미지 파일
     private final BoardImageRepository boardImageRepository;
     private final BoardImageService boardImageService;
+
+    //댓글
+    private  final BoardReplyService boardReplyService;
 
     //커뮤니티 글 등록
     @Transactional
@@ -77,7 +83,10 @@ public class BoardService {
             board.plusViewCount(board.getViewCount() + 1);
             boardRepository.save(board);
             //log.info("board2  >>"+board);
-            return GetBoardOneResponse.entityToDTO(board, boardImageList);
+
+            //댓글 조회
+            List<GetBoardReplyResponse> boardReplyList = boardReplyService.getBoardReplyList(boardId);
+            return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList);
         }
     }
 
@@ -165,26 +174,82 @@ public class BoardService {
         }
     }
     //커뮤니티 글 목록 조회
-    public List<GetBoardListResponse> getBoardsByPage(int page, int size){
-        Pageable pageable = PageRequest.of(page-1, size);
+    public List<GetBoardListResponse> getBoardsByPage(int page, int size, String sortType, String keyword){
+        // 정렬  기준(기본 최신순)
+        Sort sortByDirection =Sort.by(Sort.Direction.DESC, "created");
+
+        if(sortType.equals("sortDesc")){
+            sortByDirection = Sort.by(Sort.Direction.DESC, "created");
+        }else if(sortType.equals("sortAsc")) {
+            sortByDirection = Sort.by(Sort.Direction.ASC, "created");
+        }else if(sortType.equals("sortViewCntDesc")){
+            sortByDirection = Sort.by(Sort.Direction.DESC, "viewCount")
+                    .and(Sort.by(Sort.Direction.DESC, "created"));//조회수 →최신순
+        }
+        Pageable pageable = PageRequest.of(page-1, size, sortByDirection);
+
+        System.out.println(keyword);
 
         // noticeYn이 0인 게시글만 조회하는 쿼리 작성
+      /*
         Specification<Board> specification = (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("noticeYn"), 0);
-
+      */
+        // 검색어를 포함하는 게시글만 조회하는 쿼리 작성
+        Specification<Board> specification = (root, query, criteriaBuilder) ->
+                criteriaBuilder.and(
+                        criteriaBuilder.equal(root.get("noticeYn"), 0), // noticeYn이 0인 게시글만 조회
+                        criteriaBuilder.or(
+                                criteriaBuilder.like(root.get("title"), "%" + keyword + "%"), // 제목에 검색어 포함
+                                criteriaBuilder.like(root.get("content"), "%" + keyword + "%") // 내용에 검색어 포함
+                        )
+                );
 
         Page<Board> boardPage = boardRepository.findAll(specification, pageable);
         List<Board> boardList = boardPage.getContent();
-
-        /*
-        return boardList.stream()
-                .map(board -> GetBoardListResponse.entityToDTO(board))
-                .collect(Collectors.toList());
-         */
-
+        if(boardList.isEmpty()) {
+            System.out.println(boardList);
+        }
         return boardList.stream()
                 .map(GetBoardListResponse::entityToDTO)
                 .collect(Collectors.toList());
     }
+    //커뮤니티 글 검색
+    public List<GetBoardListResponse> searchBoardsByKeyword(String keyword, int page, int size) {
+        // 정렬 기준(기본 최신순)
+        Sort sortByDirection = Sort.by(Sort.Direction.DESC, "created");
+        /*
+        if (sortings.equals("sortDesc")) {
+            sortByDirection = Sort.by(Sort.Direction.DESC, "created");
+        } else if (sortings.equals("sortAsc")) {
+            sortByDirection = Sort.by(Sort.Direction.ASC, "created");
+        } else if (sortings.equals("sortViewCntDesc")) {
+            sortByDirection = Sort.by(Sort.Direction.DESC, "viewCount")
+                    .and(Sort.by(Sort.Direction.DESC, "created")); // 조회수 → 최신순
+        }
+        */
+        System.out.println(keyword);
+        Pageable pageable = PageRequest.of(page - 1, size, sortByDirection);
+
+        // 검색어를 포함하는 게시글만 조회하는 쿼리 작성
+        Specification<Board> specification = (root, query, criteriaBuilder) ->
+                criteriaBuilder.and(
+                        criteriaBuilder.equal(root.get("noticeYn"), 0), // noticeYn이 0인 게시글만 조회
+                        criteriaBuilder.or(
+                                criteriaBuilder.like(root.get("title"), "%" + keyword + "%"), // 제목에 검색어 포함
+                                criteriaBuilder.like(root.get("content"), "%" + keyword + "%") // 내용에 검색어 포함
+                        )
+                );
+
+        Page<Board> boardPage = boardRepository.findAll(specification, pageable);
+        List<Board> boardList = boardPage.getContent();
+        if(boardList.isEmpty()) {
+            System.out.println(boardList);
+        }
+        return boardList.stream()
+                .map(GetBoardListResponse::entityToDTO)
+                .collect(Collectors.toList());
+    }
+
 
 }
