@@ -110,4 +110,15 @@ public class BoardController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    //커뮤니티 글 댓글 삭제
+    @DeleteMapping("/reply/{id}")
+    public ResponseEntity<String> removeBoardReply(@PathVariable("id")long id){
+        log.info("id >>"+id);
+        try{
+            String res = boardReplyService.removeBoardReply(id);
+            return ResponseEntity.ok(id+"댓글 삭제 "+res);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

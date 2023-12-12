@@ -38,4 +38,25 @@ public class BoardReplyService {
             return boardReply.getBoardReplyId();
         }
     }
+
+    //댓글 수정
+
+
+    //댓글 삭제
+    @Transactional
+    public String removeBoardReply(long boardReplyId){
+        try{
+            Optional<BoardReply> optionalBoardReply = boardReplyRepository.findById(boardReplyId);
+            if(optionalBoardReply.isEmpty()){
+                return "NotFoundBoardReply";
+            }else{
+                BoardReply boardReply = optionalBoardReply.get();
+                boardReplyRepository.delete(boardReply);
+                return "success";
+            }
+        }catch (Exception e){
+            return e.getMessage();
+        }
+    }
+
 }
