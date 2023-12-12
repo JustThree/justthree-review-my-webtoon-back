@@ -1,9 +1,18 @@
 package com.java.JustThree.service;
 
+import com.java.JustThree.domain.Review;
+import com.java.JustThree.domain.Star;
 import com.java.JustThree.domain.Webtoon;
 import com.java.JustThree.dto.main.response.WebtoonDetailResponse;
+import com.java.JustThree.dto.main.response.WebtoonDetailReviewResponse;
 import com.java.JustThree.dto.main.response.WebtoonMainResponse;
+import com.java.JustThree.jwt.JwtProvider;
+import com.java.JustThree.repository.ReviewRepository;
+import com.java.JustThree.repository.StarRepository;
+import com.java.JustThree.repository.UsersRepository;
 import com.java.JustThree.repository.WebtoonRepository;
+import com.java.JustThree.repository.mypage.ReviewHeartRepository;
+import com.java.JustThree.repository.mypage.ReviewReplyRepository;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Connection;
@@ -29,20 +38,53 @@ public class WebtoonService {
     private String gujang;
     final
     WebtoonRepository webtoonRepository;
-
-    public WebtoonService(WebtoonRepository webtoonRepository) {
+    final StarRepository starRepository;
+    final UsersRepository usersRepository;
+    final ReviewRepository reviewRepository;
+    final JwtProvider jwtProvider;
+    final ReviewHeartRepository reviewHeartRepository;
+    final ReviewReplyRepository reviewReplyRepository;
+    public WebtoonService(WebtoonRepository webtoonRepository, StarRepository starRepository, UsersRepository usersRepository, ReviewRepository reviewRepository, JwtProvider jwtProvider, ReviewHeartRepository reviewHeartRepository, ReviewReplyRepository reviewReplyRepository) {
         this.webtoonRepository = webtoonRepository;
+        this.starRepository = starRepository;
+        this.usersRepository = usersRepository;
+        this.reviewRepository = reviewRepository;
+        this.jwtProvider = jwtProvider;
+        this.reviewHeartRepository = reviewHeartRepository;
+        this.reviewReplyRepository = reviewReplyRepository;
+
     }
     // 페이지 단건 조회
     @Transactional
-    public WebtoonDetailResponse getWebtoonDetail(long id){
+    public WebtoonDetailResponse getWebtoonDetail(String token,long id){
+        long sum = 0L;
+        int userStar = 5;
+        float avg = 0f;
+
+        // 게시글 내용 조회
         Webtoon webtoon = webtoonRepository.findById(id).orElseThrow(IllegalAccessError::new);
+        // 토큰으로 유저아이디 조회
+        if (token != null) {
+            Optional<Star> byWebtoonMasterIdIsAndUsersUsersIdIs = starRepository.findByWebtoon_MasterIdIsAndUsers_UsersIdIs(id, jwtProvider.getUserId(token));
+            if (byWebtoonMasterIdIsAndUsersUsersIdIs.isPresent()){
+                userStar = byWebtoonMasterIdIsAndUsersUsersIdIs.get().getStarVal();
+            }
+        }
+        // 별점 매긴 사람 숫자 조회
+        List<Star> byWebtoonMasterIdIs = starRepository.findByWebtoon_MasterIdIs(id);
+        for (Star star :byWebtoonMasterIdIs)
+        {
+            sum += star.getStarVal();
+        }
+        if (!byWebtoonMasterIdIs.isEmpty()) {
+            avg = (float) sum / byWebtoonMasterIdIs.size();
+        }
         if (webtoon.getView()==null){
             webtoon.setView(1L);
         }else {
             webtoon.setView(webtoon.getView() + 1);
         }
-        return WebtoonDetailResponse.fromEntity(webtoon);
+        return WebtoonDetailResponse.fromEntity(webtoon, avg,byWebtoonMasterIdIs.size(),userStar);
     }
     // webtoon 전체 조회
     public Page<WebtoonMainResponse> getWebtoonPage(Pageable pageable, String genre, String order){
@@ -59,7 +101,6 @@ public class WebtoonService {
                 break;
         }
 
-        System.out.println(1);
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC,
                 orderVal));
         webtoonMainResponsePage = switch (genre) {
@@ -110,6 +151,58 @@ public class WebtoonService {
         };
         return webtoonMainResponseList;
     }
+
+
+    public Page<WebtoonMainResponse> searchWebtoon(Pageable pageable, String type, String word) {
+        Page<WebtoonMainResponse> webtoonMainResponsePage;
+
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC,
+                "title"));
+        webtoonMainResponsePage = switch (type) {
+            case "title" -> webtoonRepository.findByAgeGradCdNmIsNotAndTitleContaining
+                    ("19세 이상",word,pageable)
+                    .map(WebtoonMainResponse::fromEntity);
+            case "outline" -> webtoonRepository.findByAgeGradCdNmIsNotAndOutlineContaining
+                            ("19세 이상",word,pageable)
+                    .map(WebtoonMainResponse::fromEntity);
+            case "writer" -> webtoonRepository.findByAgeGradCdNmIsNotAndWriterIs
+                            ("19세 이상",word,pageable)
+                    .map(WebtoonMainResponse::fromEntity);
+            default -> webtoonRepository.findByAgeGradCdNmIsNotAndTitleContaining
+                            ("19세 이상",word,pageable)
+                    .map(WebtoonMainResponse::fromEntity);
+        };
+        return  webtoonMainResponsePage;
+
+    }
+    @Transactional
+    public void ratingWebtoon(String token,Long masterId,Integer rating){
+        // 있는지 확인
+        Long userId = jwtProvider.getUserId(token);
+        Optional<Star> byWebtoonMasterIdIsAndUsersUsersIdIs = starRepository.findByWebtoon_MasterIdIsAndUsers_UsersIdIs(masterId, userId);
+        if (byWebtoonMasterIdIsAndUsersUsersIdIs.isPresent()) {
+            byWebtoonMasterIdIsAndUsersUsersIdIs.get().setStarVal(rating);
+            // 있으면 수정
+        } else {
+            // 없으면 저장
+            starRepository.save(Star.builder()
+                    .users(usersRepository.findById(userId).orElseThrow(IllegalArgumentException::new))
+                    .webtoon(webtoonRepository.findById(masterId).orElseThrow(IllegalAccessError::new))
+                    .starVal(rating)
+                    .build());
+        }
+    }
+    public Page<WebtoonDetailReviewResponse> getWebtoonReviewsPage(Long masterId,Pageable pageable){
+        return reviewRepository.findByWebtoon_MasterIdIs(masterId, pageable).
+                map((review -> WebtoonDetailReviewResponse.fromEntity(review,
+                        starRepository.findByWebtoon_MasterIdIsAndUsers_UsersIdIs(
+                                masterId,review.getUsers().getUsersId())
+                                .orElse(Star.builder().starVal(0).build()).getStarVal(),
+                        reviewHeartRepository.countByReview_ReviewId(review.getReviewId()),
+                        reviewReplyRepository.countByReview_ReviewId(review.getReviewId())
+                )));
+    }
+
 
     // 웹툰 초기화
     public void webtoonInit(Map<String, Webtoon> mapJson, Set<String> setNotNormal, int idx) {
