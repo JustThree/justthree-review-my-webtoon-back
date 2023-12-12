@@ -10,6 +10,10 @@ import org.hibernate.annotations.IdGeneratorType;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_title", columnList = "title"),
+        @Index(name = "idx_snw_piw", columnList = "pictrWritrNm, sntncWritrNm"),
+})
 public class Webtoon {
     @Id
     @Column(name = "master_id")
@@ -21,7 +25,7 @@ public class Webtoon {
     private String sntncWritrNm;    // 글작가
     @Column(name = "main_genre_cd_nm")
     private String mainGenreCdNm;   // 대표장르코드명
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "outline")
     private String outline;         // 줄거리
     @Column(name = "pltfom_cd_nm")
     private String pltfomCdNm;      // 플랫폼코드명
