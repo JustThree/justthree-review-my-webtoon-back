@@ -46,7 +46,12 @@ public class BoardController {
         log.info("찾아야할 id"+id);
         try{
             GetBoardOneResponse boardOneRes = boardService.getBoardOne(id);
-            log.info(""+boardOneRes);
+            //log.info(""+boardOneRes);
+            log.info("댓글 수  >>"+boardOneRes.getBoardReplyList().toArray().length);
+            log.info("댓글  수 >>"+boardOneRes.getBoardReplyList().size());
+            for(int i=0; i<boardOneRes.getBoardReplyList().size(); i++){
+                log.info("댓글  >>"+boardOneRes.getBoardReplyList().get(i));
+            }
             if( boardOneRes != null){
                 return ResponseEntity.status(HttpStatus.OK).body(boardOneRes);
             }else{

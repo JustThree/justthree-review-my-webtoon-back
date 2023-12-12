@@ -6,6 +6,7 @@ import com.java.JustThree.dto.board.request.AddBoardRequest;
 import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
 import com.java.JustThree.dto.board.request.UpdateBoardRequest;
+import com.java.JustThree.dto.board.response.GetBoardReplyResponse;
 import com.java.JustThree.repository.board.BoardImageRepository;
 import com.java.JustThree.repository.board.BoardRepository;
 import com.java.JustThree.service.board.BoardImageService;
@@ -33,9 +34,12 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
-    //이미지 파일 등록
+    //이미지 파일
     private final BoardImageRepository boardImageRepository;
     private final BoardImageService boardImageService;
+
+    //댓글
+    private  final BoardReplyService boardReplyService;
 
     //커뮤니티 글 등록
     @Transactional
@@ -79,7 +83,10 @@ public class BoardService {
             board.plusViewCount(board.getViewCount() + 1);
             boardRepository.save(board);
             //log.info("board2  >>"+board);
-            return GetBoardOneResponse.entityToDTO(board, boardImageList);
+
+            //댓글 조회
+            List<GetBoardReplyResponse> boardReplyList = boardReplyService.getBoardReplyList(boardId);
+            return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList);
         }
     }
 

@@ -4,14 +4,21 @@ import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardReply;
 import com.java.JustThree.dto.board.request.AddBoardReplyReqeust;
 import com.java.JustThree.dto.board.request.UpdateBoardReplyReqeust;
+import com.java.JustThree.dto.board.response.GetBoardReplyResponse;
 import com.java.JustThree.repository.board.BoardReplyRepository;
 import com.java.JustThree.repository.board.BoardRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -69,6 +76,24 @@ public class BoardReplyService {
         }catch (Exception e){
             return e.getMessage();
         }
+    }
+
+    //댓글 조회
+    public List<GetBoardReplyResponse> getBoardReplyList(long boardId){
+        List<BoardReply> boardReplyList = boardReplyRepository.findByBoard_BoardIdIs(boardId);
+        log.info("댓글 조회");
+
+        return boardReplyList.stream().map(GetBoardReplyResponse::entityToDTO).collect(Collectors.toList());
+       /* 
+       //댓글 페이징
+       Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "created"));
+        Page<BoardReply> boardReplyPage = boardReplyRepository.findAll(pageable);
+        List<BoardReply> boardReplyList = boardReplyPage.getContent();
+        if(boardReplyList.isEmpty()){
+            System.out.println(boardReplyList);
+        }
+        return boardReplyList.stream().map(GetBoardReplyResponse::entityToDTO).collect(Collectors.toList())
+        ;*/
     }
 
 }

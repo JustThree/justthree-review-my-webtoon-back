@@ -27,12 +27,14 @@ public class GetBoardOneResponse {
     //private List<Map<String, String>> boardImgMapList;
     private List<ImageDataResponse> boardImgMapList;
     //댓글
-
+    private List<GetBoardReplyResponse> boardReplyList;
     //좋아요
 
 
     //Entity -> DTO
-    public static GetBoardOneResponse entityToDTO(Board board, List<BoardImage> boardImageList){
+    public static GetBoardOneResponse entityToDTO(Board board,
+                                                  List<BoardImage> boardImageList,
+                                                  List<GetBoardReplyResponse> boardReplyList){
         /*List<Map<String, String>> fileMapList = new ArrayList<>();
         for(BoardImage boardImage : boardImageList){
             Map<String, String> fileMap = new HashMap<>();
@@ -63,6 +65,7 @@ public class GetBoardOneResponse {
                 .userEmail(board.getUsers().getUsersEmail())
                 .userNickname(board.getUsers().getUsersNickname())
                 .boardImgMapList(fileMapList)
+                .boardReplyList(boardReplyList)
                 .build();
     }
 }
