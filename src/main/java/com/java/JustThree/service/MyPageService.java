@@ -1,10 +1,7 @@
 package com.java.JustThree.service;
 
 import com.java.JustThree.domain.*;
-import com.java.JustThree.dto.mypage.InterestedWebtoonResponse;
-import com.java.JustThree.dto.mypage.RatedWebtoonResponse;
-import com.java.JustThree.dto.mypage.ReviewedWebtoonResponse;
-import com.java.JustThree.dto.mypage.UserInfoResponse;
+import com.java.JustThree.dto.mypage.*;
 import com.java.JustThree.repository.*;
 import com.java.JustThree.repository.mypage.*;
 import jakarta.transaction.Transactional;
@@ -26,7 +23,6 @@ public class MyPageService {
     private final ReviewReplyRepository reviewReplyRepository;
     private final ReviewHeartRepository reviewHeartRepository;
     private final FollowRepository followRepository;
-
 
     //////////////////////회원 정보 수정 Update////////////////////
     @Transactional
@@ -82,7 +78,26 @@ public class MyPageService {
         }
         return reviewedWebtoonList;
     }
-
+    //////////////////////팔로잉 리스트//////////////////////
+    public List<FollowResponse> getFollowingList(Long usersId){
+        List<Follow> list = followRepository.findAllByFollowing_UsersId(usersId);
+        List<FollowResponse>  followingList = new ArrayList<>();
+        for(Follow follow : list){
+            FollowResponse dto = new FollowResponse(follow.getFollowing(),follow.getFollowId());
+            followingList.add(dto);
+        }
+        return followingList;
+    }
+    //////////////////////팔로워 리스트//////////////////////
+    public List<FollowResponse> getFollowerList(Long usersId){
+        List<Follow> list = followRepository.findAllByFollower_UsersId(usersId);
+        List<FollowResponse>  followerList = new ArrayList<>();
+        for(Follow follow : list){
+            FollowResponse dto = new FollowResponse(follow.getFollower(),follow.getFollowId());
+            followerList.add(dto);
+        }
+        return followerList;
+    }
     //////////////////////유저 정보 페이지 /////////////////////////
     public UserInfoResponse userinfo(Long usersId) {
 
@@ -96,6 +111,4 @@ public class MyPageService {
         UserInfoResponse UserinfoResponse = new UserInfoResponse(usersRepository.findById(usersId).get(), ratedCount, reviewedCount, interestedCount, followerCount, followingCount);
         return UserinfoResponse;
     }
-    //////////////////////팔로잉 리스트//////////////////////
-    //////////////////////팔로잉 리스트//////////////////////
 }

@@ -22,8 +22,9 @@ public class RatedWebtoonResponse {
         this.pictrWritrNm=webtoon.getPictrWritrNm();
         this.sntncWritrNm=webtoon.getSntncWritrNm();
         this.imageUrl=webtoon.getImageUrl();
-        this.starVal=starVal;
         this.title=webtoon.getTitle();
+
+        this.starVal=starVal;
     }
 
 }

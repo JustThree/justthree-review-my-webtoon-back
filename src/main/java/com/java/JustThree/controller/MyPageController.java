@@ -64,8 +64,15 @@ public class MyPageController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/following/{usersId}")
+    public List<FollowResponse> getFollowingList(@PathVariable Long usersId) {
+        return service.getFollowingList(usersId);
+    }
 
-
+    @GetMapping("/follower/{usersId}")
+    public List<FollowResponse> getFollowerList(@PathVariable Long usersId){
+        return service.getFollowerList(usersId);
+    }
 
 
 

@@ -23,11 +23,11 @@ public class Follow {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "following_id" ,referencedColumnName = "users_id")
-    private Users following;
+    private Users following;//내가 팔로잉하는 사람들.
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower_id" ,referencedColumnName = "users_id")
-    private Users follower;
+    private Users follower;//나를 팔로우 하는 사람들.
 
     public Follow(Users following,Users follower){
         this.follower=follower;
