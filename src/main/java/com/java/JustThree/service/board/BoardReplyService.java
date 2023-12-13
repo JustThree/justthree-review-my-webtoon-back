@@ -30,17 +30,18 @@ public class BoardReplyService {
 
     //댓글 등록
     @Transactional
-    public Long addReply(AddBoardReplyReqeust addReplyReqeust){
+    public Long addReply(AddBoardReplyReqeust addReplyReq){
 
-        Optional<Board> optionalBoard = boardRepository.findById(addReplyReqeust.getBoardId());
+        Optional<Board> optionalBoard = boardRepository.findById(addReplyReq.getBoardId());
         if(optionalBoard.isEmpty()){
             return null;
         }else{
             Board board = optionalBoard.get();
             BoardReply boardReply = BoardReply.builder()
-                    .boardReplyContent(addReplyReqeust.getBoardReplyContent())
+                    .boardReplyContent(addReplyReq.getBoardReplyContent())
                     .board(board)
-                    .users(addReplyReqeust.getUsers())
+                    .users(addReplyReq.getUsers())
+                    .parentReplyId(addReplyReq.getParentReplyId()) //대댓글 등록 시 0이면 안됨
                     .build();
             boardReplyRepository.save(boardReply);
             return boardReply.getBoardReplyId();
@@ -80,7 +81,7 @@ public class BoardReplyService {
 
     //댓글 조회
     public List<GetBoardReplyResponse> getBoardReplyList(long boardId){
-        List<BoardReply> boardReplyList = boardReplyRepository.findByBoard_BoardIdIs(boardId);
+        List<BoardReply> boardReplyList = boardReplyRepository.findByBoard_BoardIdIsOrderByCreatedDesc(boardId);
         log.info("댓글 조회");
 
         return boardReplyList.stream().map(GetBoardReplyResponse::entityToDTO).collect(Collectors.toList());
