@@ -4,9 +4,7 @@ import com.java.JustThree.domain.Interest;
 import com.java.JustThree.domain.Review;
 import com.java.JustThree.domain.Star;
 import com.java.JustThree.domain.Webtoon;
-import com.java.JustThree.dto.main.response.WebtoonDetailResponse;
-import com.java.JustThree.dto.main.response.WebtoonDetailReviewResponse;
-import com.java.JustThree.dto.main.response.WebtoonMainResponse;
+import com.java.JustThree.dto.main.response.*;
 import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.ReviewRepository;
 import com.java.JustThree.repository.StarRepository;
@@ -47,6 +45,7 @@ public class WebtoonService {
     final ReviewHeartRepository reviewHeartRepository;
     final ReviewReplyRepository reviewReplyRepository;
     final InterestRepository interestRepository;
+
 
     public WebtoonService(WebtoonRepository webtoonRepository, StarRepository starRepository, UsersRepository usersRepository, ReviewRepository reviewRepository, JwtProvider jwtProvider, ReviewHeartRepository reviewHeartRepository, ReviewReplyRepository reviewReplyRepository, InterestRepository interestRepository) {
         this.webtoonRepository = webtoonRepository;
@@ -112,8 +111,8 @@ public class WebtoonService {
             case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
                             ("19세 이상", "판타지", pageable)
                     .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "romance" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "이성애", pageable)
+            case "romance" -> webtoonRepository.findByAgeGradCdNmIsNotAndDoubleGenreIs
+                            ("19세 이상", "이성애","로맨스", pageable)
                     .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
             case "school" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
                             ("19세 이상", "학원", pageable)
@@ -234,7 +233,18 @@ public class WebtoonService {
                 .build()
         );
     }
+    public ReviewDetailResponse getReview(Long reviewId){
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()
+                -> new IllegalArgumentException("해당 리뷰가 없어요"));
+        return ReviewDetailResponse.fromEntity(
+                review, starRepository.findByWebtoon_MasterIdIsAndUsers_UsersIdIs(
+                                review.getWebtoon().getMasterId(),review.getUsers().getUsersId())
+                        .orElse(Star.builder().starVal(0).build()));
+    }
 
+    public Page<ReviewReplyResponse> getReviewReplyResponse(Pageable pageable,Long reviewId){
+        return reviewReplyRepository.findByReviewReviewIdIs(reviewId,pageable).map(ReviewReplyResponse::fromEntity);
+    }
 
     // 웹툰 초기화
     public void webtoonInit(Map<String, Webtoon> mapJson, Set<String> setNotNormal, int idx) {
