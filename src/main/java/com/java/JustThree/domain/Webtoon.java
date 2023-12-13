@@ -2,6 +2,7 @@ package com.java.JustThree.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.IdGeneratorType;
 
 @Getter
@@ -9,10 +10,14 @@ import org.hibernate.annotations.IdGeneratorType;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_title", columnList = "title"),
+        @Index(name = "idx_snw_piw", columnList = "pictrWritrNm, sntncWritrNm"),
+})
 public class Webtoon {
     @Id
     @Column(name = "master_id")
-    private Long mastrId;           // 웹툰아이디
+    private Long masterId;           // 웹툰아이디
     private String title;           // 서명
     @Column(name = "pictr_writr_nm")
     private String pictrWritrNm;    //그림작가
@@ -20,7 +25,7 @@ public class Webtoon {
     private String sntncWritrNm;    // 글작가
     @Column(name = "main_genre_cd_nm")
     private String mainGenreCdNm;   // 대표장르코드명
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "outline")
     private String outline;         // 줄거리
     @Column(name = "pltfom_cd_nm")
     private String pltfomCdNm;      // 플랫폼코드명
@@ -45,5 +50,9 @@ public class Webtoon {
     @Column(name = "urls")
     @Setter
     private String urls;
+    @Column(name = "view")
+    @Setter
+    @ColumnDefault("0")
+    private Long view;
 
 }

@@ -23,7 +23,7 @@ public class Chat {
     @Column(columnDefinition = "TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    private LocalDateTime created = LocalDateTime.now();
+    private LocalDateTime created;
 
     @ManyToOne
     @JoinColumn(name = "users_id", referencedColumnName = "users_id")
