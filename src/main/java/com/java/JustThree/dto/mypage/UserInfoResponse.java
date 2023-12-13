@@ -20,11 +20,11 @@ public class UserInfoResponse {
 
     private Long followerCount;//팔로워 수
     private Long followingCount;//팔로잉 수
-
+    private String usersEmail;
     public UserInfoResponse(Users users, Long ratedCount, Long reviewedCount, Long interestedCount, Long followerCount, Long followingCount){
         this.profileUrl=users.getProfileUrl();
         this.usersNickname=users.getUsersNickname();
-
+        this.usersEmail=users.getUsersEmail();
         this.ratedCount=ratedCount;
         this.reviewedCount=reviewedCount;
         this.interestedCount=interestedCount;
