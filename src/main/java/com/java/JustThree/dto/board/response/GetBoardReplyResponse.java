@@ -24,6 +24,8 @@ public class GetBoardReplyResponse {
     private Long replyUsersId;
     private String replyUserNickname;
     private String replyUserEmail;
+    //게시글 작성자
+    //private Long writerUsersId;
 
     //Entity -> DTO
     public static GetBoardReplyResponse entityToDTO(BoardReply boardReply){
@@ -41,6 +43,7 @@ public class GetBoardReplyResponse {
                 .replyCreated(formattedCreated)
                 .replyUpdated(formattedUpdated)
                 .parentReplyId(boardReply.getParentReplyId())
+               // .writerUsersId(boardReply.getBoard().getUsers().getUsersId())
                 .build();
     }
 }

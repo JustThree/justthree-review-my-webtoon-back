@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface BoardReplyRepository extends JpaRepository<BoardReply, Long> {
 
-    List<BoardReply> findByBoard_BoardIdIs(Long board_boardId);
+    List<BoardReply> findByBoard_BoardIdIsOrderByCreatedDesc(Long board_boardId);
 
 }

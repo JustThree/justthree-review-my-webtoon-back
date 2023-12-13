@@ -81,7 +81,7 @@ public class BoardReplyService {
 
     //댓글 조회
     public List<GetBoardReplyResponse> getBoardReplyList(long boardId){
-        List<BoardReply> boardReplyList = boardReplyRepository.findByBoard_BoardIdIs(boardId);
+        List<BoardReply> boardReplyList = boardReplyRepository.findByBoard_BoardIdIsOrderByCreatedDesc(boardId);
         log.info("댓글 조회");
 
         return boardReplyList.stream().map(GetBoardReplyResponse::entityToDTO).collect(Collectors.toList());

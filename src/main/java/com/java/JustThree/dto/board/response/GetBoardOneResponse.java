@@ -21,6 +21,7 @@ public class GetBoardOneResponse {
     private String updated;
     private int noticeYn;
     //작성자
+    private Long writerUsersId;
     private String userNickname;
     private String userEmail;
     //첨부파일
@@ -62,6 +63,7 @@ public class GetBoardOneResponse {
                 .created(formattedCreated)
                 .updated(formattedUpdated)
                 .noticeYn(board.getNoticeYn())
+                .writerUsersId(board.getUsers().getUsersId())
                 .userEmail(board.getUsers().getUsersEmail())
                 .userNickname(board.getUsers().getUsersNickname())
                 .boardImgMapList(fileMapList)
