@@ -1,4 +1,4 @@
-package com.java.JustThree.repository.mypage;
+/*package com.java.JustThree.repository.mypage;
 
 import com.java.JustThree.domain.Star;
 import com.java.JustThree.domain.Users;
@@ -17,4 +17,4 @@ public interface StarRepository extends JpaRepository<Star,Long> {
     public List<Star> findByUsers_UsersIdAndStarVal(Long usersId,int starVal);
 
     Long countByUsers_UsersId(Long usersId);
-}
+}*/
