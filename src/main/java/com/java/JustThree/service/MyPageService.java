@@ -2,6 +2,7 @@ package com.java.JustThree.service;
 
 import com.java.JustThree.domain.*;
 import com.java.JustThree.dto.mypage.*;
+import com.java.JustThree.exception.UserNotFoundException;
 import com.java.JustThree.repository.*;
 import com.java.JustThree.repository.mypage.*;
 import com.java.JustThree.repository.StarRepository;
@@ -55,29 +56,36 @@ public class MyPageService {
         }
         return ratedWebtoonList;
     }
+    //////////////////////팔로우 기능  //////////////////////
+    public void toggleFollow(Long followerId, Long followingId) {
+        Users follower = usersRepository.findById(followerId)
+                .orElseThrow(() -> new UserNotFoundException("Follower not found with id: " + followerId));
+
+        Users following = usersRepository.findById(followingId)
+                .orElseThrow(() -> new UserNotFoundException("Following user not found with id: " + followingId));
+
+        // 팔로우 상태 확인 후 노팔이면 팔 예스팔이면 언팔
+        boolean isFollowing = followRepository.existsByFollowerAndFollowing(follower, following);
+        if (isFollowing) {
+            unfollowUser(follower, following);
+        } else {
+            followUser(follower, following);
+        }
+    }
+    private void followUser(Users follower, Users following) {
+        Follow follow = new Follow();
+        follow.setFollower(follower);
+        follow.setFollowing(following);
+        followRepository.save(follow);
+    }
+    private void unfollowUser(Users follower, Users following) {
+        Follow follow = followRepository.findByFollowerAndFollowing(follower, following)
+                .orElseThrow(() -> new RuntimeException("Follow not found"));
+        followRepository.delete(follow);
+    }
 
 
-    //    public List<FollowResponse> followList(Long usersId,int sortNum){
-//        List<Follow> list;
-//        if(sortNum==1){
-//            list = followRepository.findAllByFollower_UsersId(usersId);
-//            List<FollowResponse> followList = new ArrayList<>();
-//            for (Follow follow : list){
-//                FollowResponse dto = new FollowResponse(follow.getFollower(),follow.getFollowId());
-//                followList.add(dto);
-//            }
-//            return followList;
-//        }
-//        else{
-//            list = followRepository.findAllByFollowing_UsersId(usersId);
-//            List<FollowResponse> followList = new ArrayList<>();
-//            for (Follow follow : list){
-//                FollowResponse dto = new FollowResponse(follow.getFollowing(),follow.getFollowId());
-//                followList.add(dto);
-//            }
-//            return followList;
-//        }
-//    }
+
     //////////////////////팔로잉 리스트//////////////////////
     public List<FollowResponse> getFollowingList(Long usersId){
         List<Follow> list = followRepository.findAllByFollower_UsersId(usersId);

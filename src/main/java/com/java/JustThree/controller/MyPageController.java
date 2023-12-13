@@ -6,6 +6,7 @@ import com.java.JustThree.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,6 +71,11 @@ public class MyPageController {
 //        List<FollowResponse> follow=service.followList(usersId,sortNum);
 //        return ResponseEntity.ok(follow);
 //    }
+    //////////////////////////////////////////////// 팔로우 하기 ////////////////////////////////////
+    @PostMapping("/follow")
+    public void toggleFollow(@RequestParam Long followerId, @RequestParam Long followingId) {
+        service.toggleFollow(followerId, followingId);
+    }
     ////////////////////////////////////////////////팔로잉 하는 목록/////////////////////////////////////////////////////////////
     @GetMapping("/following/{usersId}")
     public List<FollowResponse> getFollowingList(@PathVariable Long usersId) {
