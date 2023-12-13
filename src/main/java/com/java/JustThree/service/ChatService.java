@@ -93,22 +93,8 @@ public class ChatService {
                 return chatRepository.findLastChatsOrderByHotWebtoon();
             case 4:
                 return chatRepository.findByUsers_UsersId(usersService.getUserInfo(token).getUsersId());
-//               if(!masterIds.isEmpty()){
-//                   for( Long masterId : masterIds){
-//                       list.add(new ChatListResponse((
-//                               chatRepository.findTopByWebtoon_MasterIdOrderByCreatedDesc(masterId))
-//                       ));
-//                   }
-//               }
-//                break;
             default:
         }
         return list;
     }
-    public List<ChatListResponse> findChatRoomByUserId(Long users_id){
-
-        return null;
-    }
-
-
 }
