@@ -1,11 +1,14 @@
 package com.java.JustThree.controller;
 
 import com.java.JustThree.dto.board.request.AddBoardRequest;
+import com.java.JustThree.dto.board.request.AddBoardReplyReqeust;
+import com.java.JustThree.dto.board.request.UpdateBoardReplyReqeust;
 import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
 import com.java.JustThree.dto.board.request.UpdateBoardRequest;
 import com.java.JustThree.exception.BoardNotFoundException;
-import com.java.JustThree.service.BoardService;
+import com.java.JustThree.service.board.BoardReplyService;
+import com.java.JustThree.service.board.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardReplyService boardReplyService;
 
     //커뮤니티 글 등록
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -42,7 +46,12 @@ public class BoardController {
         log.info("찾아야할 id"+id);
         try{
             GetBoardOneResponse boardOneRes = boardService.getBoardOne(id);
-            log.info(""+boardOneRes);
+            //log.info(""+boardOneRes);
+            log.info("댓글 수  >>"+boardOneRes.getBoardReplyList().toArray().length);
+            log.info("댓글  수 >>"+boardOneRes.getBoardReplyList().size());
+            for(int i=0; i<boardOneRes.getBoardReplyList().size(); i++){
+                log.info("댓글  >>"+boardOneRes.getBoardReplyList().get(i));
+            }
             if( boardOneRes != null){
                 return ResponseEntity.status(HttpStatus.OK).body(boardOneRes);
             }else{
@@ -81,8 +90,57 @@ public class BoardController {
     //커뮤니티 게시글 목록(noticeYn=0) 조회
     @GetMapping
     List<GetBoardListResponse> getBoardList(@RequestParam(name = "page", defaultValue = "1") int page,
-                                            @RequestParam(name = "size", defaultValue = "10") int size){
+                                            @RequestParam(name = "size", defaultValue = "10") int size,
+                                            @RequestParam(name = "sortings", defaultValue = "sortDesc") String sortings,
+                                            @RequestParam(name = "keyword", required = false) String keyword){
 
-        return boardService.getBoardsByPage(page, size);
+        return boardService.getBoardsByPage(page, size, sortings, keyword);
+    }
+    //커뮤니티 게시글 목록 키워드 검색 조회
+    /*@GetMapping("/search")
+    List<GetBoardListResponse> getBoardsByKeyword(@RequestParam(name = "page", defaultValue = "1") int page,
+                                            @RequestParam(name = "size", defaultValue = "10") int size,
+                                            @RequestParam(name = "keyword", required = false) String keyword){
+        return boardService.searchBoardsByKeyword(keyword, page, size);
+    }*/
+
+    //커뮤니티 글 댓글 등록
+    @PostMapping("/reply")
+    public ResponseEntity<?> addBoardReply(@RequestBody AddBoardReplyReqeust addBoardReplyReq){
+        System.out.println(addBoardReplyReq);
+        try{
+            Long res = boardReplyService.addReply(addBoardReplyReq);
+            log.info("댓글 등록 pk"+res);
+            return ResponseEntity.ok("1");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    //커뮤니티 글 댓글 수정
+    @PutMapping("/reply/{id}")
+    public ResponseEntity<?> addBoardReply(@PathVariable("id") long replyId,
+                                           @RequestBody UpdateBoardReplyReqeust updateBoardReplyReq){
+        System.out.println(replyId);
+        updateBoardReplyReq.setBoardReplyId(replyId);
+        System.out.println(updateBoardReplyReq);
+        try{
+            Long res = boardReplyService.updateBoardReply(updateBoardReplyReq);
+            log.info("댓글 수정 pk"+res);
+            return ResponseEntity.ok("1");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    //커뮤니티 글 댓글 삭제
+    @DeleteMapping("/reply/{id}")
+    public ResponseEntity<String> removeBoardReply(@PathVariable("id")long id){
+        log.info("id >>"+id);
+        try{
+            String res = boardReplyService.removeBoardReply(id);
+            return ResponseEntity.ok(id+"댓글 삭제 "+res);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

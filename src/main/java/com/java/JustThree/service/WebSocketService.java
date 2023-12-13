@@ -1,94 +1,103 @@
 package com.java.JustThree.service;
 
-        import java.time.LocalDateTime;
-        import java.util.*;
+import java.io.IOException;
+import java.util.*;
 
-        import com.fasterxml.jackson.databind.ObjectMapper;
-        import com.java.JustThree.config.chat.ServerEndpointConfigurator;
-        import com.java.JustThree.domain.Chat;
-        import com.java.JustThree.dto.chat.ChatResponse;
-        import jakarta.websocket.OnClose;
-        import jakarta.websocket.OnMessage;
-        import jakarta.websocket.OnOpen;
-        import jakarta.websocket.Session;
-        import jakarta.websocket.server.PathParam;
-        import jakarta.websocket.server.ServerEndpoint;
-//        import javax.websocket.OnClose;
-//        import javax.websocket.OnMessage;
-//        import javax.websocket.OnOpen;
-//        import javax.websocket.Session;
-//        import javax.websocket.server.PathParam;
-//        import javax.websocket.server.ServerEndpoint;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.java.JustThree.config.chat.ServerEndpointConfigurator;
+import com.java.JustThree.dto.chat.ChatResponse;
+import jakarta.websocket.*;
+import jakarta.websocket.server.PathParam;
+import jakarta.websocket.server.ServerEndpoint;
 
-        import lombok.extern.slf4j.Slf4j;
-        import org.json.JSONObject;
-        import org.springframework.beans.factory.annotation.Autowired;
-        import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-@ServerEndpoint(value="/chat/{masterId}/users/{token}", configurator = ServerEndpointConfigurator.class) // masterId -> Webtoon의 masterId. 채팅방 구분
+@ServerEndpoint(value="/chat", configurator = ServerEndpointConfigurator.class)
 public class WebSocketService {
 
-    // 현재 접속한 사람(세션) 리스트
+
+    // 채팅방 리스트를 조회하기 위해 접속한 clientSet(접속자의 Session 리스트)
+    // 리스트를 조회중이라면 token만 존재하므로 getTokenAndMasterId(Session)의 길이는 1
     private static Set<Session> clientSet =
             Collections.synchronizedSet(new HashSet<Session>());
 
+    // 채팅방은 웹툰의 masterId로 구분. 접속(소속)되어 있는 sessionMap(key = 웹툰의 masterId, value = 채팅방에 소속되어있는 접속자의 Session 리스트)
     // 접속한 사람(세션)을 방 별로 나누기 위해 MAP 제작
     private static Map<Long, ArrayList<Session>> sessionMap = Collections.synchronizedMap(new HashMap<Long, ArrayList<Session>>());
 
-    // chatService => ChatRepository, ChatRoomRepository 와 연결된 Service
+    // DB와 연결될 때는 chatService 사용
     private final ChatService chatService;
     @Autowired
-    public WebSocketService(ChatService chatService){
+    private WebSocketService(ChatService chatService){
         this.chatService = chatService;
     }
 
+
     @OnOpen
-    public void onOpen(Session s, @PathParam("masterId") Long masterId, @PathParam("token") String token) {
+    public void onOpen(Session s) throws IOException {
+        System.out.println(s.getQueryString());
+        log.info("[open session] " + s);
 
-        // ---------- 현재 접속자를 알기 위해 sessionMap과 clientSet에 session 대신 user의 닉네임 등을 넣을 예정 --------------
-        // 현재 해당 웹툰 채팅방에 아무도 접속하지 않았을 경우. sessionMap 생성 후 사용자 추가.
-        if(!sessionMap.containsKey(masterId)) {
-            sessionMap.put(masterId, new ArrayList<>());
-            sessionMap.get(masterId).add(s);
-        }else{
-            // 접속한 사람이 있을 경우 현재 사용자만 추가
-            sessionMap.get(masterId).add(s);
-        }
+        // Long masterId = Long.valueOf((String) s.getUserProperties().get("masterId"));
 
-        if(!clientSet.contains(s)){
-            // 현재 접속자 명단에 추가
+        if(isInChatRoom(s)){ // 채팅방 접속중
+
+            Long masterId = getMasterId(s);
+
+            // 현재 해당 웹툰 채팅방에 아무도 접속하지 않았을 경우. sessionMap 생성 후 사용자 추가.
+            if(!sessionMap.containsKey(masterId)) {
+                sessionMap.put(masterId, new ArrayList<>());
+            }
+            sessionMap.get(masterId).add(s);
+
+            // 채팅방 인원 변경 처리
+            sendNumOfCurrentParticipants(masterId);
+
+        }else{  // 채팅방 리스트 조회중
+            // 현재 리스트 조회 명단에 추가
             clientSet.add(s);
-            log.info("[open session] " + s);
-            log.info("Chat Room List" + sessionMap);
-        }else{
-            log.info("the session already opened");
         }
 
+        if(!clientSet.isEmpty()){
+            sendUpdate();
+        }
+
+        log.info("Chat Room List" + sessionMap);
     }
 
     @OnMessage
-    public void onMessage(String msg, Session session, @PathParam("masterId") Long masterId,@PathParam("token") String token) throws Exception{
-        if (chatService == null) {
-            log.error("ChatService is null");
-            return;
-        }
+    public void onMessage(String msg, Session session) throws Exception{
+
+        // String token = getToken(session);
+        String token = "123";
+
+        // 클라이언트에서 message가 오는 경우는 채팅을 보냈을 때 말고는 없음
+        Long masterId = getMasterId(session);
 
         // 메시지 내용을 DB에 저장
         ChatResponse chat = chatService.save(msg, masterId, token);
 
         // DB 저장 성공 시
         if(chat!=null){
+
+            // 클라이언트로 보낼 메세지를 json 형태의 String으로 변환
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = mapper.writeValueAsString(chat);
+            log.info("[ send message to " + masterId + " ] " + jsonString);
+
             // 같은 방에 있는 사람(세션)에게만 보낸다
             for(Session s : sessionMap.get(masterId)){
-                log.info("[send message] " + chat);
-                ObjectMapper mapper = new ObjectMapper();
-                System.out.println(chat);
-                String jsonString = mapper.writeValueAsString(chat);
                 s.getBasicRemote().sendText(jsonString);
             }
         }
+
+        sendUpdate();
 
     }
 
@@ -96,19 +105,75 @@ public class WebSocketService {
     public void onClose(Session s) {
         log.info("[close session] " + s);
         try {
+//            Long masterId = Long.valueOf((String) s.getUserProperties().get("masterId"));
 
-            clientSet.remove(s);
-            Long findRoom = -1L;
-            for(Long key: sessionMap.keySet()){
-                for(int j=0; j<sessionMap.get(key).size();j++){
-                    if(sessionMap.get(key).get(j).equals(s)){
-                        findRoom = key;
-                    }
+            if(isInChatRoom(s)){
+                Long masterId = getMasterId(s);
+
+                // 해당 웹툰채팅방에서 close한 session을 remove
+                sessionMap.get(masterId).remove(s);
+
+                // 해당 웹툰채팅방에 사람이 없다면 sessionMap에서 웹툰 key를 삭제
+                if(sessionMap.get(masterId).isEmpty()){
+                    sessionMap.remove(masterId);
+                }else{
+                    // 사람이 있다면 웹툰 실시간 조회를 위해 메시지 보내기
+                    sendNumOfCurrentParticipants(masterId);
                 }
+            }else{
+                clientSet.remove(s);
             }
-            sessionMap.get(findRoom).remove(s);
+
+
+            sendUpdate();
             s.close();
-        } catch(Exception e) {}
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
         clientSet.remove(s);
     }
+
+
+    // 현재 인원수 조회
+    private void sendNumOfCurrentParticipants(Long masterId) throws IOException {
+        System.out.println(masterId);
+        JSONObject currentParticipants = new JSONObject();
+        int countParticipants = sessionMap.get(masterId).size();
+        currentParticipants.put("currentParticipants", countParticipants);
+
+        for(Session participant : sessionMap.get(masterId)){
+            participant.getBasicRemote().sendText(String.valueOf(currentParticipants));
+        }
+    }
+
+
+    private boolean isInChatRoom(Session session){
+        return getTokenAndMasterId(session).length == 2;
+    }
+
+    private String[] getTokenAndMasterId(Session session){
+        return session.getQueryString().split("%");
+    }
+
+    private String getToken(Session session){
+        return getTokenAndMasterId(session)[0];
+    }
+
+    private Long getMasterId(Session session){
+        return Long.valueOf(getTokenAndMasterId(session)[1]);
+    }
+
+    private void sendUpdate() throws IOException {
+        if(!clientSet.isEmpty()){
+            for(Session session : clientSet){
+                session.getBasicRemote().sendText("update");
+            }
+        }
+    }
+
+    // 채팅방 리스트 조회 시, 현재 채팅 참여자가 있는 채팅방 조회
+    public static Set<Long> getRoomsHavingCurrentPart(){
+        return  sessionMap.isEmpty() ? null : sessionMap.keySet();
+    }
+
 }

@@ -21,18 +21,21 @@ public class GetBoardOneResponse {
     private String updated;
     private int noticeYn;
     //작성자
+    private Long writerUsersId;
     private String userNickname;
     private String userEmail;
     //첨부파일
     //private List<Map<String, String>> boardImgMapList;
     private List<ImageDataResponse> boardImgMapList;
     //댓글
-
+    private List<GetBoardReplyResponse> boardReplyList;
     //좋아요
 
 
     //Entity -> DTO
-    public static GetBoardOneResponse entityToDTO(Board board, List<BoardImage> boardImageList){
+    public static GetBoardOneResponse entityToDTO(Board board,
+                                                  List<BoardImage> boardImageList,
+                                                  List<GetBoardReplyResponse> boardReplyList){
         /*List<Map<String, String>> fileMapList = new ArrayList<>();
         for(BoardImage boardImage : boardImageList){
             Map<String, String> fileMap = new HashMap<>();
@@ -60,9 +63,11 @@ public class GetBoardOneResponse {
                 .created(formattedCreated)
                 .updated(formattedUpdated)
                 .noticeYn(board.getNoticeYn())
+                .writerUsersId(board.getUsers().getUsersId())
                 .userEmail(board.getUsers().getUsersEmail())
                 .userNickname(board.getUsers().getUsersNickname())
                 .boardImgMapList(fileMapList)
+                .boardReplyList(boardReplyList)
                 .build();
     }
 }

@@ -25,12 +25,7 @@ public class MyPageController {
         return ResponseEntity.ok(userInfoResponse);
     }
 
-    //////////////////////////////////////////////////평가 웹툰 목록/////////////////////////////////////////////////////////////
-    @GetMapping("/rated/{usersId}")
-    public ResponseEntity<List<RatedWebtoonResponse>> ratedWebtoon(@PathVariable Long usersId) {
-        List<RatedWebtoonResponse> ratedWebtoonList = service.ratedWebtoonlist(usersId);
-        return ResponseEntity.ok(ratedWebtoonList);
-    }
+
     //////////////////////////////////////////////////작성 리뷰 목록/////////////////////////////////////////////////////////////
     @GetMapping("/reviewed/{usersId}")
     public ResponseEntity<List<ReviewedWebtoonResponse>> reviewedWebtoon(@PathVariable Long usersId){
@@ -48,7 +43,7 @@ public class MyPageController {
     public ResponseEntity<CudResponse> updateUser(@RequestHeader(value="Authorization",required = false)String token, @RequestBody Users user){
         CudResponse response = new CudResponse();
         Long user_Id = user.getUsersId();//토큰으로 아이디 받아오는걸로 바꿔야하ㅁ
-        //int user_Id = jwtService.getId(token);
+//        int user_Id = jwtService.getId(token);
         user.setUsersPw(passwordEncoder.encode(user.getUsersPw()));//시큐리띠
         boolean result = service.updateUser(user,user_Id);
 
@@ -63,9 +58,28 @@ public class MyPageController {
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
-
+    //////////////////////////////////////////////////평가 웹툰 목록/////////////////////////////////////////////////////////////
+    @GetMapping("/rated/{usersId}")
+    public ResponseEntity<List<RatedWebtoonResponse>> ratedWebtoon(@PathVariable Long usersId , @RequestParam (defaultValue = "1")int sortNum) {
+        List<RatedWebtoonResponse> ratedWebtoonList = service.ratedWebtoonlist(usersId,sortNum);
+        return ResponseEntity.ok(ratedWebtoonList);
+    }
+    /////////////////////////////////////////////////팔로우 목록 //////////////////////////////////
+//    @GetMapping("/follow/{usersId}")
+//    public ResponseEntity<List<FollowResponse>> followlist(@PathVariable Long usersId,@RequestParam(defaultValue = "1")int sortNum){
+//        List<FollowResponse> follow=service.followList(usersId,sortNum);
+//        return ResponseEntity.ok(follow);
+//    }
+    ////////////////////////////////////////////////팔로잉 하는 목록/////////////////////////////////////////////////////////////
+    @GetMapping("/following/{usersId}")
+    public List<FollowResponse> getFollowingList(@PathVariable Long usersId) {
+        return service.getFollowingList(usersId);
+    }
+    ////////////////////////////////////////////////팔로워 목록 ////////////////////////////////////////////////////////////////
+    @GetMapping("/follower/{usersId}")
+    public List<FollowResponse> getFollowList(@PathVariable Long usersId){
+        return service.getFollowerList(usersId);
+    }
 
 
 

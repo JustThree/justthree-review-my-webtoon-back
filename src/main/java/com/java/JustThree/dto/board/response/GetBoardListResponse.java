@@ -21,6 +21,7 @@ public class GetBoardListResponse {
     private String updated;
     private int noticeYn;
     //작성자
+    private Long usersId;
     private String userNickname;
     private String userEmail;
     //댓글 수
@@ -38,6 +39,7 @@ public class GetBoardListResponse {
                 .created(formattedCreated)
                 .updated(formattedUpdated)
                 .noticeYn(board.getNoticeYn())
+                .usersId(board.getUsers().getUsersId())
                 .userEmail(board.getUsers().getUsersEmail())
                 .userNickname(board.getUsers().getUsersNickname())
                 .build();

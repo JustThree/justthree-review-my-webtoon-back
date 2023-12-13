@@ -13,7 +13,7 @@ import java.util.List;
 @DataJpaTest
 public class MypageRepositoryTest {
     @Autowired
-    com.java.JustThree.repository.mypage.StarRepository StarRepository;
+    com.java.JustThree.repository.StarRepository StarRepository;
     @Autowired
     UsersRepository UsersRepository;
     @BeforeEach()

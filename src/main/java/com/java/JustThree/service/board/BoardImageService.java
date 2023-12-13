@@ -1,4 +1,4 @@
-package com.java.JustThree.service;
+package com.java.JustThree.service.board;
 
 import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.AmazonS3Client;
