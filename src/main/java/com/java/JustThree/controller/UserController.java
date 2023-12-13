@@ -111,4 +111,17 @@ public class UserController {
         return isNickname ? ResponseEntity.badRequest().body("이미 존재하는 닉네임입니다.") : ResponseEntity.ok("사용 가능한 닉네임입니다.");
     }
 
+    @GetMapping("/getUserId")
+    public ResponseEntity<Object> getUsersId(@RequestHeader("Authorization") String token){
+        long usersId;
+        try{
+            usersId = usersService.getUserInfo(token).getUsersId();
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("유저가 없습니다");
+        }
+        return ResponseEntity.ok(usersId);
+
+    }
+
+
 }
