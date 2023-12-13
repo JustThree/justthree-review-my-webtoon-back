@@ -1,5 +1,6 @@
 package com.java.JustThree.service;
 
+import com.java.JustThree.domain.Interest;
 import com.java.JustThree.domain.Review;
 import com.java.JustThree.domain.Star;
 import com.java.JustThree.domain.Webtoon;
@@ -11,6 +12,7 @@ import com.java.JustThree.repository.ReviewRepository;
 import com.java.JustThree.repository.StarRepository;
 import com.java.JustThree.repository.UsersRepository;
 import com.java.JustThree.repository.WebtoonRepository;
+import com.java.JustThree.repository.mypage.InterestRepository;
 import com.java.JustThree.repository.mypage.ReviewHeartRepository;
 import com.java.JustThree.repository.mypage.ReviewReplyRepository;
 import org.json.JSONArray;
@@ -44,7 +46,9 @@ public class WebtoonService {
     final JwtProvider jwtProvider;
     final ReviewHeartRepository reviewHeartRepository;
     final ReviewReplyRepository reviewReplyRepository;
-    public WebtoonService(WebtoonRepository webtoonRepository, StarRepository starRepository, UsersRepository usersRepository, ReviewRepository reviewRepository, JwtProvider jwtProvider, ReviewHeartRepository reviewHeartRepository, ReviewReplyRepository reviewReplyRepository) {
+    final InterestRepository interestRepository;
+
+    public WebtoonService(WebtoonRepository webtoonRepository, StarRepository starRepository, UsersRepository usersRepository, ReviewRepository reviewRepository, JwtProvider jwtProvider, ReviewHeartRepository reviewHeartRepository, ReviewReplyRepository reviewReplyRepository, InterestRepository interestRepository) {
         this.webtoonRepository = webtoonRepository;
         this.starRepository = starRepository;
         this.usersRepository = usersRepository;
@@ -52,6 +56,7 @@ public class WebtoonService {
         this.jwtProvider = jwtProvider;
         this.reviewHeartRepository = reviewHeartRepository;
         this.reviewReplyRepository = reviewReplyRepository;
+        this.interestRepository = interestRepository;
 
     }
     // 페이지 단건 조회
@@ -202,6 +207,33 @@ public class WebtoonService {
                         reviewReplyRepository.countByReview_ReviewId(review.getReviewId())
                 )));
     }
+    @Transactional
+    public String modifyInterest(String token, Long masterId){
+        if (token != null) {
+            Long userId = jwtProvider.getUserId(token);
+            Optional<Interest> byUsers_usersIdIsAndWebtoon_masterIdIs = interestRepository.findByUsers_UsersIdIsAndWebtoon_MasterIdIs(userId, masterId);
+            if (byUsers_usersIdIsAndWebtoon_masterIdIs.isPresent()){
+                interestRepository.delete(byUsers_usersIdIsAndWebtoon_masterIdIs.get());
+                return "관심 삭제 되었어요.";
+            } else {
+                interestRepository.save(Interest.builder()
+                        .webtoon(webtoonRepository.findById(masterId).orElseThrow(() -> new IllegalArgumentException("웹툰 값이 잘못 입력됬습니다.")))
+                        .users(usersRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저값이 잘못 됬습니다.")))
+                        .build());
+                return "관심 등록 완료!";
+            }
+        }
+        return "로그인이 안되어 있어요.";
+    }
+    @Transactional
+    public void writeReview(String token,Long masterId,String content){
+        reviewRepository.save(Review.builder()
+                .webtoon(webtoonRepository.findById(masterId).orElseThrow(() -> new IllegalArgumentException("")))
+                .users(usersRepository.findById(jwtProvider.getUserId(token)).orElseThrow(()-> new IllegalArgumentException("")))
+                .content(content)
+                .build()
+        );
+    }
 
 
     // 웹툰 초기화
@@ -328,4 +360,5 @@ public class WebtoonService {
         webtoonRepository.saveAll(webtoons);
         }
     }
+
 }
