@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*",exposedHeaders = "Authorization", allowCredentials = "true")
 public class ChatService {
 
+    private final UsersService usersService;
+
     private final WebtoonRepository webtoonRepository;
     private final UsersRepository usersRepository;
     private final ChatRepository chatRepository;
@@ -35,7 +37,7 @@ public class ChatService {
         Chat chat = Chat.builder()
                 .contents(msg)
                 .webtoon(webtoonRepository.findById(masterId).get())
-                .users(usersRepository.findById(1L).get()) //  findById(jwtService.getId(token))
+                .users(usersRepository.findById(usersService.getUserInfo(token).getUsersId()).get()) //  findById(jwtService.getId(token))
                 .created(LocalDateTime.now())
                 .build();
         try{
@@ -69,30 +71,39 @@ public class ChatService {
                 .build();
     }
 
-    public List<ChatListResponse> findChatRoom(int page){
+    public List<ChatListResponse> findChatRoom(int page, String token){
 //         [page] 1: all, 2:current, 3: hotWebtoon, 4: my
+        List<ChatListResponse> list = new ArrayList<>();
+
         switch (page){
             case 1:
-                return chatRepository.findLatestChats();
+                return chatRepository.findAllLastChats();
             case 2:
                 Set<Long> currentChat = WebSocketService.getRoomsHavingCurrentPart();
 
-                if(currentChat == null){
-                    return new ArrayList<ChatListResponse>();
-                }else{
-
-                    return chatRepository.findLatestChats()
-                            .stream().filter(c -> currentChat.stream()
-                                    .anyMatch(Predicate.isEqual(c.getMasterId()))).collect(Collectors.toList());
+                if(currentChat != null){
+                    for( Long masterId : currentChat){
+                        list.add(new ChatListResponse(
+                                chatRepository.findTopByWebtoon_MasterIdOrderByCreatedDesc(masterId))
+                        );
+                    }
                 }
-
+                break;
             case 3:
-//                t;qlfd인기웹툰 ㅋㅋ
+                return chatRepository.findLastChatsOrderByHotWebtoon();
             case 4:
-
+                return chatRepository.findByUsers_UsersId(usersService.getUserInfo(token).getUsersId());
+//               if(!masterIds.isEmpty()){
+//                   for( Long masterId : masterIds){
+//                       list.add(new ChatListResponse((
+//                               chatRepository.findTopByWebtoon_MasterIdOrderByCreatedDesc(masterId))
+//                       ));
+//                   }
+//               }
+//                break;
             default:
-                return null;
         }
+        return list;
     }
     public List<ChatListResponse> findChatRoomByUserId(Long users_id){
 
