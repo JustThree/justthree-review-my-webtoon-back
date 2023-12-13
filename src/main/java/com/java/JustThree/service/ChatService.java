@@ -85,6 +85,11 @@ public class ChatService {
                             .stream().filter(c -> currentChat.stream()
                                     .anyMatch(Predicate.isEqual(c.getMasterId()))).collect(Collectors.toList());
                 }
+
+            case 3:
+//                t;qlfd인기웹툰 ㅋㅋ
+            case 4:
+
             default:
                 return null;
         }
