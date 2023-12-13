@@ -4,9 +4,9 @@ import com.java.JustThree.domain.*;
 import com.java.JustThree.dto.mypage.*;
 import com.java.JustThree.repository.*;
 import com.java.JustThree.repository.mypage.*;
+import com.java.JustThree.repository.StarRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
