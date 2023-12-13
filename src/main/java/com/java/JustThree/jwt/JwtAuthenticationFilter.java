@@ -105,6 +105,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("nickname", userDetails.getUsersNickname());
         jsonObject.put("profileImg", userDetails.getProfileUrl());
+        jsonObject.put("usersId", userDetails.getUsersId());
 
         response.getWriter().print(jsonObject);
         response.getWriter().flush();

@@ -3,6 +3,7 @@ package com.java.JustThree.service;
 import com.java.JustThree.config.RedisUtil;
 import com.java.JustThree.domain.RefreshToken;
 import com.java.JustThree.dto.JoinRequest;
+import com.java.JustThree.dto.ResetPWRequest;
 import com.java.JustThree.dto.RoleType;
 import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.UsersResponse;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -114,5 +116,17 @@ public class UsersService {
     public boolean validateDuplicateNickname(String nickname) {
         Optional<Users> user = ur.findByUsersNickname(nickname);
         return user.isPresent();
+    }
+
+    // 비밀번호 == 비밀번호 확인
+    public boolean validatePassword(ResetPWRequest resetPWDTO) {
+        return resetPWDTO.getPassword().equals(resetPWDTO.getCorrectPassword());
+    }
+
+    // 비밀번호 변경
+    @Transactional(rollbackFor = SQLException.class)
+    public void setPassword(String email, String password) {
+        Users user = ur.findByUsersEmail(email).orElseThrow(() -> new IllegalStateException("가입되지 않은 이메일입니다."));
+        user.changePassword(bCryptPasswordEncoder.encode(password));
     }
 }
