@@ -41,8 +41,13 @@ public class MyPageService {
     }
 
     ////////////////////평가 웹툰 리스트////////////////////
-    public List<RatedWebtoonResponse> ratedWebtoonlist(Long usersId) {
-        List<Star> list = starRepository.findByUsers_UsersId(usersId);
+    public List<RatedWebtoonResponse> ratedWebtoonlist(Long usersId, int sortNum) {
+        List<Star> list = switch (sortNum) {
+            case 2 -> starRepository.findByUsers_UsersId_OrderByStarValDesc(usersId);
+            case 3 -> starRepository.findByUsers_UsersId_OrderByStarVal(usersId);
+            case 4 -> starRepository.findByUsers_UsersIdAndStarVal(usersId, 10);
+            default -> starRepository.findByUsers_UsersId(usersId); // 기본순
+        };
         List<RatedWebtoonResponse> ratedWebtoonList = new ArrayList<>();
         for (Star star : list) {
             RatedWebtoonResponse dto = new RatedWebtoonResponse(star.getWebtoon(), star.getStarVal());
@@ -51,6 +56,48 @@ public class MyPageService {
         return ratedWebtoonList;
     }
 
+
+    //    public List<FollowResponse> followList(Long usersId,int sortNum){
+//        List<Follow> list;
+//        if(sortNum==1){
+//            list = followRepository.findAllByFollower_UsersId(usersId);
+//            List<FollowResponse> followList = new ArrayList<>();
+//            for (Follow follow : list){
+//                FollowResponse dto = new FollowResponse(follow.getFollower(),follow.getFollowId());
+//                followList.add(dto);
+//            }
+//            return followList;
+//        }
+//        else{
+//            list = followRepository.findAllByFollowing_UsersId(usersId);
+//            List<FollowResponse> followList = new ArrayList<>();
+//            for (Follow follow : list){
+//                FollowResponse dto = new FollowResponse(follow.getFollowing(),follow.getFollowId());
+//                followList.add(dto);
+//            }
+//            return followList;
+//        }
+//    }
+    //////////////////////팔로잉 리스트//////////////////////
+    public List<FollowResponse> getFollowingList(Long usersId){
+        List<Follow> list = followRepository.findAllByFollower_UsersId(usersId);
+        List<FollowResponse>  followingList = new ArrayList<>();
+        for(Follow follow : list){
+            FollowResponse dto = new FollowResponse(follow.getFollowing(),follow.getFollowId());
+            followingList.add(dto);
+        }
+        return followingList;
+    }
+    //////////////////////팔로워 리스트//////////////////////
+    public List<FollowResponse> getFollowerList(Long usersId){
+        List<Follow> list = followRepository.findAllByFollowing_UsersId(usersId);
+        List<FollowResponse>  followerList = new ArrayList<>();
+        for(Follow follow : list){
+            FollowResponse dto = new FollowResponse(follow.getFollower(),follow.getFollowId());
+            followerList.add(dto);
+        }
+        return followerList;
+    }
     //////////////////////관심 웹툰 리스트////////////////////
 
     public List<InterestedWebtoonResponse> interestedWebtoonlist(Long usersId) {
@@ -78,37 +125,15 @@ public class MyPageService {
         }
         return reviewedWebtoonList;
     }
-    //////////////////////팔로잉 리스트//////////////////////
-    public List<FollowResponse> getFollowingList(Long usersId){
-        List<Follow> list = followRepository.findAllByFollowing_UsersId(usersId);
-        List<FollowResponse>  followingList = new ArrayList<>();
-        for(Follow follow : list){
-            FollowResponse dto = new FollowResponse(follow.getFollowing(),follow.getFollowId());
-            followingList.add(dto);
-        }
-        return followingList;
-    }
-    //////////////////////팔로워 리스트//////////////////////
-    public List<FollowResponse> getFollowerList(Long usersId){
-        List<Follow> list = followRepository.findAllByFollower_UsersId(usersId);
-        List<FollowResponse>  followerList = new ArrayList<>();
-        for(Follow follow : list){
-            FollowResponse dto = new FollowResponse(follow.getFollower(),follow.getFollowId());
-            followerList.add(dto);
-        }
-        return followerList;
-    }
+
     //////////////////////유저 정보 페이지 /////////////////////////
     public UserInfoResponse userinfo(Long usersId) {
-
-
         Long followerCount = followRepository.countByFollower_UsersId(usersId);
         Long followingCount = followRepository.countByFollowing_UsersId(usersId);
         Long reviewedCount = reviewRepository.countByUsers_UsersId(usersId);
         Long ratedCount = starRepository.countByUsers_UsersId(usersId);
         Long interestedCount = interestRepository.countByUsers_UsersId(usersId);
 
-        UserInfoResponse UserinfoResponse = new UserInfoResponse(usersRepository.findById(usersId).get(), ratedCount, reviewedCount, interestedCount, followerCount, followingCount);
-        return UserinfoResponse;
+        return new UserInfoResponse(usersRepository.findById(usersId).get(), ratedCount, reviewedCount, interestedCount, followerCount, followingCount);
     }
 }
