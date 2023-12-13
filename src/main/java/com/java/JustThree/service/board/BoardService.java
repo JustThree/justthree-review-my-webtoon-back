@@ -69,6 +69,7 @@ public class BoardService {
         return newBoard.getBoardId();
     }
     //커뮤니티 글 상세 조회(댓글, 좋아요 구현 후 보완 필요)
+    @Transactional
     public GetBoardOneResponse getBoardOne(long boardId){
         //Board board = boardRepository.findById(boardId).orElseThrow(NoSuchElementException::new);
         Optional<Board> optionalBoard = boardRepository.findById(boardId);
@@ -79,9 +80,11 @@ public class BoardService {
             List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
             //log.info("board1  >>"+board);
             //log.info("boardImgList  >>"+boardImageList);
+
             //조회수 증가
-            board.plusViewCount(board.getViewCount() + 1);
-            boardRepository.save(board);
+            //board.plusViewCount(board.getViewCount() + 1);
+            //boardRepository.save(board);
+            boardRepository.updateViewCount(board.getViewCount()+1, boardId);
             //log.info("board2  >>"+board);
 
             //댓글 조회
