@@ -24,3 +24,5 @@ public interface WebtoonRepository extends JpaRepository<Webtoon,Long> {
     Page<Webtoon> findByAgeGradCdNmIsNotAndOutlineContaining(String ageGradCdNm, String outline, Pageable pageable);
     @Query("select w1 from Webtoon w1 where w1.ageGradCdNm != :ageNm and w1 in (select w2 from Webtoon w2 where w2.pictrWritrNm like %:writer% or w2.sntncWritrNm like %:writer%)")
     Page<Webtoon> findByAgeGradCdNmIsNotAndWriterIs(@Param("ageNm") String ageGradCdNm, @Param("writer") String writer, Pageable pageable);}
+
+

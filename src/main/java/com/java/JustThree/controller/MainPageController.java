@@ -19,41 +19,42 @@ public class MainPageController {
     // 성인웹툰 거르기...
     @GetMapping("/{id}")
     public ResponseEntity<?> webtoonDetail(
-//            @RequestHeader("Authorization") String token,
-                                           @PathVariable(name = "id") Long id){
+            @RequestHeader("Authorization") String token,
+            @PathVariable(name = "id") Long id) {
 
-        String token = null;
         try {
             return ResponseEntity.ok()
-                    .body(webtoonService.getWebtoonDetail(token,id));
-        } catch (IllegalArgumentException e){
+                    .body(webtoonService.getWebtoonDetail(token, id));
+        } catch (IllegalArgumentException e) {
             return ResponseEntity
                     .notFound()
-                    .header("error",e.getMessage())
+                    .header("error", e.getMessage())
                     .build();
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             return ResponseEntity
                     .status(404)
-                    .header("error",e.getMessage())
+                    .header("error", e.getMessage())
                     .build();
         }
     }
+
     @GetMapping("/webtoonlist")
-    public ResponseEntity<?> webtoonKeywordList(@PageableDefault(size = 25) Pageable pageable,@RequestParam(name = "keyword") String keyword){
+    public ResponseEntity<?> webtoonKeywordList(@PageableDefault(size = 25) Pageable pageable, @RequestParam(name = "keyword") String keyword) {
         try {
             return ResponseEntity.ok()
-                            .body(webtoonService.getWebtoonKeyword(pageable,keyword));
-        } catch (Exception e){
+                    .body(webtoonService.getWebtoonKeyword(pageable, keyword));
+        } catch (Exception e) {
             return ResponseEntity.status(404)
-                    .header("error",e.getMessage())
+                    .header("error", e.getMessage())
                     .build();
         }
     }
+
     @GetMapping("")
-    public ResponseEntity<?> webtoonList(@PageableDefault(size = 24)Pageable pageable, @RequestParam(name = "genre",required = false)String genre, @RequestParam(name = "order",required = false)String order) {
+    public ResponseEntity<?> webtoonList(@PageableDefault(size = 24) Pageable pageable, @RequestParam(name = "genre", required = false) String genre, @RequestParam(name = "order", required = false) String order) {
         try {
             return ResponseEntity.ok()
-                    .body(webtoonService.getWebtoonPage(pageable,genre,order));
+                    .body(webtoonService.getWebtoonPage(pageable, genre, order));
         } catch (Exception e) {
             return ResponseEntity.status(404)
                     .header("error", e.getMessage())
@@ -61,23 +62,25 @@ public class MainPageController {
         }
 
     }
+
     @GetMapping("/search")
-    public ResponseEntity<?> searchList(@PageableDefault(size = 24)Pageable pageable, @RequestParam(name = "type")String type, @RequestParam(name = "word")String word){
+    public ResponseEntity<?> searchList(@PageableDefault(size = 24) Pageable pageable, @RequestParam(name = "type") String type, @RequestParam(name = "word") String word) {
         try {
             return ResponseEntity.ok()
-                    .body(webtoonService.searchWebtoon(pageable,type,word));
+                    .body(webtoonService.searchWebtoon(pageable, type, word));
         } catch (Exception e) {
             return ResponseEntity.status(404)
                     .header("error", e.getMessage())
                     .build();
         }
     }
+
     @PutMapping("/rating")
     public ResponseEntity<?> ratingWebtoon(@RequestHeader("Authorization") String token,
-                                           @RequestParam(name = "masterId")Long masterId,
-                                           @RequestParam(name = "star")int star){
+                                           @RequestParam(name = "masterId") Long masterId,
+                                           @RequestParam(name = "star") int star) {
         try {
-            webtoonService.ratingWebtoon(token,masterId,star);
+            webtoonService.ratingWebtoon(token, masterId, star);
             return ResponseEntity.ok()
                     .body("sucess");
         } catch (Exception e) {
@@ -86,11 +89,47 @@ public class MainPageController {
                     .build();
         }
     }
-        @GetMapping("/reviews/{id}")
-    public ResponseEntity<?> reviewsWebtoon(@PathVariable(name = "id") Long id, @PageableDefault(size = 12)  Pageable pageable){
+
+    @GetMapping("/reviews/{id}")
+    public ResponseEntity<?> reviewsWebtoon(@PathVariable(name = "id") Long id, @PageableDefault(size = 12) Pageable pageable) {
         try {
             return ResponseEntity.ok()
                     .body(webtoonService.getWebtoonReviewsPage(id, pageable));
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
+
+    @PutMapping("/interest/{id}")
+    public ResponseEntity<?> interestWebtoon(
+            @RequestHeader("Authorization") String token
+            , @PathVariable(name = "id") Long masterId) {
+        try {
+            return ResponseEntity.ok()
+                    .body(webtoonService.modifyInterest(token, masterId));
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
+    @PostMapping("/review/{id}")
+    public ResponseEntity<?> PostWebtoonReview(
+            @RequestHeader("Authorization") String token,
+            @PathVariable(name = "id") Long masterId,
+            @RequestBody String content
+    ){
+        try {
+            String contentSplit = content.split(":")[1];
+            webtoonService.writeReview(token, masterId, contentSplit.substring(1,contentSplit.length()-2));
+            return ResponseEntity.ok()
+                    .body("등록 완료");
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(400)
+                    .header(e.getMessage())
+                    .build();
         } catch (Exception e) {
             return ResponseEntity.status(404)
                     .header("error", e.getMessage())
@@ -110,6 +149,4 @@ public class MainPageController {
 //        }
 //        return "db init...";
 //    }
-
-
 }
