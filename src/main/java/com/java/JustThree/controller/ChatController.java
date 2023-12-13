@@ -33,6 +33,7 @@ public class ChatController {
 
     @GetMapping("/type/{type}")
     public ResponseEntity<List<ChatListResponse>> chatRoom(@PathVariable Integer type){
+        // 1: 전체, 2: 실시간, 3: 인기웹툰순, 4: 해당 사용자가 메시지 보낸 채팅방
         return ResponseEntity.ok(chatService.findChatRoom(type));
     }
 }
