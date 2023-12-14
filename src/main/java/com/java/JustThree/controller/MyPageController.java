@@ -6,6 +6,7 @@ import com.java.JustThree.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ import java.util.List;
 @CrossOrigin
 public class MyPageController {
     private final MyPageService service;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     //////////////////////////////////////////////////유저 정보 페이지/////////////////////////////////////////////////////////////
     @GetMapping("/userinfo/{usersId}")
     public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable Long usersId){
