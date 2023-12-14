@@ -1,6 +1,5 @@
 package com.java.JustThree.dto.mypage;
 
-import com.java.JustThree.domain.Follow;
 import com.java.JustThree.domain.Users;
 import lombok.*;
 import org.springframework.security.core.userdetails.User;
@@ -21,16 +20,13 @@ public class UserInfoResponse {
 
     private Long followerCount;//팔로워 수
     private Long followingCount;//팔로잉 수
-
     public UserInfoResponse(Users users, Long ratedCount, Long reviewedCount, Long interestedCount, Long followerCount, Long followingCount){
         this.profileUrl=users.getProfileUrl();
         this.usersNickname=users.getUsersNickname();
         this.usersEmail=users.getUsersEmail();
-
         this.ratedCount=ratedCount;
         this.reviewedCount=reviewedCount;
         this.interestedCount=interestedCount;
-
 
         this.followerCount=followerCount;
         this.followingCount=followingCount;

@@ -23,4 +23,8 @@ public interface StarRepository extends JpaRepository<Star,Long> {
 
     Optional<Star> findByWebtoon_MasterIdIsAndUsers_UsersIdIs(Long webtoon_masterId, Long users_usersId);
 
+    public List<Star> findByUsers_UsersId_OrderByStarValDesc(Long usersId);
+    public List<Star> findByUsers_UsersId_OrderByStarVal(Long usersId);
+
+    public List<Star> findByUsers_UsersIdAndStarVal(Long usersId,int starVal);
 }
