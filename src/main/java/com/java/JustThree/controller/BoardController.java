@@ -93,16 +93,22 @@ public class BoardController {
                                             @RequestParam(name = "size", defaultValue = "10") int size,
                                             @RequestParam(name = "sortings", defaultValue = "sortDesc") String sortings,
                                             @RequestParam(name = "keyword", required = false) String keyword){
-
-        return boardService.getBoardsByPage(page, size, sortings, keyword);
+        String searchWord="";
+        if(keyword == null){
+            searchWord = "";
+        }else{
+            searchWord = keyword;
+        }
+        return boardService.getBoardsByPage(page, size, sortings, searchWord);
     }
-    //커뮤니티 게시글 목록 키워드 검색 조회
-    /*@GetMapping("/search")
-    List<GetBoardListResponse> getBoardsByKeyword(@RequestParam(name = "page", defaultValue = "1") int page,
-                                            @RequestParam(name = "size", defaultValue = "10") int size,
-                                            @RequestParam(name = "keyword", required = false) String keyword){
-        return boardService.searchBoardsByKeyword(keyword, page, size);
-    }*/
+    //공지 게시글 목록(noticeYn = 1)조회
+    @GetMapping("/notice")
+    List<GetBoardListResponse> getNoticeList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                             @RequestParam(name = "size", defaultValue = "10") int size,
+                                             @RequestParam(name = "keyword", required = false) String keyword){
+
+        return boardService.getNoticesByPage(page, size, keyword);
+    }
 
     //커뮤니티 글 댓글 등록
     @PostMapping("/reply")
