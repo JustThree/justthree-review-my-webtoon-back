@@ -168,6 +168,42 @@ public class MainPageController {
                     .build();
         }
     }
+    @PatchMapping("/review/reply/like/{id}")
+    public ResponseEntity<?> modifyLike(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") Long reviewId){
+        try {
+            return ResponseEntity.ok()
+                    .body(webtoonService.modifyReviewLike(reviewId,token));
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(400)
+                    .header(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
+    @PostMapping("/review/reply/{id}")
+    public ResponseEntity<?> addReviewReply(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") Long reviewId,
+            @RequestBody String content){
+        try {
+            String contentSplit = content.split(":")[1];
+            return ResponseEntity.ok()
+                    .body(webtoonService.addReviewReply(reviewId,token, contentSplit.substring(1,contentSplit.length()-2)));
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(400)
+                    .header(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
 
 //    @GetMapping("/dbinit")
 //    public String init(){

@@ -1,9 +1,6 @@
 package com.java.JustThree.service;
 
-import com.java.JustThree.domain.Interest;
-import com.java.JustThree.domain.Review;
-import com.java.JustThree.domain.Star;
-import com.java.JustThree.domain.Webtoon;
+import com.java.JustThree.domain.*;
 import com.java.JustThree.dto.main.response.*;
 import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.ReviewRepository;
@@ -45,7 +42,6 @@ public class WebtoonService {
     final ReviewHeartRepository reviewHeartRepository;
     final ReviewReplyRepository reviewReplyRepository;
     final InterestRepository interestRepository;
-
 
     public WebtoonService(WebtoonRepository webtoonRepository, StarRepository starRepository, UsersRepository usersRepository, ReviewRepository reviewRepository, JwtProvider jwtProvider, ReviewHeartRepository reviewHeartRepository, ReviewReplyRepository reviewReplyRepository, InterestRepository interestRepository) {
         this.webtoonRepository = webtoonRepository;
@@ -274,6 +270,33 @@ public class WebtoonService {
 
     public Page<ReviewReplyResponse> getReviewReplyResponse(Pageable pageable,Long reviewId){
         return reviewReplyRepository.findByReviewReviewIdIs(reviewId,pageable).map(ReviewReplyResponse::fromEntity);
+    }
+    @Transactional
+    public String  modifyReviewLike(Long reviewId, String token){
+        Optional<Review_Heart> byReviewReviewIdIs = reviewHeartRepository.findByReview_ReviewIdIs(reviewId);
+        if (byReviewReviewIdIs.isPresent()){
+            reviewHeartRepository.delete(byReviewReviewIdIs.get());
+            return "좋아요가 삭제되었어요";
+        } else {
+            reviewHeartRepository.save(
+                    Review_Heart.builder()
+                            .users(usersRepository.findById(jwtProvider.getUserId(token)).orElseThrow(() -> new IllegalArgumentException("올바르지 않은 토큰")))
+                            .review(reviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("리뷰가 잘못됬어요!")))
+                .build());
+            return "좋아요 버튼 누르셨어요!";
+        }
+
+    }
+    @Transactional
+    public String addReviewReply(Long reviewId, String token, String content){
+        reviewReplyRepository.save(
+                    Review_Reply.builder()
+                            .review(reviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("리뷰가 잘못됬어요")))
+                            .users(usersRepository.findById(jwtProvider.getUserId(token)).orElseThrow(() -> new IllegalArgumentException("토큰이 잘못됫어요")))
+                            .content(content)
+                            .build());
+        
+        return "저장 완료";
     }
 
     // 웹툰 초기화
