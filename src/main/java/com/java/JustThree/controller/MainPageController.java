@@ -1,11 +1,15 @@
 package com.java.JustThree.controller;
 
+import com.java.JustThree.dto.main.request.AddReviewReplyRequest;
+import com.java.JustThree.dto.main.request.PostWebtoonReviewRequest;
 import com.java.JustThree.service.UsersService;
 import com.java.JustThree.service.WebtoonService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/webtoon")
@@ -119,11 +123,10 @@ public class MainPageController {
     public ResponseEntity<?> PostWebtoonReview(
             @RequestHeader("Authorization") String token,
             @PathVariable(name = "id") Long masterId,
-            @RequestBody String content
+            @Validated @RequestBody PostWebtoonReviewRequest postWebtoonReviewRequest
     ){
         try {
-            String contentSplit = content.split(":")[1];
-            webtoonService.writeReview(token, masterId, contentSplit.substring(1,contentSplit.length()-2));
+            webtoonService.writeReview(token, masterId, postWebtoonReviewRequest.getContent());
             return ResponseEntity.ok()
                     .body("등록 완료");
         } catch (IllegalArgumentException e){
@@ -138,11 +141,12 @@ public class MainPageController {
     }
     @GetMapping("/review/{id}")
     public ResponseEntity<?> getReviewDetail(
+            @RequestHeader(value = "Authorization", required = false) String token,
             @PathVariable(name = "id") Long reviewId
     ){
         try {
             return ResponseEntity.ok()
-                    .body(webtoonService.getReview(reviewId));
+                    .body(webtoonService.getReview(reviewId,token));
         } catch (IllegalArgumentException e){
             return ResponseEntity.status(400)
                     .header(e.getMessage())
@@ -189,11 +193,15 @@ public class MainPageController {
     public ResponseEntity<?> addReviewReply(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long reviewId,
-            @RequestBody String content){
+            @Validated @RequestBody AddReviewReplyRequest addReviewReplyRequest
+            , Errors errors){
+        if(errors.hasErrors())
+            return ResponseEntity.status(400)
+                .header(errors.getAllErrors().toString())
+                    .build();
         try {
-            String contentSplit = content.split(":")[1];
             return ResponseEntity.ok()
-                    .body(webtoonService.addReviewReply(reviewId,token, contentSplit.substring(1,contentSplit.length()-2)));
+                    .body(webtoonService.addReviewReply(reviewId,token, addReviewReplyRequest.getContent()));
         } catch (IllegalArgumentException e){
             return ResponseEntity.status(400)
                     .header(e.getMessage())

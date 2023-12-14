@@ -60,6 +60,7 @@ public class WebtoonService {
         long sum = 0L;
         int userStar = 5;
         float avg = 0f;
+        boolean interested = false;
 
         // 게시글 내용 조회
         Webtoon webtoon = webtoonRepository.findById(id).orElseThrow(IllegalAccessError::new);
@@ -84,7 +85,17 @@ public class WebtoonService {
         }else {
             webtoon.setView(webtoon.getView() + 1);
         }
-        return WebtoonDetailResponse.fromEntity(webtoon, avg,byWebtoonMasterIdIs.size(),userStar);
+        if (token != null){
+            Optional<Interest> byUsersUsersIdIs = interestRepository.findByUsers_UsersIdIsAndWebtoon_MasterIdIs(jwtProvider.getUserId(token), webtoon.getMasterId());
+            if (byUsersUsersIdIs.isPresent()){
+                interested = true;
+            }
+        }
+        return WebtoonDetailResponse.fromEntity(webtoon,
+                avg,
+                byWebtoonMasterIdIs.size(),
+                userStar,
+                interested);
     }
     // webtoon 전체 조회
     public Page<WebtoonMainResponse> getWebtoonPage(Pageable pageable, String genre, String order){
@@ -154,8 +165,6 @@ public class WebtoonService {
 
             };
         }
-        System.out.println(webtoonMainResponsePage);
-        System.out.println(111);
         return  webtoonMainResponsePage;
     }
     // 웹툰 키워드로 리스트 조회
@@ -171,8 +180,8 @@ public class WebtoonService {
             case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMasterIdDesc
                             ("19세 이상", "판타지", pageable)
                     .stream().map((WebtoonMainResponse::fromEntity)).toList();
-            case "love" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMasterIdDesc
-                            ("19세 이상", "이성애", pageable)
+            case "love" -> webtoonRepository.findByAgeGradCdNmIsNotAndDoubleGenreIsOrderByPopularity
+                            ("19세 이상", "이성애", "로맨스",pageable)
                     .stream().map((WebtoonMainResponse::fromEntity)).toList();
             case "famous" -> webtoonRepository.findByAgeGradCdNmIsNotOrderByViewDesc
                             ("19세 이상", pageable)
@@ -259,13 +268,20 @@ public class WebtoonService {
                 .build()
         );
     }
-    public ReviewDetailResponse getReview(Long reviewId){
+    public ReviewDetailResponse getReview(Long reviewId, String token){
+        boolean checkLike = false;
         Review review = reviewRepository.findById(reviewId).orElseThrow(()
                 -> new IllegalArgumentException("해당 리뷰가 없어요"));
+        if (token != null) {
+            if (reviewHeartRepository.existsByReview_ReviewIdIsAndReview_Users_UsersIdIs(reviewId,
+                    jwtProvider.getUserId(token))) {
+                checkLike = true;
+            }
+        }
         return ReviewDetailResponse.fromEntity(
                 review, starRepository.findByWebtoon_MasterIdIsAndUsers_UsersIdIs(
                                 review.getWebtoon().getMasterId(),review.getUsers().getUsersId())
-                        .orElse(Star.builder().starVal(0).build()));
+                        .orElse(Star.builder().starVal(0).build()),checkLike);
     }
 
     public Page<ReviewReplyResponse> getReviewReplyResponse(Pageable pageable,Long reviewId){
