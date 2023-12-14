@@ -23,6 +23,4 @@ public interface StarRepository extends JpaRepository<Star,Long> {
     public List<Star> findByUsers_UsersId_OrderByStarVal(Long usersId);
 
     public List<Star> findByUsers_UsersIdAndStarVal(Long usersId,int starVal);
-
-
 }
