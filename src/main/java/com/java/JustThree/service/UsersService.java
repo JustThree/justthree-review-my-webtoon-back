@@ -11,6 +11,7 @@ import com.java.JustThree.jwt.JwtProperties;
 import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.RefreshTokenRepository;
 import com.java.JustThree.repository.UsersRepository;
+import io.jsonwebtoken.JwtException;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,10 +72,16 @@ public class UsersService {
     }
 
     public String getNewAccessToken(String token){
-        String userEmail = jwtProvider.getUserEmail(token);
-//        jwtProvider.createAccessToken();
-        RefreshToken refreshToken = rtr.findByUser_UsersEmail(userEmail);
-        return refreshToken.getRefreshToken();
+        UsersResponse user = getUserInfo(token);
+        String headerToken = token.replace(jwtProperties.getTOKEN_PREFIX(), "");
+
+        RefreshToken refreshToken = rtr.findByUser_UsersEmail(user.getUsersEmail());
+        if(headerToken.equals(refreshToken.getRefreshToken())){
+            return jwtProvider.createAccessToken(user.toEntity(user));
+        }else {
+            throw new JwtException("엑세스토큰 발급 실패");
+        }
+
     }
 
     public String generateRandomNumber() {
