@@ -16,8 +16,6 @@ public interface StarRepository extends JpaRepository<Star,Long> {
 
     public List<Star> findByUsers_UsersIdAndStarVal(Long usersId,int starVal);
 
-
-
     Long countByUsers_UsersId(Long usersId);
 
     // 웹툰에서 평가 수 모두 조회

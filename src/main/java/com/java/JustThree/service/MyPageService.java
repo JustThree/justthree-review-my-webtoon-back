@@ -10,13 +10,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class MyPageService {
-
     private final UsersRepository usersRepository;
     private final StarRepository starRepository;
     private final InterestRepository interestRepository;
@@ -24,7 +23,6 @@ public class MyPageService {
     private final ReviewReplyRepository reviewReplyRepository;
     private final ReviewHeartRepository reviewHeartRepository;
     private final FollowRepository followRepository;
-
     //////////////////////회원 정보 수정 Update////////////////////
     @Transactional
     public boolean updateUser(Users user, Long usersId) {
@@ -39,6 +37,19 @@ public class MyPageService {
             result = false;
         }
         return result;
+    }
+    //////////////////////////팔로워 팔로잉 리스트 ////////////////
+    public List<FollowResponse> followlist(Long usersId,int sortNum){
+        List<Follow> list = switch (sortNum){
+            case 2 -> followRepository.findAllByFollower_UsersId(usersId);//팔로잉 목록
+            default -> followRepository.findAllByFollowing_UsersId(usersId);//팔로워 목록
+        };
+        List<FollowResponse> followList = new ArrayList<>();
+        for (Follow follow : list){
+            FollowResponse dto = new FollowResponse(follow, sortNum);
+            followList.add(dto);
+        }
+        return followList;
     }
 
     ////////////////////평가 웹툰 리스트////////////////////
@@ -56,6 +67,7 @@ public class MyPageService {
         }
         return ratedWebtoonList;
     }
+
     //////////////////////팔로우 기능  //////////////////////
     public void toggleFollow(Long followerId, Long followingId) {
         Users follower = usersRepository.findById(followerId)
@@ -64,7 +76,7 @@ public class MyPageService {
         Users following = usersRepository.findById(followingId)
                 .orElseThrow(() -> new UserNotFoundException("Following user not found with id: " + followingId));
 
-        // 팔로우 상태 확인 후 노팔이면 팔 예스팔이면 언팔
+        // 팔로우 상태 확인 후 팔로우중이면 언팔로우 언팔로우중이면 팔로우
         boolean isFollowing = followRepository.existsByFollowerAndFollowing(follower, following);
         if (isFollowing) {
             unfollowUser(follower, following);
@@ -85,27 +97,6 @@ public class MyPageService {
     }
 
 
-
-    //////////////////////팔로잉 리스트//////////////////////
-    public List<FollowResponse> getFollowingList(Long usersId){
-        List<Follow> list = followRepository.findAllByFollower_UsersId(usersId);
-        List<FollowResponse>  followingList = new ArrayList<>();
-        for(Follow follow : list){
-            FollowResponse dto = new FollowResponse(follow.getFollowing(),follow.getFollowId());
-            followingList.add(dto);
-        }
-        return followingList;
-    }
-    //////////////////////팔로워 리스트//////////////////////
-    public List<FollowResponse> getFollowerList(Long usersId){
-        List<Follow> list = followRepository.findAllByFollowing_UsersId(usersId);
-        List<FollowResponse>  followerList = new ArrayList<>();
-        for(Follow follow : list){
-            FollowResponse dto = new FollowResponse(follow.getFollower(),follow.getFollowId());
-            followerList.add(dto);
-        }
-        return followerList;
-    }
     //////////////////////관심 웹툰 리스트////////////////////
 
     public List<InterestedWebtoonResponse> interestedWebtoonlist(Long usersId) {
@@ -142,6 +133,31 @@ public class MyPageService {
         Long ratedCount = starRepository.countByUsers_UsersId(usersId);
         Long interestedCount = interestRepository.countByUsers_UsersId(usersId);
 
-        return new UserInfoResponse(usersRepository.findById(usersId).get(), ratedCount, reviewedCount, interestedCount, followerCount, followingCount);
+        return new UserInfoResponse(usersRepository.findById(usersId).get(),ratedCount, reviewedCount, interestedCount, followerCount, followingCount);
+    }
+
+
+
+
+
+    //////////////////////팔로잉 리스트//////////////////////
+    public List<FollowResponse> getFollowingList(Long usersId){
+        List<Follow> list = followRepository.findAllByFollower_UsersId(usersId);
+        List<FollowResponse>  followingList = new ArrayList<>();
+        for(Follow follow : list){
+            FollowResponse dto = new FollowResponse(follow.getFollowing(),follow.getFollowId());
+            followingList.add(dto);
+        }
+        return followingList;
+    }
+    //////////////////////팔로워 리스트//////////////////////
+    public List<FollowResponse> getFollowerList(Long usersId){
+        List<Follow> list = followRepository.findAllByFollowing_UsersId(usersId);
+        List<FollowResponse>  followerList = new ArrayList<>();
+        for(Follow follow : list){
+            FollowResponse dto = new FollowResponse(follow.getFollower(),follow.getFollowId());
+            followerList.add(dto);
+        }
+        return followerList;
     }
 }
