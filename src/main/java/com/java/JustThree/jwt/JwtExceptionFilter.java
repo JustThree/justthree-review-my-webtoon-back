@@ -26,7 +26,6 @@ public class JwtExceptionFilter extends OncePerRequestFilter{
                                     FilterChain filterChain) throws ServletException, java.io.IOException {
 
         response.setCharacterEncoding("utf-8");
-        log.info("jwtExceptionFilter 실행");
         try{
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e){
@@ -40,9 +39,8 @@ public class JwtExceptionFilter extends OncePerRequestFilter{
 
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             response.getWriter().write(objectMapper.writeValueAsString(map));
-            log.info("생성된 response = {}", response);
         } catch (JwtException e){
-            log.info("JwtException 방생함");
+            log.info("JwtException 발생함");
             Map<String, String> map = new HashMap<>();
             map.put("errortype", "Forbidden");
             map.put("code", "400");
