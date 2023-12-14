@@ -1,4 +1,5 @@
 package com.java.JustThree.dto.mypage;
+import com.java.JustThree.domain.Follow;
 import com.java.JustThree.domain.Users;
 
 import lombok.*;
@@ -12,17 +13,33 @@ import lombok.*;
 public class FollowResponse{
     private Long followId;
     //유저
-    private String usersNickname;
+    private Long usersId;
+    private String followingNickname;
+    private String followerNickname;
     private String profileUrl;
     private String usersEmail;
 
 
 
     public FollowResponse(Users users,Long followId){
+        this.followId=followId;
+        this.usersId=users.getUsersId();
         this.usersEmail=users.getUsersEmail();
         this.profileUrl=users.getProfileUrl();
-        this.usersNickname=users.getUsersNickname();
-        this.followId=followId;
+        this.followingNickname=users.getUsersNickname();
+    }
+//    팔로워와 팔로잉 정보를 받아옴
+public FollowResponse(Follow follow, int sortNum) {
+        this.followId=follow.getFollowId();
+        this.usersEmail = follow.getFollowing().getUsersEmail();
+        this.profileUrl = follow.getFollowing().getProfileUrl();
+        if(sortNum == 1){
+            this.followerNickname=follow.getFollower().getUsersNickname();
+        }else{
+            this.followingNickname = follow.getFollowing().getUsersNickname();
+        }
+        this.usersId = follow.getFollowing().getUsersId();
+
     }
     }
 //}

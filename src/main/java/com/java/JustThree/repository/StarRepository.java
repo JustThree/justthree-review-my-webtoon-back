@@ -9,8 +9,12 @@ import java.util.Optional;
 
 public interface StarRepository extends JpaRepository<Star,Long> {
 
+    public List<Star> findByUsers_UsersId(Long usersId);
 
-    List<Star> findByUsers_UsersId(Long usersId);
+    public List<Star> findByUsers_UsersId_OrderByStarValDesc(Long usersId);
+    public List<Star> findByUsers_UsersId_OrderByStarVal(Long usersId);
+
+    public List<Star> findByUsers_UsersIdAndStarVal(Long usersId,int starVal);
 
     Long countByUsers_UsersId(Long usersId);
 
@@ -23,6 +27,4 @@ public interface StarRepository extends JpaRepository<Star,Long> {
     public List<Star> findByUsers_UsersId_OrderByStarVal(Long usersId);
 
     public List<Star> findByUsers_UsersIdAndStarVal(Long usersId,int starVal);
-
-
 }
