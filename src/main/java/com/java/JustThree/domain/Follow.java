@@ -21,11 +21,11 @@ public class Follow {
     @Column(name = "follow_id")
     private Long followId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "following_id" ,referencedColumnName = "users_id")
     private Users following;// 팔로잉하는 사람들.
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "follower_id" ,referencedColumnName = "users_id")
     private Users follower;//팔로우 하는 사람들.
 
