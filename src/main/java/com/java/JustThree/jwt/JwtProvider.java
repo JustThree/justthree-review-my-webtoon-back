@@ -1,11 +1,15 @@
 package com.java.JustThree.jwt;
 
+import com.java.JustThree.domain.RefreshToken;
 import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.Token;
+import com.java.JustThree.repository.RefreshTokenRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -15,17 +19,19 @@ import java.util.Date;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class JwtProvider {
 
     private final JwtProperties jwtProperties;
+    private final RefreshTokenRepository refreshTokenRepository;
 
  /*   public Key createKey(){
         Key key =  Keys.secretKeyFor(SignatureAlgorithm.HS256);
         SecretKey KEY = new SecretKeySpec(secretBytes, SignatureAlgorithm.HS256.getJcaName());  // SecretKey 생성
         return key;
     }*/
-    public String createAccessToken(Users userDetails, JwtProperties jwtProperties){
-
+    public String createAccessToken(Users userDetails){
+        log.info("create AccessToken");
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")  // 헤더 설정
                 .setIssuer(jwtProperties.getIssuer())
@@ -33,11 +39,10 @@ public class JwtProvider {
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getACCESS_TOKEN_EXPIRATION_TIME()))
                 .claim("id", userDetails.getUsersId())
-                .claim("nickname", userDetails.getUsersEmail())
                 .signWith(jwtProperties.getSecretKey())  // 암호화 알고리즘과 키 설정
                 .compact();
     }
-    public String createRefreshToken(Users userDetails, JwtProperties jwtProperties){
+    public String createRefreshToken(Users userDetails){
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")  // 헤더 설정
                 .setIssuer(jwtProperties.getIssuer())
@@ -45,7 +50,6 @@ public class JwtProvider {
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getREFRESH_TOKEN_EXPIRATION_TIME()))
                 .claim("id", userDetails.getUsersId())
-                .claim("nickname", userDetails.getUsersEmail())
                 .signWith(jwtProperties.getSecretKey())
                 .compact();
     }
@@ -63,11 +67,18 @@ public class JwtProvider {
                 .compact();
     }*/
 
-    public String recreateAccessToken(Users usreDetails){
-
-        return "";
+    public void insertRefreshToken(Users user, String refreshToken){
+        RefreshToken refreshToken1 = RefreshToken.builder()
+                .user(user)
+                .refreshToken(refreshToken)
+                .build();
+        refreshTokenRepository.save(refreshToken1);
     }
 
+    @Transactional
+    public void deleteRefreshToken(Users user){
+        refreshTokenRepository.deleteByUser_UsersEmail(user.getUsersEmail());
+    }
     public boolean validateAceessToken(String token){
 
         Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(jwtProperties.getSecretKey()).build().parseClaimsJws(token);

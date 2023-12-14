@@ -58,13 +58,13 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDTO.getUsersEmail(), loginDTO.getUsersPw());
 
-		/*
-		=> AuthenticationManager 에게 인증 요청 (UserDetailsService 통해 DB에 존재하는 유저인지 확인)
-		1. UserDetailsService 의 loadUserByUsername() 호출
-		2. loadUserByUsername() 에서 리턴 받은 UserDetails 객체와 authenticationToken 의
-		   principal(사용자 입력 email), credentials(사용자 입력 password) 비교
-		3. 비밀번호가 일치하면 Authentication 객체를 만들어서 필터체인으로 리턴, 일치하지 않으면 AuthenticationException 발생
-		*/
+       /*
+       => AuthenticationManager 에게 인증 요청 (UserDetailsService 통해 DB에 존재하는 유저인지 확인)
+       1. UserDetailsService 의 loadUserByUsername() 호출
+       2. loadUserByUsername() 에서 리턴 받은 UserDetails 객체와 authenticationToken 의
+          principal(사용자 입력 email), credentials(사용자 입력 password) 비교
+       3. 비밀번호가 일치하면 Authentication 객체를 만들어서 필터체인으로 리턴, 일치하지 않으면 AuthenticationException 발생
+       */
 
         return authenticationManager.authenticate(authenticationToken);
     }
@@ -79,8 +79,8 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
         Users userDetails = (Users) authentication.getPrincipal();
 
-        String accessToken = jwtProvider.createAccessToken(userDetails, jwtProperties);
-        String refreshToken = jwtProvider.createRefreshToken(userDetails, jwtProperties);
+        String accessToken = jwtProvider.createAccessToken(userDetails);
+        String refreshToken = jwtProvider.createRefreshToken(userDetails);
 
         Token jwtToken = Token
                 .builder()
@@ -88,8 +88,12 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
                 .refreshToken(jwtProperties.getTOKEN_PREFIX() + refreshToken)
                 .key(userDetails.getUsersEmail())
                 .build();
-
-        insertRefreshToken(userDetails, refreshToken);
+        try {
+            jwtProvider.insertRefreshToken(userDetails, refreshToken);
+        }catch (Exception e){
+            jwtProvider.deleteRefreshToken(userDetails);
+            jwtProvider.insertRefreshToken(userDetails, refreshToken);
+        }
 
         String jwtJson = new ObjectMapper().writeValueAsString(jwtToken);
 
@@ -105,6 +109,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("nickname", userDetails.getUsersNickname());
         jsonObject.put("profileImg", userDetails.getProfileUrl());
+        jsonObject.put("usersId", userDetails.getUsersId());
 
         response.getWriter().print(jsonObject);
         response.getWriter().flush();
@@ -132,13 +137,4 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         response.getWriter().print(jsonObject);
         response.getWriter().flush();
     }
-
-    public void insertRefreshToken(Users user, String refreshToken){
-        RefreshToken refreshToken1 = RefreshToken.builder()
-                                                    .user(user)
-                                                    .refreshToken(refreshToken)
-                                                    .build();
-        refreshTokenRepository.save(refreshToken1);
-    }
-
 }

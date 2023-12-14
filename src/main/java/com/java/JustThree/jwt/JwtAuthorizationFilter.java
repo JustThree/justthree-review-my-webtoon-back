@@ -42,7 +42,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         // 헤더의 JWT 검증 -> 헤더에 JWT가 없으면 인증이 필요 없는 요청이므로 바로 filterChain 리턴
         String header = request.getHeader(jwtProperties.getHEADER_STRING());
 
-        log.info(header);
+//        log.info(header);
         //헤더가 없거나, Authorization이 없거나, X-Refresh-Token가 ture이면 패스
         if (header == null || !header.startsWith(jwtProperties.getTOKEN_PREFIX()) || Objects.equals(request.getHeader("X-Refresh-Token"), "true")) {
             filterChain.doFilter(request, response);
