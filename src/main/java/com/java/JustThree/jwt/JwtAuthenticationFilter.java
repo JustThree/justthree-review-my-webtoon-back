@@ -58,13 +58,13 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDTO.getUsersEmail(), loginDTO.getUsersPw());
 
-		/*
-		=> AuthenticationManager 에게 인증 요청 (UserDetailsService 통해 DB에 존재하는 유저인지 확인)
-		1. UserDetailsService 의 loadUserByUsername() 호출
-		2. loadUserByUsername() 에서 리턴 받은 UserDetails 객체와 authenticationToken 의
-		   principal(사용자 입력 email), credentials(사용자 입력 password) 비교
-		3. 비밀번호가 일치하면 Authentication 객체를 만들어서 필터체인으로 리턴, 일치하지 않으면 AuthenticationException 발생
-		*/
+       /*
+       => AuthenticationManager 에게 인증 요청 (UserDetailsService 통해 DB에 존재하는 유저인지 확인)
+       1. UserDetailsService 의 loadUserByUsername() 호출
+       2. loadUserByUsername() 에서 리턴 받은 UserDetails 객체와 authenticationToken 의
+          principal(사용자 입력 email), credentials(사용자 입력 password) 비교
+       3. 비밀번호가 일치하면 Authentication 객체를 만들어서 필터체인으로 리턴, 일치하지 않으면 AuthenticationException 발생
+       */
 
         return authenticationManager.authenticate(authenticationToken);
     }
