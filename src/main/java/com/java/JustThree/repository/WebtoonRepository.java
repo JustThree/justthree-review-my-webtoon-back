@@ -39,7 +39,10 @@ public interface WebtoonRepository extends JpaRepository<Webtoon,Long> {
     @Query("select w1 " +
             "from Webtoon w1" +
             " where w1.ageGradCdNm != :ageNm " +
-            "and w1 in (select w2 from Webtoon w2 where w2.mainGenreCdNm = :genre1 or w2.mainGenreCdNm = :genre2)")
+            "and w1 in " +
+            "(select w2 " +
+            "from Webtoon w2 " +
+            "where w2.mainGenreCdNm = :genre1 or w2.mainGenreCdNm = :genre2)")
     Page<Webtoon> findByAgeGradCdNmIsNotAndDoubleGenreIs(@Param("ageNm") String ageNm, @Param("genre1") String genre1, @Param("genre2") String genre2, Pageable pageable);
     // 전체 조회
     @Query("SELECT w " +
