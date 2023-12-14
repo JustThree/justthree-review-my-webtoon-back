@@ -71,12 +71,16 @@ public class BoardReplyService {
                 return "NotFoundBoardReply";
             }else{
                 BoardReply boardReply = optionalBoardReply.get();
+                //대댓글 삭제
+                List<BoardReply> boardReplyList = boardReplyRepository.findByParentReplyId(boardReplyId);
                 boardReplyRepository.delete(boardReply);
+                boardReplyRepository.deleteAll(boardReplyList);
                 return "success";
             }
         }catch (Exception e){
             return e.getMessage();
         }
+
     }
 
     //댓글 조회

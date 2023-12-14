@@ -3,6 +3,7 @@ package com.java.JustThree.service;
 import com.java.JustThree.config.RedisUtil;
 import com.java.JustThree.domain.RefreshToken;
 import com.java.JustThree.dto.JoinRequest;
+import com.java.JustThree.dto.ResetPWRequest;
 import com.java.JustThree.dto.RoleType;
 import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.UsersResponse;
@@ -10,6 +11,7 @@ import com.java.JustThree.jwt.JwtProperties;
 import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.RefreshTokenRepository;
 import com.java.JustThree.repository.UsersRepository;
+import io.jsonwebtoken.JwtException;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,10 +72,16 @@ public class UsersService {
     }
 
     public String getNewAccessToken(String token){
-        String userEmail = jwtProvider.getUserEmail(token);
-//        jwtProvider.createAccessToken();
-        RefreshToken refreshToken = rtr.findByUser_UsersEmail(userEmail);
-        return refreshToken.getRefreshToken();
+        UsersResponse user = getUserInfo(token);
+        String headerToken = token.replace(jwtProperties.getTOKEN_PREFIX(), "");
+
+        RefreshToken refreshToken = rtr.findByUser_UsersEmail(user.getUsersEmail());
+        if(headerToken.equals(refreshToken.getRefreshToken())){
+            return jwtProvider.createAccessToken(user.toEntity(user));
+        }else {
+            throw new JwtException("엑세스토큰 발급 실패");
+        }
+
     }
 
     public String generateRandomNumber() {
@@ -114,5 +123,17 @@ public class UsersService {
     public boolean validateDuplicateNickname(String nickname) {
         Optional<Users> user = ur.findByUsersNickname(nickname);
         return user.isPresent();
+    }
+
+    // 비밀번호 == 비밀번호 확인
+    public boolean validatePassword(ResetPWRequest resetPWDTO) {
+        return resetPWDTO.getPassword().equals(resetPWDTO.getCorrectPassword());
+    }
+
+    // 비밀번호 변경
+    @Transactional(rollbackFor = SQLException.class)
+    public void setPassword(String email, String password) {
+        Users user = ur.findByUsersEmail(email).orElseThrow(() -> new IllegalStateException("가입되지 않은 이메일입니다."));
+        user.changePassword(bCryptPasswordEncoder.encode(password));
     }
 }

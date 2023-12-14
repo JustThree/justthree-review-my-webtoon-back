@@ -115,4 +115,8 @@ public class Users implements UserDetails {
         return true;
     }
 
+    public void changePassword(String password) {
+        this.usersPw = password;
+    }
+
 }

@@ -1,9 +1,6 @@
 package com.java.JustThree.controller;
 
-import com.java.JustThree.dto.JoinRequest;
-import com.java.JustThree.dto.LoginRequest;
-import com.java.JustThree.dto.RefreshTokenResponse;
-import com.java.JustThree.dto.UsersResponse;
+import com.java.JustThree.dto.*;
 import com.java.JustThree.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -102,6 +99,28 @@ public class UserController {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("문제가 발생하였습니다.");
+        }
+    }
+
+    @PutMapping("/reset-password")
+    public ResponseEntity<Object> resetPassword(
+            @RequestParam("email") String email,
+            @RequestHeader(value = "secretCode", required = true) String secretCode,
+            ResetPWRequest resetPWDTO) {
+
+        if (!secretCode.equals("webtakcu-justThree-1")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("허용되지 않은 접근입니다.");
+        }
+        // '비밀번호', '비밀번호 확인' 두 값이 같은 지 확인
+        if (!usersService.validatePassword(resetPWDTO)) {
+            return ResponseEntity.badRequest().body("비밀번호가 일치하지 않습니다.");
+        }
+        // 비밀번호 변경
+        try {
+            usersService.setPassword(email, resetPWDTO.getPassword());
+            return ResponseEntity.ok("비밀번호가 변경되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
