@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/mypage")
 @CrossOrigin
 public class MyPageController {
-    private final MyPageService service;
+    private final MyPageService myPageService;
     private final BCryptPasswordEncoder passwordEncoder;
   private final UsersService usersService;
     //////////////////////////////////////////////////유저 정보 페이지/////////////////////////////////////////////////////////////
