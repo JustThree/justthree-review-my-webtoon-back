@@ -79,8 +79,8 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
         Users userDetails = (Users) authentication.getPrincipal();
 
-        String accessToken = jwtProvider.createAccessToken(userDetails, jwtProperties);
-        String refreshToken = jwtProvider.createRefreshToken(userDetails, jwtProperties);
+        String accessToken = jwtProvider.createAccessToken(userDetails);
+        String refreshToken = jwtProvider.createRefreshToken(userDetails);
 
         Token jwtToken = Token
                 .builder()
@@ -88,8 +88,12 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
                 .refreshToken(jwtProperties.getTOKEN_PREFIX() + refreshToken)
                 .key(userDetails.getUsersEmail())
                 .build();
-
-        insertRefreshToken(userDetails, refreshToken);
+        try {
+            jwtProvider.insertRefreshToken(userDetails, refreshToken);
+        }catch (Exception e){
+            jwtProvider.deleteRefreshToken(userDetails);
+            jwtProvider.insertRefreshToken(userDetails, refreshToken);
+        }
 
         String jwtJson = new ObjectMapper().writeValueAsString(jwtToken);
 
@@ -133,13 +137,4 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         response.getWriter().print(jsonObject);
         response.getWriter().flush();
     }
-
-    public void insertRefreshToken(Users user, String refreshToken){
-        RefreshToken refreshToken1 = RefreshToken.builder()
-                                                    .user(user)
-                                                    .refreshToken(refreshToken)
-                                                    .build();
-        refreshTokenRepository.save(refreshToken1);
-    }
-
 }
