@@ -10,7 +10,6 @@ public class ReviewReplyResponse {
     private String userNickname;
     private String content;
     public static ReviewReplyResponse fromEntity(Review_Reply reviewReply){
-
         return ReviewReplyResponse.builder()
                 .userNickname(reviewReply.getUsers().getUsersNickname())
                 .content(reviewReply.getContent())

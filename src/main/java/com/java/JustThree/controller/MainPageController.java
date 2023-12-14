@@ -55,6 +55,7 @@ public class MainPageController {
             return ResponseEntity.ok()
                     .body(webtoonService.getWebtoonPage(pageable, genre, order));
         } catch (Exception e) {
+            System.out.println(e);
             return ResponseEntity.status(404)
                     .header("error", e.getMessage())
                     .build();

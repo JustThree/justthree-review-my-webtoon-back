@@ -107,29 +107,59 @@ public class WebtoonService {
 
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC,
                 orderVal));
-        webtoonMainResponsePage = switch (genre) {
-            case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "판타지", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "romance" -> webtoonRepository.findByAgeGradCdNmIsNotAndDoubleGenreIs
-                            ("19세 이상", "이성애","로맨스", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "school" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "학원", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "daily" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "일상", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "comic" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "코믹", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "martialarts" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "무협", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            default -> webtoonRepository.findByAgeGradCdNmIsNot
-                            ("19세 이상", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-        };
+        if (!order.equals("rate")) {
+            webtoonMainResponsePage = switch (genre) {
+                case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
+                                ("19세 이상", "판타지", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "romance" -> webtoonRepository.findByAgeGradCdNmIsNotAndDoubleGenreIs
+                                ("19세 이상", "이성애", "로맨스", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "school" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
+                                ("19세 이상", "학원", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "daily" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
+                                ("19세 이상", "일상", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "comic" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
+                                ("19세 이상", "코믹", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "martialarts" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
+                                ("19세 이상", "무협", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                default -> webtoonRepository.findByAgeGradCdNmIsNot
+                                ("19세 이상", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+            };
+        } else {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+            webtoonMainResponsePage = switch (genre) {
+                case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
+                                ("19세 이상", "판타지", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "romance" -> webtoonRepository.findByAgeGradCdNmIsNotAndDoubleGenreIsOrderByPopularity
+                                ("19세 이상", "이성애", "로맨스", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "school" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
+                                ("19세 이상", "학원", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "daily" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
+                                ("19세 이상", "일상", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "comic" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
+                                ("19세 이상", "코믹", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "martialarts" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
+                                ("19세 이상", "무협", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                default -> webtoonRepository.findByAgeGradCdNmIsNotAndOrderByPopularity
+                                ("19세 이상", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+
+            };
+        }
+        System.out.println(webtoonMainResponsePage);
+        System.out.println(111);
         return  webtoonMainResponsePage;
     }
     // 웹툰 키워드로 리스트 조회
