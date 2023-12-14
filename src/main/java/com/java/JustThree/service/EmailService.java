@@ -33,14 +33,14 @@ public class EmailService {
         // frontend url로 변경 필요
         // localhost:5173/reset-password, http://localhost:8089/api/v1/auth/verify-code?email=%s&code=%s
         String verificationUrl = String.format("http://localhost:5173/reset-password?email=%s&code=%s", to, token);
-        String text = "<h1> 안녕하세요! 노노그래머스입니다. </h1>" +
+        String text = "<h1> 안녕하세요! 웹타쿠입니다. </h1>" +
                 "<br><p> 아래 링크를 클릭하면 이메일 인증이 완료됩니다. </p>" +
                 "<br><a href='" + verificationUrl + "'>이메일 인증하기</a><br>" +
                 "<br><p>감사합니다.</p>";
 
         MimeMessage message = javaMailSender.createMimeMessage();
         message.setRecipients(MimeMessage.RecipientType.TO, to);
-        message.setSubject("[노노그래머스] 회원가입 이메일 인증 메일입니다.");
+        message.setSubject("[웹타쿠] 회원가입 이메일 인증 메일입니다.");
         message.setText(text, "utf-8", "html");
         javaMailSender.send(message);
     }
