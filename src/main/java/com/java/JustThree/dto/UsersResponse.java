@@ -1,5 +1,6 @@
 package com.java.JustThree.dto;
 
+import com.java.JustThree.domain.Users;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,4 +19,11 @@ public class UsersResponse {
     private String profileUrl;
     private LocalDateTime created;
     private int statusCode;
+
+    public Users toEntity(UsersResponse usersResponse){
+        return Users.builder()
+                .usersEmail(this.getUsersEmail())
+                        .usersId(this.getUsersId())
+                .build();
+    };
 }
