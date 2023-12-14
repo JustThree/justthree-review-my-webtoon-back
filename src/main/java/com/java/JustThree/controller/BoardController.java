@@ -11,6 +11,9 @@ import com.java.JustThree.service.board.BoardReplyService;
 import com.java.JustThree.service.board.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -93,16 +96,50 @@ public class BoardController {
                                             @RequestParam(name = "size", defaultValue = "10") int size,
                                             @RequestParam(name = "sortings", defaultValue = "sortDesc") String sortings,
                                             @RequestParam(name = "keyword", required = false) String keyword){
-
-        return boardService.getBoardsByPage(page, size, sortings, keyword);
+        String searchWord="";
+        if(keyword == null){
+            searchWord = "";
+        }else{
+            searchWord = keyword;
+        }
+        return boardService.getBoardsByPage(page, size, sortings, searchWord);
     }
-    //커뮤니티 게시글 목록 키워드 검색 조회
-    /*@GetMapping("/search")
-    List<GetBoardListResponse> getBoardsByKeyword(@RequestParam(name = "page", defaultValue = "1") int page,
-                                            @RequestParam(name = "size", defaultValue = "10") int size,
-                                            @RequestParam(name = "keyword", required = false) String keyword){
-        return boardService.searchBoardsByKeyword(keyword, page, size);
+    //공지 게시글 목록(noticeYn = 1)조회
+   /* @GetMapping("/notice")
+    List<GetBoardListResponse> getNoticeList( @RequestParam(name = "keyword", required = false) String keyword){
+        String searchWord = "";
+        if(keyword == null){
+            searchWord = "";
+        }else{
+            searchWord = keyword;
+        }
+        return boardService.getNoticesByPage(searchWord);
     }*/
+  /* @GetMapping("/notice")
+    List<GetBoardListResponse> getNoticeList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                             @RequestParam(name = "size", defaultValue = "10") int size,
+                                             @RequestParam(name = "keyword", required = false) String keyword){
+        String searchWord = "";
+        if(keyword == null){
+            searchWord = "";
+        }else{
+            searchWord = keyword;
+        }
+        return boardService.getNoticesByPage(page, size, searchWord);
+    }*/
+    @GetMapping("/notice")
+    public Page<GetBoardListResponse> getNoticeList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                             @RequestParam(name = "size", defaultValue = "10") int size,
+                                             @RequestParam(name = "keyword", required = false) String keyword){
+        String searchWord = "";
+        if(keyword == null){
+            searchWord = "";
+        }else{
+            searchWord = keyword;
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        return boardService.getNoticesByPage(searchWord, pageable);
+    }
 
     //커뮤니티 글 댓글 등록
     @PostMapping("/reply")
