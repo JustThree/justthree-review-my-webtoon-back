@@ -12,7 +12,7 @@ import org.hibernate.annotations.IdGeneratorType;
 @Entity
 @Table(indexes = {
         @Index(name = "idx_title", columnList = "title"),
-        @Index(name = "idx_snw_piw", columnList = "pictrWritrNm, sntncWritrNm"),
+//        @Index(name = "idx_snw_piw", columnList = "pictrWritrNm, sntncWritrNm"),
 })
 public class Webtoon {
     @Id

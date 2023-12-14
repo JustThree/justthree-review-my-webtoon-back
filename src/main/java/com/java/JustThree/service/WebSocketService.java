@@ -41,11 +41,8 @@ public class WebSocketService {
 
     @OnOpen
     public void onOpen(Session s) throws IOException {
-        System.out.println(s.getQueryString());
         log.info("[open session] " + s);
-
         // Long masterId = Long.valueOf((String) s.getUserProperties().get("masterId"));
-
         if(isInChatRoom(s)){ // 채팅방 접속중
 
             Long masterId = getMasterId(s);
@@ -74,9 +71,8 @@ public class WebSocketService {
     @OnMessage
     public void onMessage(String msg, Session session) throws Exception{
 
-        // String token = getToken(session);
-        String token = "123";
-
+        String token = getToken(session);
+//        String token = "123";
         // 클라이언트에서 message가 오는 경우는 채팅을 보냈을 때 말고는 없음
         Long masterId = getMasterId(session);
 
@@ -152,15 +148,15 @@ public class WebSocketService {
     }
 
     private String[] getTokenAndMasterId(Session session){
-        return session.getQueryString().split("%");
+        return session.getQueryString().split("&");
     }
 
     private String getToken(Session session){
-        return getTokenAndMasterId(session)[0];
+        return getTokenAndMasterId(session)[0].replace("%20", " ");
     }
 
     private Long getMasterId(Session session){
-        return Long.valueOf(getTokenAndMasterId(session)[1]);
+        return Long.valueOf(getTokenAndMasterId(session)[1] );
     }
 
     private void sendUpdate() throws IOException {

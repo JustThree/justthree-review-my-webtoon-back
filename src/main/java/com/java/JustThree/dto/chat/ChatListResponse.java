@@ -1,5 +1,8 @@
 package com.java.JustThree.dto.chat;
 
+import com.java.JustThree.domain.Chat;
+import com.java.JustThree.domain.Users;
+import com.java.JustThree.domain.Webtoon;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,12 +20,32 @@ public class ChatListResponse {
     private String usersNickname;
     private String imageUrl;
 
-    public ChatListResponse(String contents, Long masterId, String title, LocalDateTime created, String usersNickname, String imageUrl){
-        this.contents = contents;
-        this.masterId = masterId;
-        this.title = title;
+//    public ChatListResponse(String contents, Long masterId, String title, LocalDateTime created, String usersNickname, String imageUrl){
+//        this.contents = contents;
+//        this.masterId = masterId;
+//        this.title = title;
+//        this.created = String.valueOf(created);
+//        this.usersNickname = usersNickname;
+//        this.imageUrl = imageUrl;
+//    }
+    public ChatListResponse(Chat chat, LocalDateTime created){
+        Webtoon webtoon = chat.getWebtoon();
+        Users users = chat.getUsers();
+        this.contents = chat.getContents();
+        this.masterId = webtoon.getMasterId();
+        this.title = webtoon.getTitle();
         this.created = String.valueOf(created);
-        this.usersNickname = usersNickname;
-        this.imageUrl = imageUrl;
+        this.usersNickname = users.getUsersNickname();
+        this.imageUrl = webtoon.getImageUrl();
+    }
+    public ChatListResponse(Chat chat){
+        Webtoon webtoon = chat.getWebtoon();
+        Users users = chat.getUsers();
+        this.contents = chat.getContents();
+        this.masterId = webtoon.getMasterId();
+        this.title = webtoon.getTitle();
+        this.created = String.valueOf(chat.getCreated());
+        this.usersNickname = users.getUsersNickname();
+        this.imageUrl = webtoon.getImageUrl();
     }
 }
