@@ -36,12 +36,7 @@ public class GetBoardOneResponse {
     public static GetBoardOneResponse entityToDTO(Board board,
                                                   List<BoardImage> boardImageList,
                                                   List<GetBoardReplyResponse> boardReplyList){
-        /*List<Map<String, String>> fileMapList = new ArrayList<>();
-        for(BoardImage boardImage : boardImageList){
-            Map<String, String> fileMap = new HashMap<>();
-            fileMap.put(boardImage.getOriginName(), boardImage.getAccessUrl());
-            fileMapList.add(fileMap);
-        }*/
+
         List<ImageDataResponse> fileMapList = new ArrayList<>();
         for(BoardImage boardImage : boardImageList){
             ImageDataResponse imageData = new ImageDataResponse(boardImage.getImgId(), boardImage.getAccessUrl(), boardImage.getOriginName());

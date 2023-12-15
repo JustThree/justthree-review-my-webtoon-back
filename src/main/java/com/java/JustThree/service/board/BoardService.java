@@ -204,38 +204,15 @@ public class BoardService {
                 );
         Page<Board> boardPage = boardRepository.findAll(specification, pageable);
         List<Board> boardList = boardPage.getContent();
+
         if(boardList.isEmpty()) {
             System.out.println(boardList);
         }
+
         return boardList.stream()
                 .map(GetBoardListResponse::entityToDTO)
                 .collect(Collectors.toList());
     }
-
-    //공지사항 글 목록 조회
-   /* public List<GetBoardListResponse> getNoticesByPage(int page, int size, String keyword){
-        System.out.println(keyword);
-        // 기본 최신순 정렬
-        Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "created"));
-
-        // 검색어를 포함하는 게시글만 조회하는 쿼리 작성
-        Specification<Board> specification = (root, query, criteriaBuilder) ->
-                criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get("noticeYn"), 1), // noticeYn이 1인 공지 게시글만 조회
-                        criteriaBuilder.or(
-                                criteriaBuilder.like(root.get("title"), "%" + keyword + "%"), // 제목에 검색어 포함
-                                criteriaBuilder.like(root.get("content"), "%" + keyword + "%") // 내용에 검색어 포함
-                        )
-                );
-        Page<Board> noticeBoardPage = boardRepository.findAll(specification, pageable);
-        List<Board> boardList = noticeBoardPage.getContent();
-        if(boardList.isEmpty()) {
-            System.out.println(boardList);
-        }
-        return boardList.stream()
-                .map(GetBoardListResponse::entityToDTO)
-                .collect(Collectors.toList());
-    }*/
     public Page<GetBoardListResponse> getNoticesByPage(String keyword, Pageable pageable) {
         Specification<Board> specification = (root, query, criteriaBuilder) ->
                 criteriaBuilder.and(
@@ -249,12 +226,6 @@ public class BoardService {
         Page<Board> noticeBoardPage = boardRepository.findAll(specification, pageable);
         return noticeBoardPage.map(GetBoardListResponse::entityToDTO);
     }
-
-    public int getNoticesByPage2(String keyword){
-        List<Board> boardList = boardRepository.findAllByNoticeYnOrderByCreatedDesc(1);
-        return boardList.size();
-    }
-
 
     //커뮤니티 글 검색
     public List<GetBoardListResponse> searchBoardsByKeyword(String keyword, int page, int size) {
@@ -292,6 +263,5 @@ public class BoardService {
                 .map(GetBoardListResponse::entityToDTO)
                 .collect(Collectors.toList());
     }
-
 
 }

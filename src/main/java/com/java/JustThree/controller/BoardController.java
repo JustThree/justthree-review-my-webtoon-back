@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +66,6 @@ public class BoardController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(bnfe.getMessage());
         }
     }
-
     // 커뮤니티 글 수정
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateBoard(@PathVariable("id") long boardId,
@@ -104,29 +104,7 @@ public class BoardController {
         }
         return boardService.getBoardsByPage(page, size, sortings, searchWord);
     }
-    //공지 게시글 목록(noticeYn = 1)조회
-   /* @GetMapping("/notice")
-    List<GetBoardListResponse> getNoticeList( @RequestParam(name = "keyword", required = false) String keyword){
-        String searchWord = "";
-        if(keyword == null){
-            searchWord = "";
-        }else{
-            searchWord = keyword;
-        }
-        return boardService.getNoticesByPage(searchWord);
-    }*/
-  /* @GetMapping("/notice")
-    List<GetBoardListResponse> getNoticeList(@RequestParam(name = "page", defaultValue = "1") int page,
-                                             @RequestParam(name = "size", defaultValue = "10") int size,
-                                             @RequestParam(name = "keyword", required = false) String keyword){
-        String searchWord = "";
-        if(keyword == null){
-            searchWord = "";
-        }else{
-            searchWord = keyword;
-        }
-        return boardService.getNoticesByPage(page, size, searchWord);
-    }*/
+    //공지 목록 조회
     @GetMapping("/notice")
     public Page<GetBoardListResponse> getNoticeList(@RequestParam(name = "page", defaultValue = "1") int page,
                                              @RequestParam(name = "size", defaultValue = "10") int size,
@@ -137,47 +115,7 @@ public class BoardController {
         }else{
             searchWord = keyword;
         }
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "created"));
         return boardService.getNoticesByPage(searchWord, pageable);
-    }
-
-    //커뮤니티 글 댓글 등록
-    @PostMapping("/reply")
-    public ResponseEntity<?> addBoardReply(@RequestBody AddBoardReplyReqeust addBoardReplyReq){
-        System.out.println(addBoardReplyReq);
-        try{
-            Long res = boardReplyService.addReply(addBoardReplyReq);
-            log.info("댓글 등록 pk"+res);
-            return ResponseEntity.ok("1");
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    //커뮤니티 글 댓글 수정
-    @PutMapping("/reply/{id}")
-    public ResponseEntity<?> addBoardReply(@PathVariable("id") long replyId,
-                                           @RequestBody UpdateBoardReplyReqeust updateBoardReplyReq){
-        System.out.println(replyId);
-        updateBoardReplyReq.setBoardReplyId(replyId);
-        System.out.println(updateBoardReplyReq);
-        try{
-            Long res = boardReplyService.updateBoardReply(updateBoardReplyReq);
-            log.info("댓글 수정 pk"+res);
-            return ResponseEntity.ok("1");
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-    //커뮤니티 글 댓글 삭제
-    @DeleteMapping("/reply/{id}")
-    public ResponseEntity<String> removeBoardReply(@PathVariable("id")long id){
-        log.info("id >>"+id);
-        try{
-            String res = boardReplyService.removeBoardReply(id);
-            return ResponseEntity.ok(id+"댓글 삭제 "+res);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
     }
 }
