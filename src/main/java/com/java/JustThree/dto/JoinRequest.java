@@ -1,12 +1,12 @@
 package com.java.JustThree.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class JoinRequest {
     private String usersEmail;
     private String usersNickname;
