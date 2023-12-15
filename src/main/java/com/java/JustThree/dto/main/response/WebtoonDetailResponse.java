@@ -31,8 +31,8 @@ public class WebtoonDetailResponse {
     public String links;
     public Integer countStar;
     public Integer userStar;
-//    public List<Review> Reviews;
-    public static WebtoonDetailResponse fromEntity(Webtoon webtoon,Float starAvg,Integer countStar,Integer userStar){
+    public boolean isAddInterest;
+    public static WebtoonDetailResponse fromEntity(Webtoon webtoon,Float starAvg,Integer countStar,Integer userStar,boolean isAddInterest){
         return WebtoonDetailResponse.builder()
                 .title(webtoon.getTitle())
                 .writer("글:" + webtoon.getSntncWritrNm() + " /그림:" + webtoon.getPictrWritrNm())
@@ -43,6 +43,7 @@ public class WebtoonDetailResponse {
                 .links(webtoon.getUrls())
                 .countStar(countStar)
                 .userStar(userStar)
+                .isAddInterest(isAddInterest)
                 .build();
 
     }
