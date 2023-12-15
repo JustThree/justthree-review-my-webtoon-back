@@ -42,7 +42,7 @@ public class ChatService {
                 .build();
         try{
             chatRepository.save(chat);
-            return new ChatResponse(chat, chat.getUsers().getUsersNickname());
+            return new ChatResponse(chat, chat.getUsers());
         }catch (Exception e){
             e.printStackTrace();
             return null;
@@ -53,7 +53,7 @@ public class ChatService {
         List<ChatResponse> response = new ArrayList<>();
         chatRepository.findByWebtoon_masterIdOrderByCreated(masterId)
                 .forEach(element -> response.add(
-                        new ChatResponse(element, element.getUsers().getUsersNickname())
+                        new ChatResponse(element, element.getUsers())
                 ));
         return response;
     }
