@@ -22,12 +22,15 @@ public class ChatResponse {
     private String senderNickname;
     @JsonProperty
     private String profileUrl;
+    @JsonProperty
+    private String usersId;
 
     public ChatResponse(Chat chat, Users users){
         this.contents = chat.getContents();
         this.created = chat.getCreated().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         this.senderNickname = users.getUsersNickname();
         this.profileUrl = users.getProfileUrl();
+        this.usersId = String.valueOf(users.getUsersId());
 
     }
 }

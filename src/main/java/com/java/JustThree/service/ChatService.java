@@ -1,9 +1,11 @@
 package com.java.JustThree.service;
 
 import com.java.JustThree.domain.Chat;
+import com.java.JustThree.domain.Users;
 import com.java.JustThree.domain.Webtoon;
 import com.java.JustThree.dto.chat.ChatInfoResponse;
 import com.java.JustThree.dto.chat.ChatListResponse;
+import com.java.JustThree.dto.chat.ChatParticipantResponse;
 import com.java.JustThree.dto.chat.ChatResponse;
 import com.java.JustThree.repository.ChatRepository;
 import com.java.JustThree.repository.UsersRepository;
@@ -33,11 +35,19 @@ public class ChatService {
     private final UsersRepository usersRepository;
     private final ChatRepository chatRepository;
 
+    public List<ChatParticipantResponse> getUsers(Set<Long> usersId){
+        List<ChatParticipantResponse> users = new ArrayList<>();
+        usersId.forEach(e-> users.add(new ChatParticipantResponse(usersRepository.findById(e).get())));
+        return users;
+    }
+    public Long getUsersId(String token){
+        return usersService.getUserInfo(token).getUsersId();
+    }
     public ChatResponse save(String msg, Long masterId, String token){
         Chat chat = Chat.builder()
                 .contents(msg)
                 .webtoon(webtoonRepository.findById(masterId).get())
-                .users(usersRepository.findById(usersService.getUserInfo(token).getUsersId()).get()) //  findById(jwtService.getId(token))
+                .users(usersRepository.findById(getUsersId(token)).get()) //  findById(jwtService.getId(token))
                 .created(LocalDateTime.now())
                 .build();
         try{
@@ -92,7 +102,7 @@ public class ChatService {
             case 3:
                 return chatRepository.findLastChatsOrderByHotWebtoon();
             case 4:
-                return chatRepository.findByUsers_UsersId(usersService.getUserInfo(token).getUsersId());
+                return chatRepository.findByUsers_UsersId(getUsersId(token));
             default:
         }
         return list;
