@@ -75,4 +75,15 @@ public interface WebtoonRepository extends JpaRepository<Webtoon,Long> {
             "ORDER BY COALESCE(AVG(s.starVal), 0) DESC")
     Page<Webtoon> findByAgeGradCdNmIsNotAndDoubleGenreIsOrderByPopularity(@Param("ageNm") String ageNm, @Param("genre1") String genre1, @Param("genre2") String genre2,Pageable pageable);
 
+    // 장르 3개
+    @Query("SELECT w " +
+            "FROM Webtoon w " +
+            "LEFT JOIN Star s " +
+            "on s.webtoon.masterId = w.masterId " +
+            "WHERE (w.mainGenreCdNm = :genre1 OR w.mainGenreCdNm = :genre2 OR w.mainGenreCdNm = :genre3) " +
+            "AND w.ageGradCdNm != :ageNm " +
+            "GROUP BY w.masterId, w.title " +
+            "ORDER BY COALESCE(AVG(s.starVal), 0) DESC")
+    Page<Webtoon> findByAgeGradCdNmIsNotAndTripleGenreIsOrderByPopularity(@Param("ageNm") String ageNm, @Param("genre1") String genre1, @Param("genre2") String genre2,@Param("genre3") String genre3,Pageable pageable);
+
 }

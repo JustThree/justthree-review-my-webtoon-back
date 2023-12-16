@@ -24,20 +24,20 @@ public class MyPageController {
   private final UsersService usersService;
     //////////////////////////////////////////////////유저 정보 페이지/////////////////////////////////////////////////////////////
     @GetMapping("/userinfo/{usersId}")
-    public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable Long usersId,@RequestHeader("Authorization") String token){
+    public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable("usersId") Long usersId,@RequestHeader(value = "Authorization",required = false) String token){
         UserInfoResponse userInfoResponse = myPageService.userinfo(usersId);
 
         return ResponseEntity.ok(userInfoResponse);
     }
     //////////////////////////////////////////////////작성 리뷰 목록/////////////////////////////////////////////////////////////
     @GetMapping("/reviewed/{usersId}")
-    public ResponseEntity<List<ReviewedWebtoonResponse>> reviewedWebtoon(@PathVariable Long usersId){
+    public ResponseEntity<List<ReviewedWebtoonResponse>> reviewedWebtoon(@PathVariable("usersId") Long usersId){
         List<ReviewedWebtoonResponse> reviewedWebtoonList=myPageService.reviewedWebtoonlist(usersId);
         return ResponseEntity.ok(reviewedWebtoonList);
     }
     //////////////////////////////////////////////////관심 웹툰 목록/////////////////////////////////////////////////////////////
     @GetMapping("/interested/{usersId}")
-    public ResponseEntity<List<InterestedWebtoonResponse>> interestedWebtoon(@PathVariable Long usersId){
+    public ResponseEntity<List<InterestedWebtoonResponse>> interestedWebtoon(@PathVariable("usersId") Long usersId){
         List<InterestedWebtoonResponse> interestedWebtoonList=myPageService.interestedWebtoonlist(usersId);
         return ResponseEntity.ok(interestedWebtoonList);
     }
@@ -61,7 +61,7 @@ public class MyPageController {
     }
     //////////////////////////////////////////////////평가 웹툰 목록/////////////////////////////////////////////////////////////
     @GetMapping("/rated/{usersId}")
-    public ResponseEntity<List<RatedWebtoonResponse>> ratedWebtoon(@PathVariable Long usersId , @RequestParam (defaultValue = "1")int sortNum) {
+    public ResponseEntity<List<RatedWebtoonResponse>> ratedWebtoon(@PathVariable("usersId") Long usersId , @RequestParam (defaultValue = "1")int sortNum) {
         List<RatedWebtoonResponse> ratedWebtoonList = myPageService.ratedWebtoonlist(usersId,sortNum);
         return ResponseEntity.ok(ratedWebtoonList);
     }
@@ -72,17 +72,17 @@ public class MyPageController {
     }
     ////////////////////////////////////////////////팔로잉 하는 목록/////////////////////////////////////////////////////////////
     @GetMapping("/following/{usersId}")
-    public List<FollowResponse> getFollowingList(@PathVariable Long usersId) {
+    public List<FollowResponse> getFollowingList(@PathVariable("usersId") Long usersId) {
         return myPageService.getFollowingList(usersId);
     }
     ////////////////////////////////////////////////팔로워 목록 ////////////////////////////////////////////////////////////////
     @GetMapping("/follower/{usersId}")
-    public List<FollowResponse> getFollowerList(@PathVariable Long usersId){
+    public List<FollowResponse> getFollowerList(@PathVariable("usersId") Long usersId){
         return myPageService.getFollowerList(usersId);
     }
     //////////////////////////////////////////////팔로잉 팔로워 목록 ///////////////////////////////
     @GetMapping("/follow/{usersId}")
-    public ResponseEntity<List<FollowResponse>> getFollowList(@PathVariable Long usersId, @RequestParam(defaultValue = "1") int sortNum) {
+    public ResponseEntity<List<FollowResponse>> getFollowList(@PathVariable("usersId") Long usersId, @RequestParam(defaultValue = "1") int sortNum) {
         try {
             List<FollowResponse> followList = myPageService.followlist(usersId,sortNum);
             return ResponseEntity.ok(followList);

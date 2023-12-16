@@ -32,7 +32,13 @@ public class WebtoonDetailResponse {
     public Integer countStar;
     public Integer userStar;
     public boolean isAddInterest;
-    public static WebtoonDetailResponse fromEntity(Webtoon webtoon,Float starAvg,Integer countStar,Integer userStar,boolean isAddInterest){
+    public boolean ageCheck;
+    public static WebtoonDetailResponse fromEntity(Webtoon webtoon,
+                                                   Float starAvg,
+                                                   Integer countStar,
+                                                   Integer userStar,
+                                                   boolean isAddInterest,
+                                                   boolean ageCheck){
         return WebtoonDetailResponse.builder()
                 .title(webtoon.getTitle())
                 .writer("글:" + webtoon.getSntncWritrNm() + " /그림:" + webtoon.getPictrWritrNm())
@@ -44,6 +50,7 @@ public class WebtoonDetailResponse {
                 .countStar(countStar)
                 .userStar(userStar)
                 .isAddInterest(isAddInterest)
+                .ageCheck(ageCheck)
                 .build();
 
     }

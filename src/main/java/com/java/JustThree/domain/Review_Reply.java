@@ -39,5 +39,7 @@ public class Review_Reply {
 
     @Column(name = "parent_id")
     private Long parentId;
+
+    private Integer remove;
 }
 

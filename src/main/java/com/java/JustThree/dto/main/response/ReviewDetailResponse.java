@@ -10,6 +10,7 @@ import lombok.Getter;
 @Getter
 public class ReviewDetailResponse {
     Long ReviewId;
+    Long writerId;
     String webtoonTitle;
     String profileImg;
     String userNickName;
@@ -17,11 +18,13 @@ public class ReviewDetailResponse {
     String content;
     String webtoonImg;
     String genre;
+    boolean deleted;
     boolean checkLike;
 
-    public static ReviewDetailResponse fromEntity(Review review, Star star, boolean checkLike){
+    public static ReviewDetailResponse fromEntity(Review review, Star star,boolean deleted, boolean checkLike){
         return ReviewDetailResponse.builder()
                 .ReviewId(review.getReviewId())
+                .writerId(review.getUsers().getUsersId())
                 .webtoonTitle(review.getWebtoon().getTitle())
                 .profileImg(review.getUsers().getProfileUrl())
                 .userNickName(review.getUsers().getUsersNickname())
@@ -29,6 +32,7 @@ public class ReviewDetailResponse {
                 .content(review.getContent())
                 .webtoonImg(review.getWebtoon().getImageUrl())
                 .genre(review.getWebtoon().getMainGenreCdNm())
+                .deleted(deleted)
                 .checkLike(checkLike)
                 .build();
     }
