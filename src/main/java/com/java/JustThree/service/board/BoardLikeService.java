@@ -16,6 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class BoardLikeService {
+
     private final BoardLikeRepository boardLikeRepository;
     private final BoardRepository boardRepository;
 
@@ -34,6 +35,31 @@ public class BoardLikeService {
             boardLikeRepository.save(newBoardLike);
             return newBoardLike.getBoardLikeId();
         }
+    }
+    //게시글 좋아요 취소
+    @Transactional
+    public String removeBoardLike(long boardLikeId){
+        try{
+            Optional<BoardLike> optionalBoardLike = boardLikeRepository.findById(boardLikeId);
+            if(optionalBoardLike.isEmpty()){
+                return "NotFound";
+            }else{
+                BoardLike boardLike = optionalBoardLike.get();
+                boardLikeRepository.delete(boardLike);
+                return "success";
+            }
+        }catch (Exception e){
+            return e.getMessage();
+        }
+    }
+    //게시글 좋아요 조회(좋아요 여부)
+    public boolean getBoardLike(Long boardId, Long usersId){
+        return boardLikeRepository.existsBoardLikeByBoard_BoardIdAndUsers_UsersId(boardId, usersId);
+    }
+
+    // 하나의 게시글에 좋아요 개수
+    public long getBoardLikeCount(Long boardId){
+        return boardLikeRepository.countByBoard_BoardId(boardId);
     }
 
 }

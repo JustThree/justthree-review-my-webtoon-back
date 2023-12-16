@@ -15,9 +15,9 @@ public class BoardLike {
     @Column(name = "board_like_id")
     private Long boardLikeId;
     @ManyToOne
-    @JoinColumn(name = "users_id")
+    @JoinColumn(name = "users_id", referencedColumnName = "users_id")
     private Users users;
     @ManyToOne
-    @JoinColumn(name = "board_id")
+    @JoinColumn(name = "board_id",  referencedColumnName = "board_id")
     private Board board;
 }

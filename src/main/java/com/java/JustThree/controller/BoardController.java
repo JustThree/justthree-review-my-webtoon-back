@@ -1,12 +1,10 @@
 package com.java.JustThree.controller;
 
-import com.java.JustThree.dto.board.request.AddBoardRequest;
-import com.java.JustThree.dto.board.request.AddBoardReplyReqeust;
-import com.java.JustThree.dto.board.request.UpdateBoardReplyReqeust;
+import com.java.JustThree.dto.board.request.*;
 import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
-import com.java.JustThree.dto.board.request.UpdateBoardRequest;
 import com.java.JustThree.exception.BoardNotFoundException;
+import com.java.JustThree.service.board.BoardLikeService;
 import com.java.JustThree.service.board.BoardReplyService;
 import com.java.JustThree.service.board.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +28,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
-    private final BoardReplyService boardReplyService;
+    private final BoardLikeService boardLikeService;
 
     //커뮤니티 글 등록
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -118,4 +116,28 @@ public class BoardController {
         Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "created"));
         return boardService.getNoticesByPage(searchWord, pageable);
     }
+    //게시글 좋아요
+    @PostMapping("/likes")
+    public ResponseEntity<?> addBoardLike(@RequestBody AddBoardLikeRequest addBoardLikeReq){
+        System.out.println(addBoardLikeReq);
+        try{
+            Long res = boardLikeService.addLike(addBoardLikeReq);
+            log.info("좋아요 등록 pk"+res);
+            return ResponseEntity.ok(res);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    //게시글 좋아요 취소(삭제)
+    @DeleteMapping("/likes/{id}")
+    public ResponseEntity<String> removeBoardLike(@PathVariable("id")long id){
+        log.info("id >>"+id);
+        try{
+            String res = boardLikeService.removeBoardLike(id);
+            return ResponseEntity.ok(id+"글 삭제 "+res);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

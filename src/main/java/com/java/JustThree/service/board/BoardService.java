@@ -41,6 +41,9 @@ public class BoardService {
     //댓글
     private  final BoardReplyService boardReplyService;
 
+    //좋아요
+    private final BoardLikeService boardLikeService;
+
     //커뮤니티 글 등록
     @Transactional
     public Long addBoard(AddBoardRequest addBoardRequest){
@@ -77,19 +80,26 @@ public class BoardService {
             return null;
         }else {
             Board board = optionalBoard.get();
+
+            //해당 글에 대한 이미지  파일
             List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
             //log.info("board1  >>"+board);
             //log.info("boardImgList  >>"+boardImageList);
 
             //조회수 증가
-            //board.plusViewCount(board.getViewCount() + 1);
-            //boardRepository.save(board);
             boardRepository.updateViewCount(board.getViewCount()+1, boardId);
             //log.info("board2  >>"+board);
 
-            //댓글 조회
+            //해당 글에 대한 댓글
             List<GetBoardReplyResponse> boardReplyList = boardReplyService.getBoardReplyList(boardId);
-            return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList);
+
+            //해당 글에 대한 좋아요 여부 ( boardId, usersId 모두 필요)
+            boolean isBoardLIke = boardLikeService.getBoardLike(boardId, 18L);
+            log.info("좋아요 여부  >>"+isBoardLIke);
+
+            long boardLikeCount = boardLikeService.getBoardLikeCount(boardId);
+
+            return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, isBoardLIke, boardLikeCount);
         }
     }
 
