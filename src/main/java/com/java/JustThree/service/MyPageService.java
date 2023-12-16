@@ -111,7 +111,7 @@ public class MyPageService {
 
     //////////////////////웹툰 리뷰 리스트////////////////////
     public List<ReviewedWebtoonResponse> reviewedWebtoonlist(Long usersId) {
-        List<Review> list = reviewRepository.findByUsers_UsersId(usersId);
+        List<Review> list = reviewRepository.findByUsers_UsersIdIs(usersId);
         List<ReviewedWebtoonResponse> reviewedWebtoonList = new ArrayList<>();
 
         for (Review review : list) {

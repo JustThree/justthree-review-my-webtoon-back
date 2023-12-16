@@ -15,6 +15,7 @@ public class WebtoonDetailReviewResponse {
     public int rating;
     public long heartCount;
     public long replyCount;
+    public long replyUserId;
     public static WebtoonDetailReviewResponse fromEntity(Review review,int rating,long heartCount,long replyCount){
         return WebtoonDetailReviewResponse.builder()
                 .userNickName(review.getUsers().getUsersNickname())
@@ -24,6 +25,7 @@ public class WebtoonDetailReviewResponse {
                 .rating(rating)
                 .heartCount(heartCount)
                 .replyCount(replyCount)
+                .replyUserId(review.getUsers().getUsersId())
                 .build();
     }
 }

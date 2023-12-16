@@ -37,4 +37,5 @@ public class Review {
     @CreatedDate
     private LocalDateTime created;
 
+    private Integer remove;
 }
