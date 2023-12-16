@@ -46,7 +46,7 @@ public class MyPageController {
     public ResponseEntity<CudResponse> updateUser(@RequestHeader(value="Authorization",required = false)String token, @RequestBody Users user){
         CudResponse response = new CudResponse();
         Long usersId = usersService.getUserInfo(token).getUsersId();
-        user.setUsersPw(passwordEncoder.encode(user.getUsersPw()));//시큐리띠
+//        user.setUsersPw(passwordEncoder.encode(user.getUsersPw()));//시큐리띠
         boolean result = myPageService.updateUser(user,usersId);
         if (result){
             response.setSuccess(true);

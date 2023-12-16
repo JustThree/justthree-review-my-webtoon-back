@@ -30,7 +30,6 @@ public class MyPageService {
         try {
             Users nuser = usersRepository.findById(usersId).get();
             nuser.setUsersNickname(user.getUsersNickname());
-            nuser.setUsersPw(user.getUsersPw());
             nuser.setProfileUrl(user.getProfileUrl());
         } catch (Exception e) {
             System.out.println("회원정보 업데이트 실패");
@@ -127,8 +126,8 @@ public class MyPageService {
 
     //////////////////////유저 정보 페이지 /////////////////////////
     public UserInfoResponse userinfo(Long usersId) {
-        Long followerCount = followRepository.countByFollower_UsersId(usersId);
-        Long followingCount = followRepository.countByFollowing_UsersId(usersId);
+        Long followerCount = followRepository.countByFollowing_UsersId(usersId);
+        Long followingCount = followRepository.countByFollower_UsersId(usersId);
         Long reviewedCount = reviewRepository.countByUsers_UsersId(usersId);
         Long ratedCount = starRepository.countByUsers_UsersId(usersId);
         Long interestedCount = interestRepository.countByUsers_UsersId(usersId);
