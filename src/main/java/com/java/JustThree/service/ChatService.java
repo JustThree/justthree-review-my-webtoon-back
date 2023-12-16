@@ -102,7 +102,14 @@ public class ChatService {
             case 3:
                 return chatRepository.findLastChatsOrderByHotWebtoon();
             case 4:
-                return chatRepository.findByUsers_UsersId(getUsersId(token));
+                Set<Long> masterId = new HashSet<>();
+                for( Chat chat : chatRepository.findByUsers_UsersId(getUsersId(token))){
+                    if(!masterId.contains(chat.getWebtoon().getMasterId())){
+                        list.add(new ChatListResponse(chat));
+                        masterId.add(chat.getWebtoon().getMasterId());
+                    }
+                }
+                return list;
             default:
         }
         return list;
