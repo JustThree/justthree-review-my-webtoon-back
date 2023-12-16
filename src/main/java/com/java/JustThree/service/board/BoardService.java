@@ -7,6 +7,7 @@ import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
 import com.java.JustThree.dto.board.request.UpdateBoardRequest;
 import com.java.JustThree.dto.board.response.GetBoardReplyResponse;
+import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.board.BoardImageRepository;
 import com.java.JustThree.repository.board.BoardRepository;
 import com.java.JustThree.service.board.BoardImageService;
@@ -44,6 +45,9 @@ public class BoardService {
     //좋아요
     private final BoardLikeService boardLikeService;
 
+    //토큰관련
+    private final JwtProvider jwtProvider;
+
     //커뮤니티 글 등록
     @Transactional
     public Long addBoard(AddBoardRequest addBoardRequest){
@@ -73,8 +77,9 @@ public class BoardService {
     }
     //커뮤니티 글 상세 조회(댓글, 좋아요 구현 후 보완 필요)
     @Transactional
-    public GetBoardOneResponse getBoardOne(long boardId){
+    public GetBoardOneResponse getBoardOne(long boardId, String token ){
         //Board board = boardRepository.findById(boardId).orElseThrow(NoSuchElementException::new);
+
         Optional<Board> optionalBoard = boardRepository.findById(boardId);
         if(optionalBoard.isEmpty()){
             return null;
@@ -93,16 +98,22 @@ public class BoardService {
             //해당 글에 대한 댓글
             List<GetBoardReplyResponse> boardReplyList = boardReplyService.getBoardReplyList(boardId);
 
-            //해당 글에 대한 좋아요 여부 ( boardId, usersId 모두 필요)
-            boolean isBoardLIke = boardLikeService.getBoardLike(boardId, 18L);
-            log.info("좋아요 여부  >>"+isBoardLIke);
-
+            //해당 글에 대한 좋아요 수
             long boardLikeCount = boardLikeService.getBoardLikeCount(boardId);
 
-            return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, isBoardLIke, boardLikeCount);
+
+            //해당 글에 대한 좋아요 여부 ( boardId, usersId 모두 필요)
+            if(token==null){
+                log.info("token"+token);
+                return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, false, boardLikeCount);
+            }else{
+                Long userId = jwtProvider.getUserId(token);
+                boolean isBoardLIke = boardLikeService.getBoardLike(boardId, userId);
+                log.info("좋아요 여부  >>"+isBoardLIke);
+                return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, isBoardLIke, boardLikeCount);
+            }
         }
     }
-
 
     //커뮤니티 글 수정 (추후 수정 필요)
     @Transactional

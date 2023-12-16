@@ -3,6 +3,7 @@ package com.java.JustThree.service.board;
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardLike;
 import com.java.JustThree.dto.board.request.AddBoardLikeRequest;
+import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.board.BoardLikeRepository;
 import com.java.JustThree.repository.board.BoardRepository;
 import jakarta.transaction.Transactional;
@@ -19,6 +20,9 @@ public class BoardLikeService {
 
     private final BoardLikeRepository boardLikeRepository;
     private final BoardRepository boardRepository;
+
+    //토큰관련
+    private final JwtProvider jwtProvider;
 
     //게시글 좋아요 등록
     @Transactional
@@ -38,14 +42,14 @@ public class BoardLikeService {
     }
     //게시글 좋아요 취소
     @Transactional
-    public String removeBoardLike(long boardLikeId){
+    public String removeBoardLike(long boardId, String token){
         try{
-            Optional<BoardLike> optionalBoardLike = boardLikeRepository.findById(boardLikeId);
-            if(optionalBoardLike.isEmpty()){
+            Long usersId = jwtProvider.getUserId(token);
+            BoardLike boardLikeOne = boardLikeRepository.findBoardLikeByBoard_BoardIdAndUsers_UsersId(boardId, usersId);
+            if(boardLikeOne == null){
                 return "NotFound";
             }else{
-                BoardLike boardLike = optionalBoardLike.get();
-                boardLikeRepository.delete(boardLike);
+                boardLikeRepository.delete(boardLikeOne);
                 return "success";
             }
         }catch (Exception e){

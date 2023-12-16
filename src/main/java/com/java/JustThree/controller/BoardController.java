@@ -44,10 +44,18 @@ public class BoardController {
     }
     // 커뮤니티 글 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBoardOne(@PathVariable("id") long id){
+    public ResponseEntity<?> getBoardOne(@PathVariable("id") long id, @RequestHeader(value = "Authorization", required = false) String token){
         log.info("찾아야할 id"+id);
+        log.info("token  >>"+token);
         try{
-            GetBoardOneResponse boardOneRes = boardService.getBoardOne(id);
+            GetBoardOneResponse boardOneRes = null;
+            if(token.equals(null)){
+                boardOneRes = boardService.getBoardOne(id, null);
+            }else{
+                boardOneRes = boardService.getBoardOne(id,token);
+            }
+            log.info("boardOne Result  >>"+boardOneRes);
+
             //log.info(""+boardOneRes);
             log.info("댓글 수  >>"+boardOneRes.getBoardReplyList().toArray().length);
             log.info("댓글  수 >>"+boardOneRes.getBoardReplyList().size());
@@ -130,11 +138,12 @@ public class BoardController {
     }
     //게시글 좋아요 취소(삭제)
     @DeleteMapping("/likes/{id}")
-    public ResponseEntity<String> removeBoardLike(@PathVariable("id")long id){
-        log.info("id >>"+id);
+    public ResponseEntity<String> removeBoardLike(@PathVariable("id")long boardId, @RequestHeader(value = "Authorization", required = false) String token){
+        log.info("id >>" + boardId);
+        log.info("remove board like >>"+token);
         try{
-            String res = boardLikeService.removeBoardLike(id);
-            return ResponseEntity.ok(id+"글 삭제 "+res);
+            String res = boardLikeService.removeBoardLike(boardId, token);
+            return ResponseEntity.ok(boardId+"글 좋아요 취소 "+res);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
