@@ -16,6 +16,8 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +57,7 @@ public class UsersService {
 
         Users user = ur.findById(jwtProvider.getUserId(token)).get();
 
-        return user.toDto();
+        return Users.toDto(user);
     }
 
     @Transactional
@@ -135,5 +137,23 @@ public class UsersService {
     public void setPassword(String email, String password) {
         Users user = ur.findByUsersEmail(email).orElseThrow(() -> new IllegalStateException("가입되지 않은 이메일입니다."));
         user.changePassword(bCryptPasswordEncoder.encode(password));
+    }
+
+    public Page<UsersResponse> getUserList(Pageable pageable,String search, String type){
+        Page<UsersResponse> userList;
+
+        userList = switch (type) {
+            case "All" -> ur.findAll(pageable).map(Users::toDto);
+            case "Email" -> ur.findByUsersEmailContaining(search,pageable).map(Users::toDto);
+            case "Nickname" -> ur.findByUsersNicknameContaining(search,pageable).map(Users::toDto);
+            default -> throw new IllegalStateException("Unexpected value: " + type);
+        };
+
+        return userList;
+    }
+    @Transactional
+    public void deleteUser(Long UsersId){
+        Users user = ur.findById(UsersId).orElseThrow(() -> new IllegalStateException("없는 유저입니다."));
+        user.disableUser();
     }
 }
