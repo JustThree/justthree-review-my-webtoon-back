@@ -1,6 +1,8 @@
 package com.java.JustThree.dto.board.response;
 
 import com.java.JustThree.domain.Board;
+import com.java.JustThree.domain.BoardReply;
+import com.java.JustThree.service.board.BoardReplyService;
 import lombok.*;
 
 import java.time.format.DateTimeFormatter;
@@ -25,12 +27,17 @@ public class GetBoardListResponse {
     private String userNickname;
     private String userEmail;
     //댓글 수
+    //private int boardReplyCount;
 
     //Entity → DTO
     public static GetBoardListResponse entityToDTO(Board board){
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String formattedCreated = board.getCreated().format(formatter);
         String formattedUpdated = board.getUpdated().format(formatter);
+
+       // int cnt = boardReplyService.getBoardReplyList(board.getBoardId()).size()
+
         return GetBoardListResponse.builder()
                 .boardId(board.getBoardId())
                 .title(board.getTitle())

@@ -7,6 +7,7 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class JoinRequest {
     private String usersEmail;
     private String usersNickname;

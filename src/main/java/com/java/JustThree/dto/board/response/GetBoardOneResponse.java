@@ -30,30 +30,27 @@ public class GetBoardOneResponse {
     //댓글
     private List<GetBoardReplyResponse> boardReplyList;
     //좋아요
+    private boolean boardLikeYn;
+    private long boardLikeCount;
 
 
     //Entity -> DTO
     public static GetBoardOneResponse entityToDTO(Board board,
                                                   List<BoardImage> boardImageList,
-                                                  List<GetBoardReplyResponse> boardReplyList){
-        /*List<Map<String, String>> fileMapList = new ArrayList<>();
-        for(BoardImage boardImage : boardImageList){
-            Map<String, String> fileMap = new HashMap<>();
-            fileMap.put(boardImage.getOriginName(), boardImage.getAccessUrl());
-            fileMapList.add(fileMap);
-        }*/
+                                                  List<GetBoardReplyResponse> boardReplyList,
+                                                  boolean isBoardLike,
+                                                  long boardLikeCnt){
+
         List<ImageDataResponse> fileMapList = new ArrayList<>();
         for(BoardImage boardImage : boardImageList){
             ImageDataResponse imageData = new ImageDataResponse(boardImage.getImgId(), boardImage.getAccessUrl(), boardImage.getOriginName());
             fileMapList.add(imageData);
         }
-        System.out.println(board.getCreated());
-        System.out.println(board.getUpdated());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String formattedCreated = board.getCreated().format(formatter);
         String formattedUpdated = board.getUpdated().format(formatter);
-        System.out.println(formattedCreated);
-        System.out.println(formattedUpdated);
+        //System.out.println(formattedCreated);
+        //System.out.println(formattedUpdated);
 
         return GetBoardOneResponse.builder()
                 .boardId(board.getBoardId())
@@ -68,6 +65,8 @@ public class GetBoardOneResponse {
                 .userNickname(board.getUsers().getUsersNickname())
                 .boardImgMapList(fileMapList)
                 .boardReplyList(boardReplyList)
+                .boardLikeYn(isBoardLike)
+                .boardLikeCount(boardLikeCnt)
                 .build();
     }
 }

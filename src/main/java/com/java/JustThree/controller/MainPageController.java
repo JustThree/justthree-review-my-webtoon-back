@@ -1,11 +1,15 @@
 package com.java.JustThree.controller;
 
+import com.java.JustThree.dto.main.request.AddReviewReplyRequest;
+import com.java.JustThree.dto.main.request.PostWebtoonReviewRequest;
 import com.java.JustThree.service.UsersService;
 import com.java.JustThree.service.WebtoonService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/webtoon")
@@ -19,9 +23,8 @@ public class MainPageController {
     // 성인웹툰 거르기...
     @GetMapping("/{id}")
     public ResponseEntity<?> webtoonDetail(
-            @RequestHeader("Authorization") String token,
+            @RequestHeader(value = "Authorization",required = false) String token,
             @PathVariable(name = "id") Long id) {
-
         try {
             return ResponseEntity.ok()
                     .body(webtoonService.getWebtoonDetail(token, id));
@@ -56,6 +59,7 @@ public class MainPageController {
             return ResponseEntity.ok()
                     .body(webtoonService.getWebtoonPage(pageable, genre, order));
         } catch (Exception e) {
+            System.out.println(e);
             return ResponseEntity.status(404)
                     .header("error", e.getMessage())
                     .build();
@@ -119,13 +123,85 @@ public class MainPageController {
     public ResponseEntity<?> PostWebtoonReview(
             @RequestHeader("Authorization") String token,
             @PathVariable(name = "id") Long masterId,
-            @RequestBody String content
+            @Validated @RequestBody PostWebtoonReviewRequest postWebtoonReviewRequest
     ){
         try {
-            String contentSplit = content.split(":")[1];
-            webtoonService.writeReview(token, masterId, contentSplit.substring(1,contentSplit.length()-2));
+            webtoonService.writeReview(token, masterId, postWebtoonReviewRequest.getContent());
             return ResponseEntity.ok()
                     .body("등록 완료");
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(400)
+                    .header(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
+    @GetMapping("/review/{id}")
+    public ResponseEntity<?> getReviewDetail(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable(name = "id") Long reviewId
+    ){
+        try {
+            return ResponseEntity.ok()
+                    .body(webtoonService.getReview(reviewId,token));
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(400)
+                    .header(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
+    @GetMapping("/review/reply/{id}")
+    public ResponseEntity<?> getReviewReplyPage(Pageable pageable, @PathVariable("id") Long reviewId){
+        try {
+            return ResponseEntity.ok()
+                    .body(webtoonService.getReviewReplyResponse(pageable,reviewId));
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(400)
+                    .header(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
+    @PatchMapping("/review/reply/like/{id}")
+    public ResponseEntity<?> modifyLike(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") Long reviewId){
+        try {
+            return ResponseEntity.ok()
+                    .body(webtoonService.modifyReviewLike(reviewId,token));
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(400)
+                    .header(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
+    @PostMapping("/review/reply/{id}")
+    public ResponseEntity<?> addReviewReply(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") Long reviewId,
+            @Validated @RequestBody AddReviewReplyRequest addReviewReplyRequest
+            , Errors errors){
+        if(errors.hasErrors())
+            return ResponseEntity.status(400)
+                .header(errors.getAllErrors().toString())
+                    .build();
+        try {
+            return ResponseEntity.ok()
+                    .body(webtoonService.addReviewReply(reviewId,token, addReviewReplyRequest.getContent()));
         } catch (IllegalArgumentException e){
             return ResponseEntity.status(400)
                     .header(e.getMessage())

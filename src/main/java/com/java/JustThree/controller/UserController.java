@@ -125,7 +125,6 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
     @GetMapping("/check-nickname")
     public ResponseEntity<Object> checkDuplicateNickname(@RequestParam("nickname") String nickname) {
         boolean isNickname = usersService.validateDuplicateNickname(nickname);

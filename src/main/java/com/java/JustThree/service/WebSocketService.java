@@ -6,6 +6,7 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java.JustThree.config.chat.ServerEndpointConfigurator;
+import com.java.JustThree.dto.chat.ChatParticipantResponse;
 import com.java.JustThree.dto.chat.ChatResponse;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
@@ -29,7 +30,7 @@ public class WebSocketService {
 
     // 채팅방은 웹툰의 masterId로 구분. 접속(소속)되어 있는 sessionMap(key = 웹툰의 masterId, value = 채팅방에 소속되어있는 접속자의 Session 리스트)
     // 접속한 사람(세션)을 방 별로 나누기 위해 MAP 제작
-    private static Map<Long, ArrayList<Session>> sessionMap = Collections.synchronizedMap(new HashMap<Long, ArrayList<Session>>());
+        private static Map<Long, HashMap<Long, ArrayList<Session>>> sessionMap = Collections.synchronizedMap(new HashMap<>());
 
     // DB와 연결될 때는 chatService 사용
     private final ChatService chatService;
@@ -41,20 +42,22 @@ public class WebSocketService {
 
     @OnOpen
     public void onOpen(Session s) throws IOException {
-        System.out.println(s.getQueryString());
         log.info("[open session] " + s);
-
         // Long masterId = Long.valueOf((String) s.getUserProperties().get("masterId"));
-
         if(isInChatRoom(s)){ // 채팅방 접속중
 
             Long masterId = getMasterId(s);
-
+            Long usersId = chatService.getUsersId(getToken(s));
             // 현재 해당 웹툰 채팅방에 아무도 접속하지 않았을 경우. sessionMap 생성 후 사용자 추가.
             if(!sessionMap.containsKey(masterId)) {
-                sessionMap.put(masterId, new ArrayList<>());
+                sessionMap.put(masterId, new HashMap<>());
             }
-            sessionMap.get(masterId).add(s);
+
+            if(!sessionMap.get(masterId).containsKey(usersId)){
+                sessionMap.get(masterId).put(usersId, new ArrayList<>());
+            }
+
+            sessionMap.get(masterId).get(usersId).add(s);
 
             // 채팅방 인원 변경 처리
             sendNumOfCurrentParticipants(masterId);
@@ -74,9 +77,8 @@ public class WebSocketService {
     @OnMessage
     public void onMessage(String msg, Session session) throws Exception{
 
-        // String token = getToken(session);
-        String token = "123";
-
+        String token = getToken(session);
+//        String token = "123";
         // 클라이언트에서 message가 오는 경우는 채팅을 보냈을 때 말고는 없음
         Long masterId = getMasterId(session);
 
@@ -92,8 +94,10 @@ public class WebSocketService {
             log.info("[ send message to " + masterId + " ] " + jsonString);
 
             // 같은 방에 있는 사람(세션)에게만 보낸다
-            for(Session s : sessionMap.get(masterId)){
-                s.getBasicRemote().sendText(jsonString);
+            for( Long usersId  : sessionMap.get(masterId).keySet()){
+                for( Session s : sessionMap.get(masterId).get(usersId)){
+                    s.getBasicRemote().sendText(jsonString);
+                }
             }
         }
 
@@ -109,17 +113,22 @@ public class WebSocketService {
 
             if(isInChatRoom(s)){
                 Long masterId = getMasterId(s);
+                Long usersId = chatService.getUsersId(getToken(s));
 
                 // 해당 웹툰채팅방에서 close한 session을 remove
-                sessionMap.get(masterId).remove(s);
+                sessionMap.get(masterId).get(usersId).remove(s);
 
-                // 해당 웹툰채팅방에 사람이 없다면 sessionMap에서 웹툰 key를 삭제
-                if(sessionMap.get(masterId).isEmpty()){
-                    sessionMap.remove(masterId);
-                }else{
-                    // 사람이 있다면 웹툰 실시간 조회를 위해 메시지 보내기
-                    sendNumOfCurrentParticipants(masterId);
+                if(sessionMap.get(masterId).get(usersId).isEmpty()){
+                    sessionMap.get(masterId).remove(usersId);
+                    if(sessionMap.get(masterId).isEmpty()){
+                        sessionMap.remove(masterId);
+                    }else{
+                        // 사람이 있다면 웹툰 실시간 조회를 위해 메시지 보내기
+                        sendNumOfCurrentParticipants(masterId);
+                    }
                 }
+                // 해당 웹툰채팅방에 사람이 없다면 sessionMap에서 웹툰 key를 삭제
+
             }else{
                 clientSet.remove(s);
             }
@@ -138,11 +147,15 @@ public class WebSocketService {
     private void sendNumOfCurrentParticipants(Long masterId) throws IOException {
         System.out.println(masterId);
         JSONObject currentParticipants = new JSONObject();
-        int countParticipants = sessionMap.get(masterId).size();
-        currentParticipants.put("currentParticipants", countParticipants);
 
-        for(Session participant : sessionMap.get(masterId)){
-            participant.getBasicRemote().sendText(String.valueOf(currentParticipants));
+        currentParticipants.put("currentParticipants", chatService.getUsers(sessionMap.get(masterId).keySet()));
+
+
+        for( Long usersId  : sessionMap.get(masterId).keySet()){
+            for( Session s : sessionMap.get(masterId).get(usersId)){
+                System.out.println(sessionMap);
+                s.getBasicRemote().sendText(String.valueOf(currentParticipants));
+            }
         }
     }
 
@@ -152,15 +165,15 @@ public class WebSocketService {
     }
 
     private String[] getTokenAndMasterId(Session session){
-        return session.getQueryString().split("%");
+        return session.getQueryString().split("&");
     }
 
     private String getToken(Session session){
-        return getTokenAndMasterId(session)[0];
+        return getTokenAndMasterId(session)[0].replace("%20", " ");
     }
 
     private Long getMasterId(Session session){
-        return Long.valueOf(getTokenAndMasterId(session)[1]);
+        return Long.valueOf(getTokenAndMasterId(session)[1] );
     }
 
     private void sendUpdate() throws IOException {

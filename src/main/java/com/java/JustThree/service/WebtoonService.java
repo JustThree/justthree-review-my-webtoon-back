@@ -1,12 +1,7 @@
 package com.java.JustThree.service;
 
-import com.java.JustThree.domain.Interest;
-import com.java.JustThree.domain.Review;
-import com.java.JustThree.domain.Star;
-import com.java.JustThree.domain.Webtoon;
-import com.java.JustThree.dto.main.response.WebtoonDetailResponse;
-import com.java.JustThree.dto.main.response.WebtoonDetailReviewResponse;
-import com.java.JustThree.dto.main.response.WebtoonMainResponse;
+import com.java.JustThree.domain.*;
+import com.java.JustThree.dto.main.response.*;
 import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.ReviewRepository;
 import com.java.JustThree.repository.StarRepository;
@@ -65,6 +60,7 @@ public class WebtoonService {
         long sum = 0L;
         int userStar = 5;
         float avg = 0f;
+        boolean interested = false;
 
         // 게시글 내용 조회
         Webtoon webtoon = webtoonRepository.findById(id).orElseThrow(IllegalAccessError::new);
@@ -89,7 +85,17 @@ public class WebtoonService {
         }else {
             webtoon.setView(webtoon.getView() + 1);
         }
-        return WebtoonDetailResponse.fromEntity(webtoon, avg,byWebtoonMasterIdIs.size(),userStar);
+        if (token != null){
+            Optional<Interest> byUsersUsersIdIs = interestRepository.findByUsers_UsersIdIsAndWebtoon_MasterIdIs(jwtProvider.getUserId(token), webtoon.getMasterId());
+            if (byUsersUsersIdIs.isPresent()){
+                interested = true;
+            }
+        }
+        return WebtoonDetailResponse.fromEntity(webtoon,
+                avg,
+                byWebtoonMasterIdIs.size(),
+                userStar,
+                interested);
     }
     // webtoon 전체 조회
     public Page<WebtoonMainResponse> getWebtoonPage(Pageable pageable, String genre, String order){
@@ -108,29 +114,57 @@ public class WebtoonService {
 
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC,
                 orderVal));
-        webtoonMainResponsePage = switch (genre) {
-            case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "판타지", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "romance" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "이성애", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "school" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "학원", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "daily" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "일상", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "comic" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "코믹", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            case "martialarts" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
-                            ("19세 이상", "무협", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-            default -> webtoonRepository.findByAgeGradCdNmIsNot
-                            ("19세 이상", pageable)
-                    .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
-        };
+        if (!order.equals("rate")) {
+            webtoonMainResponsePage = switch (genre) {
+                case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
+                                ("19세 이상", "판타지", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "romance" -> webtoonRepository.findByAgeGradCdNmIsNotAndDoubleGenreIs
+                                ("19세 이상", "이성애", "로맨스", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "school" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
+                                ("19세 이상", "학원", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "daily" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
+                                ("19세 이상", "일상", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "comic" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
+                                ("19세 이상", "코믹", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "martialarts" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
+                                ("19세 이상", "무협", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                default -> webtoonRepository.findByAgeGradCdNmIsNot
+                                ("19세 이상", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+            };
+        } else {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+            webtoonMainResponsePage = switch (genre) {
+                case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
+                                ("19세 이상", "판타지", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "romance" -> webtoonRepository.findByAgeGradCdNmIsNotAndDoubleGenreIsOrderByPopularity
+                                ("19세 이상", "이성애", "로맨스", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "school" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
+                                ("19세 이상", "학원", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "daily" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
+                                ("19세 이상", "일상", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "comic" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
+                                ("19세 이상", "코믹", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                case "martialarts" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
+                                ("19세 이상", "무협", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                default -> webtoonRepository.findByAgeGradCdNmIsNotAndOrderByPopularity
+                                ("19세 이상", pageable)
+                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+
+            };
+        }
         return  webtoonMainResponsePage;
     }
     // 웹툰 키워드로 리스트 조회
@@ -146,8 +180,8 @@ public class WebtoonService {
             case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMasterIdDesc
                             ("19세 이상", "판타지", pageable)
                     .stream().map((WebtoonMainResponse::fromEntity)).toList();
-            case "love" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMasterIdDesc
-                            ("19세 이상", "이성애", pageable)
+            case "love" -> webtoonRepository.findByAgeGradCdNmIsNotAndDoubleGenreIsOrderByPopularity
+                            ("19세 이상", "이성애", "로맨스",pageable)
                     .stream().map((WebtoonMainResponse::fromEntity)).toList();
             case "famous" -> webtoonRepository.findByAgeGradCdNmIsNotOrderByViewDesc
                             ("19세 이상", pageable)
@@ -234,7 +268,52 @@ public class WebtoonService {
                 .build()
         );
     }
+    public ReviewDetailResponse getReview(Long reviewId, String token){
+        boolean checkLike = false;
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()
+                -> new IllegalArgumentException("해당 리뷰가 없어요"));
+        if (token != null) {
+            if (reviewHeartRepository.existsByReview_ReviewIdIsAndReview_Users_UsersIdIs(reviewId,
+                    jwtProvider.getUserId(token))) {
+                checkLike = true;
+            }
+        }
+        return ReviewDetailResponse.fromEntity(
+                review, starRepository.findByWebtoon_MasterIdIsAndUsers_UsersIdIs(
+                                review.getWebtoon().getMasterId(),review.getUsers().getUsersId())
+                        .orElse(Star.builder().starVal(0).build()),checkLike);
+    }
 
+    public Page<ReviewReplyResponse> getReviewReplyResponse(Pageable pageable,Long reviewId){
+        return reviewReplyRepository.findByReviewReviewIdIs(reviewId,pageable).map(ReviewReplyResponse::fromEntity);
+    }
+    @Transactional
+    public String  modifyReviewLike(Long reviewId, String token){
+        Optional<Review_Heart> byReviewReviewIdIs = reviewHeartRepository.findByReview_ReviewIdIs(reviewId);
+        if (byReviewReviewIdIs.isPresent()){
+            reviewHeartRepository.delete(byReviewReviewIdIs.get());
+            return "좋아요가 삭제되었어요";
+        } else {
+            reviewHeartRepository.save(
+                    Review_Heart.builder()
+                            .users(usersRepository.findById(jwtProvider.getUserId(token)).orElseThrow(() -> new IllegalArgumentException("올바르지 않은 토큰")))
+                            .review(reviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("리뷰가 잘못됬어요!")))
+                .build());
+            return "좋아요 버튼 누르셨어요!";
+        }
+
+    }
+    @Transactional
+    public String addReviewReply(Long reviewId, String token, String content){
+        reviewReplyRepository.save(
+                    Review_Reply.builder()
+                            .review(reviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("리뷰가 잘못됬어요")))
+                            .users(usersRepository.findById(jwtProvider.getUserId(token)).orElseThrow(() -> new IllegalArgumentException("토큰이 잘못됫어요")))
+                            .content(content)
+                            .build());
+        
+        return "저장 완료";
+    }
 
     // 웹툰 초기화
     public void webtoonInit(Map<String, Webtoon> mapJson, Set<String> setNotNormal, int idx) {
