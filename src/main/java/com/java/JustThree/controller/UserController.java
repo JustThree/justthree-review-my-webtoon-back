@@ -5,6 +5,8 @@ import com.java.JustThree.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -141,6 +143,31 @@ public class UserController {
         return ResponseEntity.ok(usersId);
 
     }
+
+    @GetMapping("/getUserList")
+    public ResponseEntity<?> getUserList(@PageableDefault() Pageable pageable,@RequestParam(required = false) String search,@RequestParam(required = false,defaultValue = "All") String type){
+        try{
+            return ResponseEntity.ok().body( usersService.getUserList(pageable,search,type));
+
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+
+    }
+
+    @PostMapping("/deleteUser")
+    public ResponseEntity<String> deleteUserId(@RequestBody String UsersId){
+        log.info("유저 삭제");
+        log.info(UsersId);
+        try {
+            usersService.deleteUser(Long.parseLong(UsersId));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok("삭제완료");
+    }
+
+
 
 
 }
