@@ -7,6 +7,7 @@ import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
 import com.java.JustThree.dto.board.request.UpdateBoardRequest;
 import com.java.JustThree.dto.board.response.GetBoardReplyResponse;
+import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.board.BoardImageRepository;
 import com.java.JustThree.repository.board.BoardRepository;
 import com.java.JustThree.service.board.BoardImageService;
@@ -41,6 +42,12 @@ public class BoardService {
     //댓글
     private  final BoardReplyService boardReplyService;
 
+    //좋아요
+    private final BoardLikeService boardLikeService;
+
+    //토큰관련
+    private final JwtProvider jwtProvider;
+
     //커뮤니티 글 등록
     @Transactional
     public Long addBoard(AddBoardRequest addBoardRequest){
@@ -70,29 +77,43 @@ public class BoardService {
     }
     //커뮤니티 글 상세 조회(댓글, 좋아요 구현 후 보완 필요)
     @Transactional
-    public GetBoardOneResponse getBoardOne(long boardId){
+    public GetBoardOneResponse getBoardOne(long boardId, String token ){
         //Board board = boardRepository.findById(boardId).orElseThrow(NoSuchElementException::new);
+
         Optional<Board> optionalBoard = boardRepository.findById(boardId);
         if(optionalBoard.isEmpty()){
             return null;
         }else {
             Board board = optionalBoard.get();
+
+            //해당 글에 대한 이미지  파일
             List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
             //log.info("board1  >>"+board);
             //log.info("boardImgList  >>"+boardImageList);
 
             //조회수 증가
-            //board.plusViewCount(board.getViewCount() + 1);
-            //boardRepository.save(board);
             boardRepository.updateViewCount(board.getViewCount()+1, boardId);
             //log.info("board2  >>"+board);
 
-            //댓글 조회
+            //해당 글에 대한 댓글
             List<GetBoardReplyResponse> boardReplyList = boardReplyService.getBoardReplyList(boardId);
-            return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList);
+
+            //해당 글에 대한 좋아요 수
+            long boardLikeCount = boardLikeService.getBoardLikeCount(boardId);
+
+
+            //해당 글에 대한 좋아요 여부 ( boardId, usersId 모두 필요)
+            if(token==null){
+                log.info("token"+token);
+                return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, false, boardLikeCount);
+            }else{
+                Long userId = jwtProvider.getUserId(token);
+                boolean isBoardLIke = boardLikeService.getBoardLike(boardId, userId);
+                log.info("좋아요 여부  >>"+isBoardLIke);
+                return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, isBoardLIke, boardLikeCount);
+            }
         }
     }
-
 
     //커뮤니티 글 수정 (추후 수정 필요)
     @Transactional
@@ -204,38 +225,15 @@ public class BoardService {
                 );
         Page<Board> boardPage = boardRepository.findAll(specification, pageable);
         List<Board> boardList = boardPage.getContent();
+
         if(boardList.isEmpty()) {
             System.out.println(boardList);
         }
+
         return boardList.stream()
                 .map(GetBoardListResponse::entityToDTO)
                 .collect(Collectors.toList());
     }
-
-    //공지사항 글 목록 조회
-   /* public List<GetBoardListResponse> getNoticesByPage(int page, int size, String keyword){
-        System.out.println(keyword);
-        // 기본 최신순 정렬
-        Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "created"));
-
-        // 검색어를 포함하는 게시글만 조회하는 쿼리 작성
-        Specification<Board> specification = (root, query, criteriaBuilder) ->
-                criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get("noticeYn"), 1), // noticeYn이 1인 공지 게시글만 조회
-                        criteriaBuilder.or(
-                                criteriaBuilder.like(root.get("title"), "%" + keyword + "%"), // 제목에 검색어 포함
-                                criteriaBuilder.like(root.get("content"), "%" + keyword + "%") // 내용에 검색어 포함
-                        )
-                );
-        Page<Board> noticeBoardPage = boardRepository.findAll(specification, pageable);
-        List<Board> boardList = noticeBoardPage.getContent();
-        if(boardList.isEmpty()) {
-            System.out.println(boardList);
-        }
-        return boardList.stream()
-                .map(GetBoardListResponse::entityToDTO)
-                .collect(Collectors.toList());
-    }*/
     public Page<GetBoardListResponse> getNoticesByPage(String keyword, Pageable pageable) {
         Specification<Board> specification = (root, query, criteriaBuilder) ->
                 criteriaBuilder.and(
@@ -249,12 +247,6 @@ public class BoardService {
         Page<Board> noticeBoardPage = boardRepository.findAll(specification, pageable);
         return noticeBoardPage.map(GetBoardListResponse::entityToDTO);
     }
-
-    public int getNoticesByPage2(String keyword){
-        List<Board> boardList = boardRepository.findAllByNoticeYnOrderByCreatedDesc(1);
-        return boardList.size();
-    }
-
 
     //커뮤니티 글 검색
     public List<GetBoardListResponse> searchBoardsByKeyword(String keyword, int page, int size) {
@@ -292,6 +284,5 @@ public class BoardService {
                 .map(GetBoardListResponse::entityToDTO)
                 .collect(Collectors.toList());
     }
-
 
 }
