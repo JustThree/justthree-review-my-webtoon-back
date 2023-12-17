@@ -11,7 +11,8 @@ public class WebtoonMainResponse {
     String title;
     String writer;
     String imgUrl;
-    public static WebtoonMainResponse fromEntity(Webtoon webtoon){
+    Float starAvg;
+    public static WebtoonMainResponse fromEntity(Webtoon webtoon,Float starAvg){
         return WebtoonMainResponse.builder()
                 .masterId(webtoon.getMasterId())
                 .title(webtoon.getTitle())
@@ -19,6 +20,7 @@ public class WebtoonMainResponse {
                         webtoon.getPictrWritrNm() :
                         webtoon.getSntncWritrNm() + "/" + webtoon.getPictrWritrNm() )
                 .imgUrl(webtoon.getImageUrl())
+                .starAvg(starAvg)
                 .build();
     }
 }

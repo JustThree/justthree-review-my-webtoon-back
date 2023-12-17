@@ -119,50 +119,50 @@ public class WebtoonService {
             webtoonMainResponsePage = switch (genre) {
                 case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
                                 ("19세 이상", "판타지", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 case "romance" -> webtoonRepository.findByAgeGradCdNmIsNotAndDoubleGenreIs
                                 ("19세 이상", "이성애", "로맨스", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 case "school" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
                                 ("19세 이상", "학원", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 case "daily" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
                                 ("19세 이상", "일상", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 case "comic" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
                                 ("19세 이상", "코믹", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 case "martialarts" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIs
                                 ("19세 이상", "무협", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 default -> webtoonRepository.findByAgeGradCdNmIsNot
                                 ("19세 이상", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
             };
         } else {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
             webtoonMainResponsePage = switch (genre) {
                 case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
                                 ("19세 이상", "판타지", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 case "romance" -> webtoonRepository.findByAgeGradCdNmIsNotAndTripleGenreIsOrderByPopularity
                                 ("19세 이상", "이성애", "로맨스","순정", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 case "school" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
                                 ("19세 이상", "학원", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 case "daily" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
                                 ("19세 이상", "일상", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 case "comic" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
                                 ("19세 이상", "코믹", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 case "martialarts" -> webtoonRepository.findByAgeGradCdNmIsNotAndGenreIsOrderByPopularity
                                 ("19세 이상", "무협", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
                 default -> webtoonRepository.findByAgeGradCdNmIsNotAndOrderByPopularity
                                 ("19세 이상", pageable)
-                        .map(WebtoonMainResponse::fromEntity); // 19세 이상 인웹툰 제외한 글 다 꺼내서 WebtoonMainResponse 으로 변환
+                        .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
 
             };
         }
@@ -174,19 +174,24 @@ public class WebtoonService {
         webtoonMainResponseList = switch (keyword) {
             case "recent" -> webtoonRepository.findByAgeGradCdNmIsNotOrderByPusryBeginDeDesc
                             ("19세 이상", pageable)
-                    .stream().map((WebtoonMainResponse::fromEntity)).toList();
+                    .stream()
+                    .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId()))).toList();
             case "recentend" -> webtoonRepository.findByAgeGradCdNmIsNotOrderByPusryEndDeDesc
                             ("19세 이상", pageable)
-                    .stream().map((WebtoonMainResponse::fromEntity)).toList();
+                    .stream()
+                    .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId()))).toList();
             case "fantasy" -> webtoonRepository.findByAgeGradCdNmIsNotAndMainGenreCdNmIsOrderByMasterIdDesc
                             ("19세 이상", "판타지", pageable)
-                    .stream().map((WebtoonMainResponse::fromEntity)).toList();
+                    .stream()
+                    .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId()))).toList();
             case "love" -> webtoonRepository.findByAgeGradCdNmIsNotAndTripleGenreIsOrderByPopularity
                             ("19세 이상", "이성애", "로맨스","순정",pageable)
-                    .stream().map((WebtoonMainResponse::fromEntity)).toList();
+                    .stream()
+                    .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId()))).toList();
             case "famous" -> webtoonRepository.findByAgeGradCdNmIsNotOrderByViewDesc
                             ("19세 이상", pageable)
-                    .stream().map((WebtoonMainResponse::fromEntity)).toList();
+                    .stream()
+                    .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId()))).toList();
             default -> webtoonMainResponseList;
         };
         return webtoonMainResponseList;
@@ -201,16 +206,20 @@ public class WebtoonService {
         webtoonMainResponsePage = switch (type) {
             case "title" -> webtoonRepository.findByAgeGradCdNmIsNotAndTitleContaining
                     ("19세 이상",word,pageable)
-                    .map(WebtoonMainResponse::fromEntity);
+                    .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
+
             case "outline" -> webtoonRepository.findByAgeGradCdNmIsNotAndOutlineContaining
                             ("19세 이상",word,pageable)
-                    .map(WebtoonMainResponse::fromEntity);
+                    .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
+
             case "writer" -> webtoonRepository.findByAgeGradCdNmIsNotAndWriterIs
                             ("19세 이상",word,pageable)
-                    .map(WebtoonMainResponse::fromEntity);
+                    .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
+
             default -> webtoonRepository.findByAgeGradCdNmIsNotAndTitleContaining
                             ("19세 이상",word,pageable)
-                    .map(WebtoonMainResponse::fromEntity);
+                    .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
+
         };
         return  webtoonMainResponsePage;
 
