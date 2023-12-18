@@ -6,6 +6,8 @@ import com.java.JustThree.domain.Users;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 
 @Getter @Setter @ToString
 @Builder
@@ -22,6 +24,7 @@ public class UpdateBoardRequest {
     private Users users;
     //save image request dto
     private MultipartFile[] imageFiles;
-
+    //기존 이미지 수정 시
+    private List<Long> imageIdList;
 
 }

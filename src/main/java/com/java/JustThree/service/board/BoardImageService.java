@@ -67,11 +67,11 @@ public class BoardImageService {
         return convertedFile;
     }
 
-    //S3에서 수정
+  /*  //S3에서 수정
     public String updateFile(Long boardId, MultipartFile[] mfList) {
         try {
-            /*Board oldBoard = boardRepository.findById(boardId)
-                    .orElseThrow(NoSuchElementException::new);*/
+            *//*Board oldBoard = boardRepository.findById(boardId)
+                    .orElseThrow(NoSuchElementException::new);*//*
 
             List<BoardImage> boardImageList = boardImageRepository.findByBoard_BoardIdIs(boardId);
 
@@ -101,7 +101,7 @@ public class BoardImageService {
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
         }
-    }
+    }*/
 
     /*public String updateFile(Long boardImageId, MultipartFile mf) {
         try {
@@ -122,6 +122,17 @@ public class BoardImageService {
             throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
         }
     }*/
+    //BoardImage 에서 삭제 & S3에서 삭제
+    public void deleteBoardImage(long boardImgId){
+        try{
+            BoardImage boardImage = boardImageRepository.findById(boardImgId).get();
+            String imgStoredName = boardImage.getStoredName();
+            boardImageRepository.delete(boardImage);
+            deleteFile(imgStoredName);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+    }
 
     //Amazon S3에서 삭제
     public void deleteFile(String storedName){
