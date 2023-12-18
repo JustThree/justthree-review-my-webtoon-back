@@ -64,7 +64,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
         System.out.println("등록");
-        return new JwtAuthenticationFilter(authenticationManagerBean(), jwtProperties, refreshTokenRepository, jwtProvider);
+        return new JwtAuthenticationFilter(authenticationManagerBean(), jwtProperties, refreshTokenRepository, jwtProvider, usersRepository);
     }
 
     @Bean
