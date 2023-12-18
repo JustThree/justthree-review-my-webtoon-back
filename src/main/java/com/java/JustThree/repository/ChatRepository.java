@@ -10,16 +10,24 @@ import java.util.List;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
-    public List<Chat> findByWebtoon_masterIdOrderByCreated(Long masterId);
+    @Query("SELECT c.webtoon.masterId from Chat c GROUP BY c.webtoon.masterId order by c.webtoon.view")
+    List<Long> findAllChat();
 
-    @Query("SELECT NEW com.java.JustThree.dto.chat.ChatListResponse(c) " +
-            "FROM Chat c " +
-            "WHERE c.created = (SELECT MAX(c2.created) FROM Chat c2 " +
-            "WHERE c2.webtoon = c.webtoon AND c2.created = (SELECT MAX(c3.created) FROM Chat c3 WHERE c3.webtoon = c.webtoon)) " +
-            "ORDER BY c.created DESC")
-    List<ChatListResponse> findAllLastChats();
+    @Query("SELECT c.webtoon.masterId from Chat c GROUP BY c.webtoon.masterId order by c.webtoon.view desc ")
+    List<Long> findAllChatOrderByView();
 
-    Chat findTopByWebtoon_MasterIdOrderByCreatedDesc(Long master_id);
+    Chat findTopByWebtoon_MasterIdOrderByCreatedDesc(Long masterId);
+
+    List<Chat> findByWebtoon_masterIdOrderByCreated(Long masterId);
+
+    // Query로 전체를 한 번에 찾는 건 시간이 오래 걸림
+//    @Query("SELECT NEW com.java.JustThree.dto.chat.ChatListResponse(c) " +
+//            "FROM Chat c " +
+//            "WHERE c.created = (SELECT MAX(c2.created) FROM Chat c2 " +
+//            "WHERE c2.webtoon = c.webtoon AND c2.created = (SELECT MAX(c3.created) FROM Chat c3 WHERE c3.webtoon = c.webtoon)) " +
+//            "ORDER BY c.created DESC")
+//    List<ChatListResponse> findAllLastChats();
+
     @Query("SELECT NEW com.java.JustThree.dto.chat.ChatListResponse(c) " +
             "FROM Chat c " +
             "WHERE c.created = (SELECT MAX(c2.created) FROM Chat c2 " +
@@ -37,5 +45,5 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     List<Chat> findByUsers_UsersId(@Param("users_id")Long users_id);
 
-//    @Query("SELECT c.we, MAX(c.created) From Chat c WHERE c.users.usersId = :users_id GROUP BY c.webtoon")
+    boolean existsByUsers_UsersIdAndWebtoon_MasterId(Long usersId, Long masterId);
 }

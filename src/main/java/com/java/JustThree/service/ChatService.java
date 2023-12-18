@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -84,11 +81,18 @@ public class ChatService {
     public List<ChatListResponse> findChatRoom(int page, String token){
 //         [page] 1: all, 2:current, 3: hotWebtoon, 4: my
         List<ChatListResponse> list = new ArrayList<>();
-
+        List<Long> existsMasterId = chatRepository.findAllChat();
         switch (page){
             case 1:
-                return chatRepository.findAllLastChats();
+//                return chatRepository.findAllLastChats();
+                for(  Long masterId : existsMasterId ){
+                    list.add(new ChatListResponse(
+                            chatRepository.findTopByWebtoon_MasterIdOrderByCreatedDesc(masterId))
+                    );
+                }
+                break;
             case 2:
+                // 현재 참여자가 있는 방의 master_id
                 Set<Long> currentChat = WebSocketService.getRoomsHavingCurrentPart();
 
                 if(currentChat != null){
@@ -100,18 +104,25 @@ public class ChatService {
                 }
                 break;
             case 3:
-                return chatRepository.findLastChatsOrderByHotWebtoon();
-            case 4:
-                Set<Long> masterId = new HashSet<>();
-                for( Chat chat : chatRepository.findByUsers_UsersId(getUsersId(token))){
-                    if(!masterId.contains(chat.getWebtoon().getMasterId())){
-                        list.add(new ChatListResponse(chat));
-                        masterId.add(chat.getWebtoon().getMasterId());
-                    }
+//                return chatRepository.findLastChatsOrderByHotWebtoon();
+                for(  Long masterId : chatRepository.findAllChatOrderByView() ){
+                    list.add(new ChatListResponse(
+                            chatRepository.findTopByWebtoon_MasterIdOrderByCreatedDesc(masterId))
+                    );
                 }
                 return list;
+                case 4:
+                for( Long masterId : existsMasterId){
+                    if(chatRepository.existsByUsers_UsersIdAndWebtoon_MasterId(getUsersId(token), masterId)){
+                        list.add(new ChatListResponse( chatRepository.findTopByWebtoon_MasterIdOrderByCreatedDesc(masterId)));
+                    }
+                }
             default:
         }
+        System.out.println("before" + list);
+        Collections.sort(list);
+        System.out.println("after"+list);
+//        Collections.sort(list, );
         return list;
     }
 }
