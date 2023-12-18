@@ -23,7 +23,7 @@ public class Follow {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "following_id" ,referencedColumnName = "users_id")
-    private Users following;// 팔로잉하는 사람들.
+    private Users following;// 팔로잉 받는 사람들.
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "follower_id" ,referencedColumnName = "users_id")

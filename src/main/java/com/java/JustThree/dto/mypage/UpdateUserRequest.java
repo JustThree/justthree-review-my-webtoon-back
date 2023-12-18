@@ -12,6 +12,5 @@ import lombok.ToString;
 public class UpdateUserRequest {
     private String usersId;
     private String usersNickname;
-    private String usersPw;
-    private String profileUrl;
+    private String profilesUrl;
 }

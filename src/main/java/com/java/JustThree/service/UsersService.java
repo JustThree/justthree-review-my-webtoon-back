@@ -54,7 +54,6 @@ public class UsersService {
     }
 
     public UsersResponse getUserInfo(String token){
-
         Users user = ur.findById(jwtProvider.getUserId(token)).get();
 
         return Users.toDto(user);
