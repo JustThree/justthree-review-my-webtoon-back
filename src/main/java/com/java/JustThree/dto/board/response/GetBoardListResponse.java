@@ -27,7 +27,7 @@ public class GetBoardListResponse {
     private String userNickname;
     private String userEmail;
     //댓글 수
-    //private int boardReplyCount;
+    private int boardReplyCount;
 
     //Entity → DTO
     public static GetBoardListResponse entityToDTO(Board board){
@@ -49,6 +49,7 @@ public class GetBoardListResponse {
                 .usersId(board.getUsers().getUsersId())
                 .userEmail(board.getUsers().getUsersEmail())
                 .userNickname(board.getUsers().getUsersNickname())
+                .boardReplyCount(board.getReplyCount())
                 .build();
     }
 }

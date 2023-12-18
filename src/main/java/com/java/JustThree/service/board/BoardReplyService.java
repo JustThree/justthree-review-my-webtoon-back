@@ -89,16 +89,6 @@ public class BoardReplyService {
         log.info("댓글 조회");
 
         return boardReplyList.stream().map(GetBoardReplyResponse::entityToDTO).collect(Collectors.toList());
-       /* 
-       //댓글 페이징
-       Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "created"));
-        Page<BoardReply> boardReplyPage = boardReplyRepository.findAll(pageable);
-        List<BoardReply> boardReplyList = boardReplyPage.getContent();
-        if(boardReplyList.isEmpty()){
-            System.out.println(boardReplyList);
-        }
-        return boardReplyList.stream().map(GetBoardReplyResponse::entityToDTO).collect(Collectors.toList())
-        ;*/
     }
 
 }
