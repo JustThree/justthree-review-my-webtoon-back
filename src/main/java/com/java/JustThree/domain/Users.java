@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,13 +57,14 @@ public class Users implements UserDetails {
     @Column(name = "status_code")
     private int statusCode = 1;
 
-    public UsersResponse toDto() {
+    public static UsersResponse toDto(Users users) {
         return UsersResponse.builder()
-                .usersId(usersId)
-                .usersNickname(usersNickname)
-                .usersEmail(usersEmail)
-                .profileUrl(profileUrl)
-                .statusCode(statusCode)
+                .usersId(users.usersId)
+                .usersNickname(users.usersNickname)
+                .usersEmail(users.usersEmail)
+                .created(users.created.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .profileUrl(users.profileUrl)
+                .statusCode(users.statusCode)
                 .build();
     }
 
@@ -118,5 +120,7 @@ public class Users implements UserDetails {
     public void changePassword(String password) {
         this.usersPw = password;
     }
+
+    public void disableUser() {this.statusCode = 0;}
 
 }

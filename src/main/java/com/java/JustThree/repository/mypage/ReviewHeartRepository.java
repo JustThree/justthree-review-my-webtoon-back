@@ -10,5 +10,5 @@ public interface ReviewHeartRepository extends JpaRepository<Review_Heart,Long> 
 
     public Optional<Review_Heart> findByReview_ReviewIdIs(Long review_reviewId);
 
-
+    boolean existsByReview_ReviewIdIsAndReview_Users_UsersIdIs(Long review_reviewId, Long review_users_usersId);
 }

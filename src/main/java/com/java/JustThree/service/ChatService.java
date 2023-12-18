@@ -1,9 +1,11 @@
 package com.java.JustThree.service;
 
 import com.java.JustThree.domain.Chat;
+import com.java.JustThree.domain.Users;
 import com.java.JustThree.domain.Webtoon;
 import com.java.JustThree.dto.chat.ChatInfoResponse;
 import com.java.JustThree.dto.chat.ChatListResponse;
+import com.java.JustThree.dto.chat.ChatParticipantResponse;
 import com.java.JustThree.dto.chat.ChatResponse;
 import com.java.JustThree.repository.ChatRepository;
 import com.java.JustThree.repository.UsersRepository;
@@ -33,16 +35,24 @@ public class ChatService {
     private final UsersRepository usersRepository;
     private final ChatRepository chatRepository;
 
+    public List<ChatParticipantResponse> getUsers(Set<Long> usersId){
+        List<ChatParticipantResponse> users = new ArrayList<>();
+        usersId.forEach(e-> users.add(new ChatParticipantResponse(usersRepository.findById(e).get())));
+        return users;
+    }
+    public Long getUsersId(String token){
+        return usersService.getUserInfo(token).getUsersId();
+    }
     public ChatResponse save(String msg, Long masterId, String token){
         Chat chat = Chat.builder()
                 .contents(msg)
                 .webtoon(webtoonRepository.findById(masterId).get())
-                .users(usersRepository.findById(usersService.getUserInfo(token).getUsersId()).get()) //  findById(jwtService.getId(token))
+                .users(usersRepository.findById(getUsersId(token)).get()) //  findById(jwtService.getId(token))
                 .created(LocalDateTime.now())
                 .build();
         try{
             chatRepository.save(chat);
-            return new ChatResponse(chat, chat.getUsers().getUsersNickname());
+            return new ChatResponse(chat, chat.getUsers());
         }catch (Exception e){
             e.printStackTrace();
             return null;
@@ -53,7 +63,7 @@ public class ChatService {
         List<ChatResponse> response = new ArrayList<>();
         chatRepository.findByWebtoon_masterIdOrderByCreated(masterId)
                 .forEach(element -> response.add(
-                        new ChatResponse(element, element.getUsers().getUsersNickname())
+                        new ChatResponse(element, element.getUsers())
                 ));
         return response;
     }
@@ -92,7 +102,14 @@ public class ChatService {
             case 3:
                 return chatRepository.findLastChatsOrderByHotWebtoon();
             case 4:
-                return chatRepository.findByUsers_UsersId(usersService.getUserInfo(token).getUsersId());
+                Set<Long> masterId = new HashSet<>();
+                for( Chat chat : chatRepository.findByUsers_UsersId(getUsersId(token))){
+                    if(!masterId.contains(chat.getWebtoon().getMasterId())){
+                        list.add(new ChatListResponse(chat));
+                        masterId.add(chat.getWebtoon().getMasterId());
+                    }
+                }
+                return list;
             default:
         }
         return list;

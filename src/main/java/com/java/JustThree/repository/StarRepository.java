@@ -23,5 +23,5 @@ public interface StarRepository extends JpaRepository<Star,Long> {
     List<Star> findByWebtoon_MasterIdIs(Long webtoon_masterId);
 
     Optional<Star> findByWebtoon_MasterIdIsAndUsers_UsersIdIs(Long webtoon_masterId, Long users_usersId);
-    
+
 }

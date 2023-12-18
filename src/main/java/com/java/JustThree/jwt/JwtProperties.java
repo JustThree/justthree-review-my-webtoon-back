@@ -21,7 +21,6 @@ public class JwtProperties {
     private String issuer;
 
     // 임시 키
-//    private SecretKey KEY = Jwts.SIG.HS256.key().build();
     private Key key =  Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     private int ACCESS_TOKEN_EXPIRATION_TIME = 86400000; // 86400000 1일 (1/1000초)

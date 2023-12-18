@@ -17,13 +17,13 @@ public class UsersResponse {
     private String usersEmail;
     private String usersNickname;
     private String profileUrl;
-    private LocalDateTime created;
+    private String created;
     private int statusCode;
 
     public Users toEntity(UsersResponse usersResponse){
         return Users.builder()
                 .usersEmail(this.getUsersEmail())
-                        .usersId(this.getUsersId())
+                .usersId(this.getUsersId())
                 .build();
     };
 }
