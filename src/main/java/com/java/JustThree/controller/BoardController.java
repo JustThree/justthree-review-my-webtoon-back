@@ -49,7 +49,7 @@ public class BoardController {
         log.info("token  >>"+token);
         try{
             GetBoardOneResponse boardOneRes = null;
-            if(token.equals(null)){
+            if(token == null){
                 boardOneRes = boardService.getBoardOne(id, null);
             }else{
                 boardOneRes = boardService.getBoardOne(id,token);
