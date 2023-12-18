@@ -200,9 +200,13 @@ public class WebtoonService {
 
     public Page<WebtoonMainResponse> searchWebtoon(Pageable pageable, String type, String word) {
         Page<WebtoonMainResponse> webtoonMainResponsePage;
-
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC,
-                "title"));
+        if (type.equals("user")) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC,
+                    "usersNickname"));
+        } else {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC,
+                    "title"));
+        }
         webtoonMainResponsePage = switch (type) {
             case "title" -> webtoonRepository.findByAgeGradCdNmIsNotAndTitleContaining
                     ("19세 이상",word,pageable)
@@ -215,12 +219,15 @@ public class WebtoonService {
             case "writer" -> webtoonRepository.findByAgeGradCdNmIsNotAndWriterIs
                             ("19세 이상",word,pageable)
                     .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
-
+            case "user" -> usersRepository.findByUsersNicknameContaining
+                    (word,pageable)
+                    .map(WebtoonMainResponse::fromEntity);
             default -> webtoonRepository.findByAgeGradCdNmIsNotAndTitleContaining
                             ("19세 이상",word,pageable)
                     .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
 
         };
+        System.out.println(1);
         return  webtoonMainResponsePage;
 
     }
