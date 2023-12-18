@@ -227,7 +227,6 @@ public class WebtoonService {
                     .map((webtoon) -> WebtoonMainResponse.fromEntity(webtoon,starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
 
         };
-        System.out.println(1);
         return  webtoonMainResponsePage;
 
     }
