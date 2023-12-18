@@ -9,6 +9,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -57,6 +58,13 @@ public class Board {
 
     public void plusViewCount(int viewCount){
         this.viewCount = viewCount;
+    }
+
+    @OneToMany(mappedBy = "board")
+    private List<BoardReply> replies; // 댓글들을 저장하는 필드
+
+    public int getReplyCount() {
+        return replies.size(); // 댓글 수 반환
     }
 
 }
