@@ -49,6 +49,7 @@ public class BoardController {
         log.info("token  >>"+token);
         try{
             GetBoardOneResponse boardOneRes = boardService.getBoardOne(id,token);
+
             log.info("boardOne Result  >>"+boardOneRes);
 
             //log.info(""+boardOneRes);

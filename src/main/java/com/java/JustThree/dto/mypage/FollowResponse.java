@@ -19,6 +19,10 @@ public class FollowResponse{
     private String profileUrl;
     private String usersEmail;
 
+    private Long followingId;
+    private Long followerId;
+    private boolean isFollowing;
+
 
 
     public FollowResponse(Users users,Long followId){
@@ -28,11 +32,15 @@ public class FollowResponse{
         this.profileUrl=users.getProfileUrl();
         this.followingNickname=users.getUsersNickname();
     }
+
 //    팔로워와 팔로잉 정보를 받아옴
-public FollowResponse(Follow follow, int sortNum) {
+public FollowResponse(Follow follow, int sortNum,boolean isFollowing) {
         this.followId=follow.getFollowId();
         this.usersEmail = follow.getFollowing().getUsersEmail();
         this.profileUrl = follow.getFollowing().getProfileUrl();
+        this.isFollowing=isFollowing;
+        this.followerId=follow.getFollower().getUsersId();
+        this.followingId=follow.getFollowing().getUsersId();
         if(sortNum == 1){
             this.followerNickname=follow.getFollower().getUsersNickname();
         }else{

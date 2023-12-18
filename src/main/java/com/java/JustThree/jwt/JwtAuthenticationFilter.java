@@ -1,11 +1,11 @@
 package com.java.JustThree.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.java.JustThree.domain.RefreshToken;
 import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.LoginRequest;
 import com.java.JustThree.dto.Token;
 import com.java.JustThree.repository.RefreshTokenRepository;
+import com.java.JustThree.repository.UsersRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,13 +31,15 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
+    private final UsersRepository usersRepository;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtProperties jwtProperties, RefreshTokenRepository refreshTokenRepository, JwtProvider jwtProvider) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtProperties jwtProperties, RefreshTokenRepository refreshTokenRepository, JwtProvider jwtProvider, UsersRepository usersRepository) {
         super(DEFAULT_ANT_PATH_REQUEST_MATCHER, authenticationManager);
         this.authenticationManager = authenticationManager;
         this.jwtProperties = jwtProperties;
         this.refreshTokenRepository = refreshTokenRepository;
         this.jwtProvider = jwtProvider;
+        this.usersRepository = usersRepository;
     }
 
     @Override

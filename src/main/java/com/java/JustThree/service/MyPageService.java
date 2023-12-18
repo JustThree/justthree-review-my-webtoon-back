@@ -25,12 +25,12 @@ public class MyPageService {
     private final FollowRepository followRepository;
     //////////////////////회원 정보 수정 Update////////////////////
     @Transactional
-    public boolean updateUser(Users user, Long usersId) {
+    public boolean updateUser(String nickname, Long usersId) {
         boolean result = true;
         try {
             Users nuser = usersRepository.findById(usersId).get();
-            nuser.setUsersNickname(user.getUsersNickname());
-            nuser.setProfileUrl(user.getProfileUrl());
+            nuser.setUsersNickname(nickname);
+//            nuser.setProfileUrl(user.getProfileUrl());
         } catch (Exception e) {
             System.out.println("회원정보 업데이트 실패");
             result = false;
@@ -38,14 +38,15 @@ public class MyPageService {
         return result;
     }
     //////////////////////////팔로워 팔로잉 리스트 ////////////////
-    public List<FollowResponse> followlist(Long usersId,int sortNum){
+    public List<FollowResponse> followlist(Long currentUser ,Long usersId,int sortNum){
         List<Follow> list = switch (sortNum){
             case 2 -> followRepository.findAllByFollower_UsersId(usersId);//팔로잉 목록
             default -> followRepository.findAllByFollowing_UsersId(usersId);//팔로워 목록
         };
         List<FollowResponse> followList = new ArrayList<>();
         for (Follow follow : list){
-            FollowResponse dto = new FollowResponse(follow, sortNum);
+            boolean isFollowing = followRepository.existsByFollowerAndFollowing(usersRepository.findById(currentUser).get(),sortNum==1?follow.getFollowing().getUsersId():follow.getFollower());
+            FollowResponse dto = new FollowResponse(follow, sortNum,isFollowing);
             followList.add(dto);
         }
         return followList;
@@ -71,10 +72,8 @@ public class MyPageService {
     public void toggleFollow(Long followerId, Long followingId) {
         Users follower = usersRepository.findById(followerId)
                 .orElseThrow(() -> new UserNotFoundException("Follower not found with id: " + followerId));
-
         Users following = usersRepository.findById(followingId)
                 .orElseThrow(() -> new UserNotFoundException("Following user not found with id: " + followingId));
-
         // 팔로우 상태 확인 후 팔로우중이면 언팔로우 언팔로우중이면 팔로우
         boolean isFollowing = followRepository.existsByFollowerAndFollowing(follower, following);
         if (isFollowing) {
@@ -125,14 +124,15 @@ public class MyPageService {
     }
 
     //////////////////////유저 정보 페이지 /////////////////////////
-    public UserInfoResponse userinfo(Long usersId) {
+    public UserInfoResponse userinfo(Long currentUser,Long usersId) {
         Long followerCount = followRepository.countByFollowing_UsersId(usersId);
         Long followingCount = followRepository.countByFollower_UsersId(usersId);
         Long reviewedCount = reviewRepository.countByUsers_UsersId(usersId);
         Long ratedCount = starRepository.countByUsers_UsersId(usersId);
         Long interestedCount = interestRepository.countByUsers_UsersId(usersId);
+        boolean isFollowing = followRepository.existsByFollowerAndFollowing(usersRepository.findById(currentUser).get(),usersRepository.findById(usersId).get());
 
-        return new UserInfoResponse(usersRepository.findById(usersId).get(),ratedCount, reviewedCount, interestedCount, followerCount, followingCount);
+        return new UserInfoResponse(usersRepository.findById(usersId).get(),isFollowing,ratedCount, reviewedCount, interestedCount, followerCount, followingCount);
     }
 
 
