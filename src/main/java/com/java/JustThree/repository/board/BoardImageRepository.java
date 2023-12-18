@@ -9,7 +9,6 @@ import java.util.List;
 public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
 
     List<BoardImage> findByBoard(Board b);
-    //List<Long> findImgIdByBoardId(Long boardId);
     List<BoardImage> findByBoard_BoardIdIs(Long board_boardId);
 
 }

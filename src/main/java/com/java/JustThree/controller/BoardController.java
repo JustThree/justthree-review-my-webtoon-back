@@ -48,20 +48,17 @@ public class BoardController {
         log.info("찾아야할 id"+id);
         log.info("token  >>"+token);
         try{
-            GetBoardOneResponse boardOneRes = null;
-            if(token.equals(null)){
-                boardOneRes = boardService.getBoardOne(id, null);
-            }else{
-                boardOneRes = boardService.getBoardOne(id,token);
-            }
+            GetBoardOneResponse boardOneRes = boardService.getBoardOne(id,token);
             log.info("boardOne Result  >>"+boardOneRes);
 
             //log.info(""+boardOneRes);
+            /*
             log.info("댓글 수  >>"+boardOneRes.getBoardReplyList().toArray().length);
             log.info("댓글  수 >>"+boardOneRes.getBoardReplyList().size());
             for(int i=0; i<boardOneRes.getBoardReplyList().size(); i++){
                 log.info("댓글  >>"+boardOneRes.getBoardReplyList().get(i));
             }
+            */
             if( boardOneRes != null){
                 return ResponseEntity.status(HttpStatus.OK).body(boardOneRes);
             }else{
@@ -79,7 +76,8 @@ public class BoardController {
         updateBoardRequest.setBoardId(boardId);
         log.info("수정요청  >>"+updateBoardRequest);
         try{
-            Long res = boardService.updateBoard(updateBoardRequest);
+            //Long res = 1L;
+           Long res = boardService.updateBoard(updateBoardRequest);
             return ResponseEntity.ok().body("글 수정 "+res);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());

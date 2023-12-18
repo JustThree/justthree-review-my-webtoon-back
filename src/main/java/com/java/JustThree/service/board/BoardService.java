@@ -22,9 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -89,7 +87,7 @@ public class BoardService {
             //해당 글에 대한 이미지  파일
             List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
             //log.info("board1  >>"+board);
-            //log.info("boardImgList  >>"+boardImageList);
+            log.info("boardImgList  >>"+boardImageList);
 
             //조회수 증가
             boardRepository.updateViewCount(board.getViewCount()+1, boardId);
@@ -100,7 +98,6 @@ public class BoardService {
 
             //해당 글에 대한 좋아요 수
             long boardLikeCount = boardLikeService.getBoardLikeCount(boardId);
-
 
             //해당 글에 대한 좋아요 여부 ( boardId, usersId 모두 필요)
             if(token==null){
@@ -118,47 +115,55 @@ public class BoardService {
     //커뮤니티 글 수정 (추후 수정 필요)
     @Transactional
     public Long updateBoard(UpdateBoardRequest updateBoardReq){
-        //Optional<Board> oldOptionalBoard = boardRepository.findById(updateBoardReq.getBoardId());
         Board oldBoard = boardRepository.findById(updateBoardReq.getBoardId())
                 .orElseThrow(NoSuchElementException::new);
         oldBoard.updateBoard(updateBoardReq.getTitle(), updateBoardReq.getContent());
         boardRepository.save(oldBoard);
 
         List<BoardImage> oldBoardImageList = boardImageRepository.findByBoard(oldBoard);
-
         if(oldBoardImageList.isEmpty()){//기존 첨부파일 없을 경우
             //수정요청에 첨부파일 있을 경우
             if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
                 for(MultipartFile imgFile: updateBoardReq.getImageFiles()){
                     String storedName = boardImageService.uploadFile(imgFile);
                     String accessUrl = boardImageService.getAccessUrl(storedName);
-
                     BoardImage boardImage = BoardImage.builder()
                             .board(oldBoard)
                             .accessUrl(accessUrl)
                             .originName(imgFile.getOriginalFilename())
                             .storedName(storedName)
                             .build();
-
                     boardImageRepository.save(boardImage);
                 }
             }
         }else{ //기존 첨부파일 있을 경우
-            log.info("기존 이미지파일  >>" + oldBoardImageList);
-            //수정요청에 첨부파일 있을 경우
-            if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
-                //DB & S3에서 기존 파일 삭제
-                List<BoardImage> oldBImgList = boardImageRepository.findByBoard(oldBoard);
-                for(BoardImage oldBoardImg: oldBImgList){
-                    String storedName = oldBoardImg.getStoredName();
-                    boardImageService.deleteFile(storedName); //AWS S3에서 삭제
-                    boardImageRepository.delete(oldBoardImg); //DB Table(BoardImage)에서 삭제
+            //log.info("기존 이미지파일  >>" + oldBoardImageList);
+            //log.info("수정요청 imgIdList "+updateBoardReq.getImageIdList());
+
+            //수정 케이스1 - 기존 첨부파일 다 삭제한 경우
+            if(updateBoardReq.getImageIdList() == null){
+                for(BoardImage oldBoardImage : oldBoardImageList){
+                    boardImageService.deleteBoardImage(oldBoardImage.getImgId()); //db&s3 모두 삭제
                 }
-                // 수정요청 첨부파일 저장
-                for(MultipartFile imgFile: updateBoardReq.getImageFiles()) {
+            }else {
+                List<Long> updateImageIdList = updateBoardReq.getImageIdList();
+                // 삭제 대상 이미지를 확인
+                List<BoardImage> imagesToDelete = new ArrayList<>();
+                for (BoardImage oldBoardImg : oldBoardImageList) {
+                    if (!updateImageIdList.contains(oldBoardImg.getImgId())) {
+                        imagesToDelete.add(oldBoardImg);
+                    }
+                }
+                // 삭제 대상 이미지를 실제로 삭제
+                for (BoardImage imageToDelete : imagesToDelete) {
+                    boardImageService.deleteBoardImage(imageToDelete.getImgId());
+                }
+            }
+            //수정 요청에 첨부파일 있을 경우
+            if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
+                for(MultipartFile imgFile: updateBoardReq.getImageFiles()){
                     String storedName = boardImageService.uploadFile(imgFile);
                     String accessUrl = boardImageService.getAccessUrl(storedName);
-
                     BoardImage boardImage = BoardImage.builder()
                             .board(oldBoard)
                             .accessUrl(accessUrl)
