@@ -45,7 +45,7 @@ public class MyPageService {
         };
         List<FollowResponse> followList = new ArrayList<>();
         for (Follow follow : list){
-            boolean isFollowing = followRepository.existsByFollowerAndFollowing(usersRepository.findById(currentUser).get(),sortNum==1?follow.getFollowing().getUsersId():follow.getFollower());
+            boolean isFollowing = followRepository.existsByFollowerAndFollowing(usersRepository.findById(currentUser).get(),sortNum==1?follow.getFollowing():follow.getFollower());
             FollowResponse dto = new FollowResponse(follow, sortNum,isFollowing);
             followList.add(dto);
         }

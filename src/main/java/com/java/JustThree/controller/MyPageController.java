@@ -28,7 +28,7 @@ public class MyPageController {
     @GetMapping("/userinfo/{usersId}")
 
     public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable("usersId") Long usersId,@RequestHeader(value = "Authorization",required = false) String token){
-        UserInfoResponse userInfoResponse = myPageService.userinfo(usersId);
+        UserInfoResponse userInfoResponse = myPageService.userinfo(usersService.getUserInfo(token).getUsersId(), usersId);
 
 
         return ResponseEntity.ok(userInfoResponse);
@@ -94,17 +94,6 @@ public class MyPageController {
     @GetMapping("/follower/{usersId}")
     public List<FollowResponse> getFollowerList(@PathVariable("usersId") Long usersId){
         return myPageService.getFollowerList(usersId);
-    }
-
-    //////////////////////////////////////////////팔로잉 팔로워 목록 ///////////////////////////////
-    @GetMapping("/follow/{usersId}")
-    public ResponseEntity<List<FollowResponse>> getFollowList(@PathVariable("usersId") Long usersId, @RequestParam(defaultValue = "1") int sortNum) {
-        try {
-            List<FollowResponse> followList = myPageService.followlist(usersId,sortNum);
-            return ResponseEntity.ok(followList);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
     }
 
 }
