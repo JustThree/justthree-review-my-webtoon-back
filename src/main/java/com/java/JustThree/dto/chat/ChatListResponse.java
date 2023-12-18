@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @ToString
-public class ChatListResponse {
+public class ChatListResponse implements Comparable<ChatListResponse> {
     private String contents;
     private Long masterId;
     private String title;
@@ -47,5 +47,19 @@ public class ChatListResponse {
         this.created = String.valueOf(chat.getCreated());
         this.usersNickname = users.getUsersNickname();
         this.imageUrl = webtoon.getImageUrl();
+    }
+
+
+    @Override
+    public int compareTo(ChatListResponse chatListResponse) {
+        LocalDateTime newDateTime = LocalDateTime.parse(chatListResponse.created);
+        LocalDateTime oldDateTime = LocalDateTime.parse(created);
+        if( newDateTime.isAfter(oldDateTime) ){
+            return 1;
+        }else if( newDateTime.isBefore(oldDateTime)){
+            return -1;
+        }
+
+        return 0;
     }
 }
