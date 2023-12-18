@@ -1,5 +1,6 @@
 package com.java.JustThree.dto.main.response;
 
+import com.java.JustThree.domain.Users;
 import com.java.JustThree.domain.Webtoon;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +12,8 @@ public class WebtoonMainResponse {
     String title;
     String writer;
     String imgUrl;
-    public static WebtoonMainResponse fromEntity(Webtoon webtoon){
+    Float starAvg;
+    public static WebtoonMainResponse fromEntity(Webtoon webtoon,Float starAvg){
         return WebtoonMainResponse.builder()
                 .masterId(webtoon.getMasterId())
                 .title(webtoon.getTitle())
@@ -19,6 +21,16 @@ public class WebtoonMainResponse {
                         webtoon.getPictrWritrNm() :
                         webtoon.getSntncWritrNm() + "/" + webtoon.getPictrWritrNm() )
                 .imgUrl(webtoon.getImageUrl())
+                .starAvg(starAvg)
                 .build();
+    }
+    public static WebtoonMainResponse fromEntity(Users users){
+        return WebtoonMainResponse.builder()
+                .masterId(users.getUsersId())
+                .title(users.getUsersNickname())
+                .writer("")
+                .imgUrl(users.getProfileUrl())
+                .build();
+
     }
 }
