@@ -100,7 +100,8 @@ public class BoardService {
             long boardLikeCount = boardLikeService.getBoardLikeCount(boardId);
 
             //해당 글에 대한 좋아요 여부 ( boardId, usersId 모두 필요)
-            if(token==null){
+            log.info(token);
+           if(token==null){
                 log.info("token"+token);
                 return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, false, boardLikeCount);
             }else{

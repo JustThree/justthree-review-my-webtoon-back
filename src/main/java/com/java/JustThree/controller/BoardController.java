@@ -46,7 +46,7 @@ public class BoardController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getBoardOne(@PathVariable("id") long id, @RequestHeader(value = "Authorization", required = false) String token){
         log.info("찾아야할 id"+id);
-        log.info("token  >>"+token);
+        //log.info(token);
         try{
             GetBoardOneResponse boardOneRes = boardService.getBoardOne(id,token);
 
