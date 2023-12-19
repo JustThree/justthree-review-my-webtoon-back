@@ -22,7 +22,7 @@ public class BoardReply {
     @Column(name = "board_reply_id")
     private Long boardReplyId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="board_id", referencedColumnName = "board_id")
     @OnDelete(action = OnDeleteAction.CASCADE)   //Board 엔티티 데이터 삭제 시 같이 삭제
     private Board board;

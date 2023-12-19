@@ -16,6 +16,7 @@ public class BoardLike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_like_id")
     private Long boardLikeId;
+
     @ManyToOne
     @JoinColumn(name = "users_id", referencedColumnName = "users_id")
     private Users users;
