@@ -7,6 +7,7 @@ import com.java.JustThree.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -55,9 +56,14 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(
                         authorize -> authorize
-                                .requestMatchers("/**").permitAll()
-                                .anyRequest().authenticated()
-                );
+//                                .requestMatchers("/**").permitAll();
+                                .requestMatchers(HttpMethod.GET,"/api/verify-code","/api/reset-password",
+                                        "/api/check-nickname","/api/check-nickname","/board/**","/board/notice"
+                                        ,"chat/**","/api/webtoon/**").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/join","/api/logout","/api/email-verification").permitAll()
+                                .requestMatchers(HttpMethod.PUT,"/reset-password").permitAll()
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .anyRequest().authenticated());
         return http.build();
     }
 
