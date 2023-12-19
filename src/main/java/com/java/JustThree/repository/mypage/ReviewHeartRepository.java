@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface ReviewHeartRepository extends JpaRepository<Review_Heart,Long> {
     public Long countByReview_ReviewId(Long reviewId);
 
-    public Optional<Review_Heart> findByReview_ReviewIdIs(Long review_reviewId);
+    public Optional<Review_Heart> findByReview_ReviewIdIsAndUsers_UsersIdIs(Long review_reviewId, Long users_usersId);
 
-    boolean existsByReview_ReviewIdIsAndReview_Users_UsersIdIs(Long review_reviewId, Long review_users_usersId);
+    boolean existsByReview_ReviewIdIsAndUsers_UsersIdIs(Long review_reviewId, Long review_users_usersId);
 }
