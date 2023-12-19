@@ -100,7 +100,8 @@ public class BoardService {
             long boardLikeCount = boardLikeService.getBoardLikeCount(boardId);
 
             //해당 글에 대한 좋아요 여부 ( boardId, usersId 모두 필요)
-            if(token==null){
+            log.info(token);
+           if(token==null){
                 log.info("token"+token);
                 return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, false, boardLikeCount);
             }else{
@@ -239,6 +240,7 @@ public class BoardService {
                 .map(GetBoardListResponse::entityToDTO)
                 .collect(Collectors.toList());
     }
+    //공지 글목록 조회
     public Page<GetBoardListResponse> getNoticesByPage(String keyword, Pageable pageable) {
         Specification<Board> specification = (root, query, criteriaBuilder) ->
                 criteriaBuilder.and(
@@ -253,11 +255,11 @@ public class BoardService {
         return noticeBoardPage.map(GetBoardListResponse::entityToDTO);
     }
 
-    //커뮤니티 글 검색
+   /* //커뮤니티 글 검색
     public List<GetBoardListResponse> searchBoardsByKeyword(String keyword, int page, int size) {
         // 정렬 기준(기본 최신순)
         Sort sortByDirection = Sort.by(Sort.Direction.DESC, "created");
-        /*
+        *//*
         if (sortings.equals("sortDesc")) {
             sortByDirection = Sort.by(Sort.Direction.DESC, "created");
         } else if (sortings.equals("sortAsc")) {
@@ -266,7 +268,7 @@ public class BoardService {
             sortByDirection = Sort.by(Sort.Direction.DESC, "viewCount")
                     .and(Sort.by(Sort.Direction.DESC, "created")); // 조회수 → 최신순
         }
-        */
+        *//*
         System.out.println(keyword);
         Pageable pageable = PageRequest.of(page - 1, size, sortByDirection);
 
@@ -288,6 +290,6 @@ public class BoardService {
         return boardList.stream()
                 .map(GetBoardListResponse::entityToDTO)
                 .collect(Collectors.toList());
-    }
+    }*/
 
 }

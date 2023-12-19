@@ -2,6 +2,8 @@ package com.java.JustThree.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -9,7 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @ToString
+@Getter @ToString(exclude = "board")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -21,7 +23,8 @@ public class BoardReply {
     private Long boardReplyId;
 
     @ManyToOne
-    @JoinColumn(name = "board_id")
+    @JoinColumn(name="board_id", referencedColumnName = "board_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)   //Board 엔티티 데이터 삭제 시 같이 삭제
     private Board board;
 
     @ManyToOne
