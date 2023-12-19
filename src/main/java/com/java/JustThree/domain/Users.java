@@ -123,4 +123,8 @@ public class Users implements UserDetails {
 
     public void disableUser() {this.statusCode = 0;}
 
+    public void updateUser(String nickname, String profileUrl) {
+        this.usersNickname=nickname;
+        this.profileUrl=profileUrl;
+    }
 }

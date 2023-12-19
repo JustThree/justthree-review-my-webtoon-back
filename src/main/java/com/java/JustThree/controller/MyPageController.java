@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -46,11 +47,32 @@ public class MyPageController {
         return ResponseEntity.ok(interestedWebtoonList);
     }
     //////////////////////////////////////////////////유저 정보 업뎃/////////////////////////////////////////////////////////////
-    @PutMapping("/update")
-    public ResponseEntity<CudResponse> updateUser(@RequestHeader(value="Authorization",required = false)String token, @RequestPart("newNickname") String newNickname){
+//    @PutMapping(value = "/update",consumes = "multipart/form-data")
+//    public ResponseEntity<CudResponse> updateUser(@RequestHeader(value="Authorization",required = false)String token, @RequestPart("newNickname") String newNickname, @RequestPart("file")MultipartFile[] profileImageFile){
+//        CudResponse response = new CudResponse();
+//        Long usersId = usersService.getUserInfo(token).getUsersId();
+//        boolean result = myPageService.updateUser(newNickname,usersId,profileImageFile[0]);
+////        boolean result = myPageService.updateUser(newNickname,usersId,multipartFile);
+//
+//        if(result){
+//            response.setSuccess(true);
+//            response.setMessage("수정완료");
+//            return new ResponseEntity<>(response, HttpStatus.OK);
+//        }
+//        else{
+//            response.setSuccess(false);
+//            response.setMessage("처리 도중 오류가 발생했습니다. \n다시 시도해 주세요.");
+//        }
+//
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
+    //////////////////////////////////////////////////유저 정보 업뎃/////////////////////////////////////////////////////////////
+    @PutMapping(value = "/update",consumes = "multipart/form-data")
+    public ResponseEntity<CudResponse> updateUser(@RequestHeader(value="Authorization",required = false)String token, @RequestPart(value = "newNickname",required = false) String newNickname, @RequestPart(value = "file",required = false)MultipartFile[] profileImageFile){
         CudResponse response = new CudResponse();
         Long usersId = usersService.getUserInfo(token).getUsersId();
-        boolean result = myPageService.updateUser(newNickname,usersId);
+//        String result = myPageService.updateUser(newNickname,usersId,profileImageFile[0]);
+        boolean result = myPageService.updateUser(newNickname,usersId,profileImageFile[0]);
         if(result){
             response.setSuccess(true);
             response.setMessage("수정완료");
