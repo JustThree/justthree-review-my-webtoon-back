@@ -13,6 +13,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOrigin("http://192.168.0.85:5173");
         config.addAllowedHeader("*"); // 모든 header에 응답 허용
         config.addAllowedMethod("*"); // 모든 post, get, put, delete, patch 등 요청 허용
         config.addExposedHeader("Authorization"); // header에 Authorization 추가
