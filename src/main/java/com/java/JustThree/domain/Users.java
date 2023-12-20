@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
@@ -24,9 +25,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 @Builder(toBuilder = true)
 @Entity
-@Data
 @Setter
-
 public class Users implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,7 +68,9 @@ public class Users implements UserDetails {
     }
 
     public List<String> getRoleList() {
+        System.out.println(getClass().getName());
         if (!this.usersRole.isEmpty()) {
+            System.out.println(getClass().getName()+Arrays.asList(this.usersRole.split(",")));
             return Arrays.asList(this.usersRole.split(","));
         }
         return new ArrayList<>();
@@ -78,12 +79,16 @@ public class Users implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        getRoleList().forEach(r -> {
+        List<String> roles = getRoleList();
+        for (String role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
+        /*getRoleList().forEach(r -> {
             System.out.println("role : " + r);
             authorities.add(() -> {
                 return r;
             });
-        });
+        });*/
         return authorities;
     }
 

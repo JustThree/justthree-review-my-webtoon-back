@@ -32,7 +32,7 @@ public class ChatController {
         return ResponseEntity.ok(chatService.findChatInfo(master_id));
     }
 
-
+    //권한 여부 확인 필요
     @GetMapping("/type/{type}")
     public ResponseEntity<List<ChatListResponse>> chatRoom(@PathVariable Integer type, @RequestHeader(name = "Authorization", required = false) String token){
         // 1: 전체, 2: 실시간, 3: 인기웹툰순, 4: 해당 사용자가 메시지 보낸 채팅방

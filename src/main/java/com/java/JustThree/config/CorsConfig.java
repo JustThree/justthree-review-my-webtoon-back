@@ -12,8 +12,9 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
+        config.addAllowedOrigin("http://192.168.3.112:5173");//L3 시연용 컴퓨터 성수IP
         config.addAllowedOrigin("http://localhost:5173");
-        config.addAllowedOrigin("http://192.168.0.85:5173");
+        config.addAllowedOrigin("http://192.168.0.85:5173");// L2 현덕 IP
         config.addAllowedHeader("*"); // 모든 header에 응답 허용
         config.addAllowedMethod("*"); // 모든 post, get, put, delete, patch 등 요청 허용
         config.addExposedHeader("Authorization"); // header에 Authorization 추가
