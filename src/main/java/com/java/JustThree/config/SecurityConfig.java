@@ -56,13 +56,13 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(
                         authorize -> authorize
-//                                .requestMatchers("/**").permitAll();
-                                .requestMatchers(HttpMethod.GET,"/api/verify-code","/api/reset-password",
-                                        "/api/check-nickname","/api/check-nickname","/board/**","/board/notice"
-                                        ,"chat/**","/api/webtoon/**").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/api/join","/api/logout","/api/email-verification").permitAll()
-                                .requestMatchers(HttpMethod.PUT,"/reset-password").permitAll()
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/**").permitAll()
+//                                .requestMatchers(HttpMethod.GET,"/api/verify-code","/api/reset-password",
+//                                        "/api/check-nickname","/api/check-nickname","/board/**","/board/notice"
+//                                        ,"chats/**","/api/webtoon/**").permitAll()
+//                                .requestMatchers(HttpMethod.POST,"/api/join","/api/logout","/api/email-verification").permitAll()
+//                                .requestMatchers(HttpMethod.PUT,"/reset-password").permitAll()
+//                                .requestMatchers("/admin/**").hasAnyRole("ADMIN")
                                 .anyRequest().authenticated());
         return http.build();
     }
