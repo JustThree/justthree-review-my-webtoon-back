@@ -65,19 +65,20 @@ public class MyPageService {
 //    }
     //////////////////////프로필 사진 변경 ////////////////////
     @Transactional
-    public boolean updateUser(String nickname, Long usersId, MultipartFile profileUrl) {
+    public boolean updateUser(String nickname, Long usersId, MultipartFile[] profileUrl) {
         boolean result = true;
         try {
-            // 프로필 이미지 업로드 및 저장
-            String storedName = boardImageService.uploadFile(profileUrl);
-            String accessUrl = boardImageService.getAccessUrl(storedName);
             // 사용자 정보 업데이트
             Users nuser = usersRepository.findById(usersId).get();
             if(nickname!=null){
                 nuser.setUsersNickname(nickname);
             }
-            nuser.setProfileUrl(accessUrl);
-            usersRepository.save(nuser);
+            if (profileUrl!=null){
+                // 프로필 이미지 업로드 및 저장
+                String storedName = boardImageService.uploadFile(profileUrl[0]);
+                String accessUrl = boardImageService.getAccessUrl(storedName);
+                nuser.setProfileUrl(accessUrl);
+            }
         } catch (Exception e) {
             result = false;
             e.printStackTrace();

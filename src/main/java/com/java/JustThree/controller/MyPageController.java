@@ -72,7 +72,7 @@ public class MyPageController {
         CudResponse response = new CudResponse();
         Long usersId = usersService.getUserInfo(token).getUsersId();
 //        String result = myPageService.updateUser(newNickname,usersId,profileImageFile[0]);
-        boolean result = myPageService.updateUser(newNickname,usersId,profileImageFile[0]);
+        boolean result = myPageService.updateUser(newNickname,usersId,profileImageFile);
         if(result){
             response.setSuccess(true);
             response.setMessage("수정완료");
