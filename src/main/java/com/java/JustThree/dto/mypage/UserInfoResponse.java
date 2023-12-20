@@ -20,6 +20,8 @@ public class UserInfoResponse {
     private Long interestedCount;//관심 웹툰 수
     private Long followerCount;//팔로워 수
     private Long followingCount;//팔로잉 수
+
+
     public UserInfoResponse(Users users,boolean isFollowing, Long ratedCount, Long reviewedCount, Long interestedCount, Long followerCount, Long followingCount){
         this.profileUrl=users.getProfileUrl();
         this.usersNickname=users.getUsersNickname();
