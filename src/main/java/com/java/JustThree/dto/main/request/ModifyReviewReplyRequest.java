@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ModifyReviewReplyRequest {
     @NotEmpty
-    @Size(min = 5, max= 200, message = "내용은 5자에서 200자 사이여야 됩니다.")
+        @Size(min = 5, max= 200, message = "내용은 5자에서 200자 사이여야 됩니다.")
     private String content;
 }
