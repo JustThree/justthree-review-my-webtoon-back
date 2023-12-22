@@ -5,6 +5,9 @@ import com.java.JustThree.service.AdminBoardService;
 import com.java.JustThree.service.board.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +35,21 @@ public class AdminController {
             searchWord = keyword;
         }
         return adminBoardService.getBoardsByPage(page, size, sortings, searchWord);
+    }
+
+    //공지 목록 조회
+    @GetMapping("/notice")
+    public Page<GetBoardListResponse> getNoticeList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                                    @RequestParam(name = "size", defaultValue = "10") int size,
+                                                    @RequestParam(name = "keyword", required = false) String keyword){
+        String searchWord = "";
+        if(keyword == null){
+            searchWord = "";
+        }else{
+            searchWord = keyword;
+        }
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "created"));
+        return adminBoardService.getNoticesByPage(searchWord, pageable);
     }
 
 }

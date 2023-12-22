@@ -201,12 +201,8 @@ public class MainPageController {
     public ResponseEntity<?> addReviewReply(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long reviewId,
-            @Validated @RequestBody AddReviewReplyRequest addReviewReplyRequest
-            , Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400)
-                .header(errors.getAllErrors().toString())
-                    .build();
+            @Validated @RequestBody AddReviewReplyRequest addReviewReplyRequest)
+            {
         try {
             return ResponseEntity.ok()
                     .body(webtoonService.addReviewReply(reviewId,token, addReviewReplyRequest.getContent()));
@@ -224,8 +220,7 @@ public class MainPageController {
     public ResponseEntity<?> modifyReview(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long reviewId,
-            @Validated @RequestBody ModifyReviewRequest modifyReviewRequest
-            , Errors errors){
+            @Validated @RequestBody ModifyReviewRequest modifyReviewRequest){
         try {
             webtoonService.fixReview(reviewId,token,modifyReviewRequest.getContent());
             return ResponseEntity.ok()

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -24,18 +25,6 @@ public class UserController {
     public Long join(@RequestBody JoinRequest joinDTO){
 
         return usersService.insertUsers(joinDTO);
-    }
-
-    @GetMapping(value = "/tui")
-    public UsersResponse asdf(@RequestHeader("Authorization") String token){
-
-        log.info("Authorization이 도착했습니다");
-        log.info(token);
-
-        log.info("userId가 도착했습니다");
-        log.info(usersService.something(token));
-
-        return usersService.getUserInfo(token);
     }
 
     @PostMapping(value = "/logout")
@@ -143,6 +132,7 @@ public class UserController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getUserList")
     public ResponseEntity<?> getUserList(@PageableDefault() Pageable pageable,@RequestParam(required = false) String search,@RequestParam(required = false,defaultValue = "All") String type){
         try{
@@ -154,6 +144,7 @@ public class UserController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/deleteUser")
     public ResponseEntity<String> deleteUserId(@RequestBody String UsersId){
         log.info("유저 삭제");
