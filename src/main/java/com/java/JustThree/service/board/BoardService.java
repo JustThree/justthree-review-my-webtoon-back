@@ -2,6 +2,7 @@ package com.java.JustThree.service.board;
 
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardImage;
+import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.board.request.AddBoardRequest;
 import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
@@ -48,34 +49,25 @@ public class BoardService {
 
     //커뮤니티 글 등록
     @Transactional
-    public Long addBoard(AddBoardRequest addBoardRequest){
+    public Long addBoard(AddBoardRequest addBoardRequest, String token){
+        Long userId = jwtProvider.getUserId(token);
         Board newBoard = Board.builder()
                 .title(addBoardRequest.getTitle())
                 .content(addBoardRequest.getContent())
                 .noticeYn(addBoardRequest.getNoticeYn())
-                .users(addBoardRequest.getUsers())
+                .users(Users.builder().usersId(userId).build())
                 .build();
         boardRepository.save(newBoard);
         //첨부파일 있을 경우
         if(addBoardRequest.getImageFiles() != null && !addBoardRequest.getImageFiles()[0].isEmpty()){
-            for(MultipartFile imgFile: addBoardRequest.getImageFiles()){
-                String storedName = boardImageService.uploadFile(imgFile);
-                String accessUrl = boardImageService.getAccessUrl(storedName);
-
-                BoardImage boardImage = BoardImage.builder()
-                        .board(newBoard)
-                        .accessUrl(accessUrl)
-                        .originName(imgFile.getOriginalFilename())
-                        .storedName(storedName)
-                        .build();
-                boardImageRepository.save(boardImage);
-            }
+            String resSaveImg = boardImageService.saveBoardImage(newBoard, addBoardRequest.getImageFiles());
+           //log.info("resSaveImg  >>"+resSaveImg);
         }
         return newBoard.getBoardId();
     }
     //커뮤니티 글 상세 조회
     @Transactional
-    public GetBoardOneResponse getBoardOne(long boardId, String token ){
+    public GetBoardOneResponse getBoardOne(long boardId, String token){
         Optional<Board> optionalBoard = boardRepository.findById(boardId);
         if(optionalBoard.isEmpty()){
             return null;
@@ -117,22 +109,10 @@ public class BoardService {
         if(oldBoardImageList.isEmpty()){//기존 첨부파일 없을 경우
             //수정요청에 첨부파일 있을 경우
             if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
-                for(MultipartFile imgFile: updateBoardReq.getImageFiles()){
-                    String storedName = boardImageService.uploadFile(imgFile);
-                    String accessUrl = boardImageService.getAccessUrl(storedName);
-                    BoardImage boardImage = BoardImage.builder()
-                            .board(oldBoard)
-                            .accessUrl(accessUrl)
-                            .originName(imgFile.getOriginalFilename())
-                            .storedName(storedName)
-                            .build();
-                    boardImageRepository.save(boardImage);
-                }
+                String resSaveImg = boardImageService.saveBoardImage(oldBoard, updateBoardReq.getImageFiles());
+                log.info("resSaveImg  >>"+resSaveImg);
             }
         }else{ //기존 첨부파일 있을 경우
-            //log.info("기존 이미지파일  >>" + oldBoardImageList);
-            //log.info("수정요청 imgIdList "+updateBoardReq.getImageIdList());
-
             //수정 케이스1 - 기존 첨부파일 다 삭제한 경우
             if(updateBoardReq.getImageIdList() == null){
                 for(BoardImage oldBoardImage : oldBoardImageList){
@@ -154,17 +134,8 @@ public class BoardService {
             }
             //수정 요청에 첨부파일 있을 경우
             if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
-                for(MultipartFile imgFile: updateBoardReq.getImageFiles()){
-                    String storedName = boardImageService.uploadFile(imgFile);
-                    String accessUrl = boardImageService.getAccessUrl(storedName);
-                    BoardImage boardImage = BoardImage.builder()
-                            .board(oldBoard)
-                            .accessUrl(accessUrl)
-                            .originName(imgFile.getOriginalFilename())
-                            .storedName(storedName)
-                            .build();
-                    boardImageRepository.save(boardImage);
-                }
+                String resSaveImg = boardImageService.saveBoardImage(oldBoard, updateBoardReq.getImageFiles());
+                log.info("resSaveImg  >>"+resSaveImg);
             }
         }
         return updateBoardReq.getBoardId();

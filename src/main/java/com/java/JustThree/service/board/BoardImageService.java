@@ -33,6 +33,30 @@ public class BoardImageService {
     private static String bucketName = "just-three";
     private final BoardImageRepository boardImageRepository;
 
+    //DB(BoardImage) 에 등록  & S3에서 업로드
+    @Transactional
+    public String saveBoardImage(Board newBoard, MultipartFile[] newMfList){
+        try{
+            for(MultipartFile mf: newMfList){
+                String storedName = uploadFile(mf);
+                String accessUrl = getAccessUrl(storedName);
+
+                BoardImage boardImage = BoardImage.builder()
+                        .board(newBoard)
+                        .accessUrl(accessUrl)
+                        .originName(mf.getOriginalFilename())
+                        .storedName(storedName)
+                        .build();
+
+                boardImageRepository.save(boardImage);
+            }
+            return "success";
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return e.getMessage();
+        }
+    }
+
     //MultipartFile을 받아서 Amazon S3에 업로드
     public String uploadFile(MultipartFile mf) {
         try {
@@ -63,7 +87,8 @@ public class BoardImageService {
         }
         return convertedFile;
     }
-    //BoardImage 에서 삭제 & S3에서 삭제
+    //DB(BoardImage) 에서 삭제 & S3에서 삭제
+    @Transactional
     public void deleteBoardImage(long boardImgId){
         try{
             BoardImage boardImage = boardImageRepository.findById(boardImgId).get();
