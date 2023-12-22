@@ -73,11 +73,9 @@ public class BoardService {
         }
         return newBoard.getBoardId();
     }
-    //커뮤니티 글 상세 조회(댓글, 좋아요 구현 후 보완 필요)
+    //커뮤니티 글 상세 조회
     @Transactional
     public GetBoardOneResponse getBoardOne(long boardId, String token ){
-        //Board board = boardRepository.findById(boardId).orElseThrow(NoSuchElementException::new);
-
         Optional<Board> optionalBoard = boardRepository.findById(boardId);
         if(optionalBoard.isEmpty()){
             return null;
@@ -86,12 +84,9 @@ public class BoardService {
 
             //해당 글에 대한 이미지  파일
             List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
-            //log.info("board1  >>"+board);
-            log.info("boardImgList  >>"+boardImageList);
 
             //조회수 증가
             boardRepository.updateViewCount(board.getViewCount()+1, boardId);
-            //log.info("board2  >>"+board);
 
             //해당 글에 대한 댓글
             List<GetBoardReplyResponse> boardReplyList = boardReplyService.getBoardReplyList(boardId);
@@ -100,14 +95,11 @@ public class BoardService {
             long boardLikeCount = boardLikeService.getBoardLikeCount(boardId);
 
             //해당 글에 대한 좋아요 여부 ( boardId, usersId 모두 필요)
-            log.info(token);
            if(token==null){
-                log.info("token"+token);
                 return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, false, boardLikeCount);
             }else{
                 Long userId = jwtProvider.getUserId(token);
                 boolean isBoardLIke = boardLikeService.getBoardLike(boardId, userId);
-                log.info("좋아요 여부  >>"+isBoardLIke);
                 return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, isBoardLIke, boardLikeCount);
             }
         }
