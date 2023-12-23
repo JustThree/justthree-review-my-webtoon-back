@@ -34,10 +34,12 @@ public class BoardReplyController {
 
     //커뮤니티 글 댓글 등록
     @PostMapping
-    public ResponseEntity<?> addBoardReply(@RequestBody AddBoardReplyReqeust addBoardReplyReq){
+    public ResponseEntity<?> addBoardReply(@RequestBody AddBoardReplyReqeust addBoardReplyReq,
+                                           @RequestHeader(value = "Authorization", required = false) String token){
         System.out.println(addBoardReplyReq);
+        log.info("token  >>" + token);
         try{
-            Long res = boardReplyService.addReply(addBoardReplyReq);
+            Long res = boardReplyService.addReply(addBoardReplyReq, token);
             log.info("댓글 등록 pk"+res);
             return ResponseEntity.ok("1");
         }catch (Exception e){

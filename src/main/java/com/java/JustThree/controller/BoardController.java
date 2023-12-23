@@ -32,10 +32,12 @@ public class BoardController {
 
     //커뮤니티 글 등록
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> saveBoard(@ModelAttribute AddBoardRequest addBoardRequest){
+    public ResponseEntity<String> saveBoard(@ModelAttribute AddBoardRequest addBoardRequest,
+                                            @RequestHeader(value = "Authorization", required = false) String token){
         System.out.println(addBoardRequest);
+        log.info(token);
         try{
-            Long res = boardService.addBoard(addBoardRequest);
+            Long res = boardService.addBoard(addBoardRequest, token);
             log.info("글 등록 pk"+res);
             return ResponseEntity.ok("1");
         }catch (Exception e){
@@ -44,22 +46,15 @@ public class BoardController {
     }
     // 커뮤니티 글 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBoardOne(@PathVariable("id") long id, @RequestHeader(value = "Authorization", required = false) String token){
+    public ResponseEntity<?> getBoardOne(@PathVariable("id") long id,
+                                         @RequestHeader(value = "Authorization", required = false) String token){
         log.info("찾아야할 id"+id);
-        //log.info(token);
+        log.info(token);
         try{
             GetBoardOneResponse boardOneRes = boardService.getBoardOne(id,token);
 
             log.info("boardOne Result  >>"+boardOneRes);
 
-            //log.info(""+boardOneRes);
-            /*
-            log.info("댓글 수  >>"+boardOneRes.getBoardReplyList().toArray().length);
-            log.info("댓글  수 >>"+boardOneRes.getBoardReplyList().size());
-            for(int i=0; i<boardOneRes.getBoardReplyList().size(); i++){
-                log.info("댓글  >>"+boardOneRes.getBoardReplyList().get(i));
-            }
-            */
             if( boardOneRes != null){
                 return ResponseEntity.status(HttpStatus.OK).body(boardOneRes);
             }else{
@@ -96,10 +91,10 @@ public class BoardController {
         }
     }
     //커뮤니티 게시글 목록(noticeYn=0) 조회
-    @GetMapping
-    List<GetBoardListResponse> getBoardList(@RequestParam(name = "page", defaultValue = "1") int page,
+   @GetMapping
+    Page<GetBoardListResponse> getBoardList(@RequestParam(name = "page", defaultValue = "1") int page,
                                             @RequestParam(name = "size", defaultValue = "10") int size,
-                                            @RequestParam(name = "sortings", defaultValue = "sortDesc") String sortings,
+                                            @RequestParam(name = "sortingType", defaultValue = "sortDesc") String sortingType,
                                             @RequestParam(name = "keyword", required = false) String keyword){
         String searchWord="";
         if(keyword == null){
@@ -107,7 +102,7 @@ public class BoardController {
         }else{
             searchWord = keyword;
         }
-        return boardService.getBoardsByPage(page, size, sortings, searchWord);
+        return boardService.getBoardsByPage(page, size, sortingType, searchWord);
     }
     //공지 목록 조회
     @GetMapping("/notice")
@@ -125,10 +120,11 @@ public class BoardController {
     }
     //게시글 좋아요
     @PostMapping("/likes")
-    public ResponseEntity<?> addBoardLike(@RequestBody AddBoardLikeRequest addBoardLikeReq){
-        System.out.println(addBoardLikeReq);
+    public ResponseEntity<?> addBoardLike(@RequestBody AddBoardLikeRequest addBoardLikeReq,
+                                          @RequestHeader(value = "Authorization", required = false) String token){
+        log.info(token);
         try{
-            Long res = boardLikeService.addLike(addBoardLikeReq);
+            Long res = boardLikeService.addLike(addBoardLikeReq, token);
             log.info("좋아요 등록 pk"+res);
             return ResponseEntity.ok(res);
         }catch (Exception e){
@@ -137,7 +133,8 @@ public class BoardController {
     }
     //게시글 좋아요 취소(삭제)
     @DeleteMapping("/likes/{id}")
-    public ResponseEntity<String> removeBoardLike(@PathVariable("id")long boardId, @RequestHeader(value = "Authorization", required = false) String token){
+    public ResponseEntity<String> removeBoardLike(@PathVariable("id")long boardId,
+                                                  @RequestHeader(value = "Authorization", required = false) String token){
         log.info("id >>" + boardId);
         log.info("remove board like >>"+token);
         try{

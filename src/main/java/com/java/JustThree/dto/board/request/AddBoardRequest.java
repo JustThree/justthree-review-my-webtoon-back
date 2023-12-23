@@ -23,7 +23,7 @@ public class AddBoardRequest {
     //private LocalDateTime created;
     //private LocalDateTime updated;
     private int noticeYn;
-    private Users users;
+    //private Users users;
     //save image request dto
     private MultipartFile[] imageFiles;
     //private List<MultipartFile> boardImgList = new ArrayList<>();

@@ -21,7 +21,7 @@ public class UpdateBoardRequest {
     //private LocalDateTime created;
     //private LocalDateTime updated;
     private int noticeYn;
-    private Users users;
+    //private Users users;
     //save image request dto
     private MultipartFile[] imageFiles;
     //기존 이미지 수정 시
