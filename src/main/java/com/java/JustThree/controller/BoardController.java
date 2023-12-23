@@ -91,10 +91,10 @@ public class BoardController {
         }
     }
     //커뮤니티 게시글 목록(noticeYn=0) 조회
-    @GetMapping
-    List<GetBoardListResponse> getBoardList(@RequestParam(name = "page", defaultValue = "1") int page,
+   @GetMapping
+    Page<GetBoardListResponse> getBoardList(@RequestParam(name = "page", defaultValue = "1") int page,
                                             @RequestParam(name = "size", defaultValue = "10") int size,
-                                            @RequestParam(name = "sortings", defaultValue = "sortDesc") String sortings,
+                                            @RequestParam(name = "sortingType", defaultValue = "sortDesc") String sortingType,
                                             @RequestParam(name = "keyword", required = false) String keyword){
         String searchWord="";
         if(keyword == null){
@@ -102,7 +102,7 @@ public class BoardController {
         }else{
             searchWord = keyword;
         }
-        return boardService.getBoardsByPage(page, size, sortings, searchWord);
+        return boardService.getBoardsByPage(page, size, sortingType, searchWord);
     }
     //공지 목록 조회
     @GetMapping("/notice")

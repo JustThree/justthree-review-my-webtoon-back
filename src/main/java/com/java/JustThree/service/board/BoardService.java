@@ -15,10 +15,7 @@ import com.java.JustThree.service.board.BoardImageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -167,7 +164,7 @@ public class BoardService {
         }
     }
     //커뮤니티 글 목록 조회
-    public List<GetBoardListResponse> getBoardsByPage(int page, int size, String sortType, String keyword){
+   public Page<GetBoardListResponse> getBoardsByPage(int page, int size, String sortType, String keyword){
         // 정렬  기준(기본 최신순)
         Sort sortByDirection =Sort.by(Sort.Direction.DESC, "created");
 
@@ -198,10 +195,11 @@ public class BoardService {
         if(boardList.isEmpty()) {
             System.out.println(boardList);
         }
-
-        return boardList.stream()
+        List<GetBoardListResponse> responseList = boardList.stream()
                 .map(GetBoardListResponse::entityToDTO)
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(responseList, pageable, boardPage.getTotalElements());
     }
     //공지 글목록 조회
     public Page<GetBoardListResponse> getNoticesByPage(String keyword, Pageable pageable) {
@@ -218,41 +216,6 @@ public class BoardService {
         return noticeBoardPage.map(GetBoardListResponse::entityToDTO);
     }
 
-   /* //커뮤니티 글 검색
-    public List<GetBoardListResponse> searchBoardsByKeyword(String keyword, int page, int size) {
-        // 정렬 기준(기본 최신순)
-        Sort sortByDirection = Sort.by(Sort.Direction.DESC, "created");
-        *//*
-        if (sortings.equals("sortDesc")) {
-            sortByDirection = Sort.by(Sort.Direction.DESC, "created");
-        } else if (sortings.equals("sortAsc")) {
-            sortByDirection = Sort.by(Sort.Direction.ASC, "created");
-        } else if (sortings.equals("sortViewCntDesc")) {
-            sortByDirection = Sort.by(Sort.Direction.DESC, "viewCount")
-                    .and(Sort.by(Sort.Direction.DESC, "created")); // 조회수 → 최신순
-        }
-        *//*
-        System.out.println(keyword);
-        Pageable pageable = PageRequest.of(page - 1, size, sortByDirection);
 
-        // 검색어를 포함하는 게시글만 조회하는 쿼리 작성
-        Specification<Board> specification = (root, query, criteriaBuilder) ->
-                criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get("noticeYn"), 0), // noticeYn이 0인 게시글만 조회
-                        criteriaBuilder.or(
-                                criteriaBuilder.like(root.get("title"), "%" + keyword + "%"), // 제목에 검색어 포함
-                                criteriaBuilder.like(root.get("content"), "%" + keyword + "%") // 내용에 검색어 포함
-                        )
-                );
-
-        Page<Board> boardPage = boardRepository.findAll(specification, pageable);
-        List<Board> boardList = boardPage.getContent();
-        if(boardList.isEmpty()) {
-            System.out.println(boardList);
-        }
-        return boardList.stream()
-                .map(GetBoardListResponse::entityToDTO)
-                .collect(Collectors.toList());
-    }*/
 
 }
