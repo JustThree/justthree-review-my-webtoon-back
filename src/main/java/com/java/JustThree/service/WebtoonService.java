@@ -286,10 +286,11 @@ public class WebtoonService {
     }
     public ReviewDetailResponse getReview(Long reviewId, String token){
         boolean checkLike = false;
+        System.out.println(token);
         Review review = reviewRepository.findById(reviewId).orElseThrow(()
                 -> new IllegalArgumentException("해당 리뷰가 없어요"));
         if (token != null) {
-            if (reviewHeartRepository.existsByReview_ReviewIdIsAndReview_Users_UsersIdIs(reviewId,
+            if (reviewHeartRepository.existsByReview_ReviewIdIsAndUsers_UsersIdIs(reviewId,
                     jwtProvider.getUserId(token))) {
                 checkLike = true;
             }
@@ -305,7 +306,7 @@ public class WebtoonService {
     }
     @Transactional
     public String  modifyReviewLike(Long reviewId, String token){
-        Optional<Review_Heart> byReviewReviewIdIs = reviewHeartRepository.findByReview_ReviewIdIs(reviewId);
+        Optional<Review_Heart> byReviewReviewIdIs = reviewHeartRepository.findByReview_ReviewIdIsAndUsers_UsersIdIs(reviewId,jwtProvider.getUserId(token));
         if (byReviewReviewIdIs.isPresent()){
             reviewHeartRepository.delete(byReviewReviewIdIs.get());
             return "좋아요가 삭제되었어요";

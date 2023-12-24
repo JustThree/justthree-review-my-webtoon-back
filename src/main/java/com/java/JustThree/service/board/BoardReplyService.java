@@ -2,9 +2,11 @@ package com.java.JustThree.service.board;
 
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardReply;
+import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.board.request.AddBoardReplyReqeust;
 import com.java.JustThree.dto.board.request.UpdateBoardReplyReqeust;
 import com.java.JustThree.dto.board.response.GetBoardReplyResponse;
+import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.board.BoardReplyRepository;
 import com.java.JustThree.repository.board.BoardRepository;
 import jakarta.transaction.Transactional;
@@ -27,11 +29,13 @@ public class BoardReplyService {
 
     private final BoardRepository boardRepository;
     private final BoardReplyRepository boardReplyRepository;
+    //토큰
+    private final JwtProvider jwtProvider;
 
     //댓글 등록
     @Transactional
-    public Long addReply(AddBoardReplyReqeust addReplyReq){
-
+    public Long addReply(AddBoardReplyReqeust addReplyReq, String token){
+        Long userId = jwtProvider.getUserId(token);
         Optional<Board> optionalBoard = boardRepository.findById(addReplyReq.getBoardId());
         if(optionalBoard.isEmpty()){
             return null;
@@ -40,7 +44,8 @@ public class BoardReplyService {
             BoardReply boardReply = BoardReply.builder()
                     .boardReplyContent(addReplyReq.getBoardReplyContent())
                     .board(board)
-                    .users(addReplyReq.getUsers())
+                    .users(Users.builder().usersId(userId).build())
+                    //.users(addReplyReq.getUsers())
                     .parentReplyId(addReplyReq.getParentReplyId()) //대댓글 등록 시 0이면 안됨
                     .build();
             boardReplyRepository.save(boardReply);

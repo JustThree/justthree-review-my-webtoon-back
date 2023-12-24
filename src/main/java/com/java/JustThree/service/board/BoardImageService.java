@@ -32,7 +32,30 @@ public class BoardImageService {
     private final AmazonS3Client s3Client;
     private static String bucketName = "just-three";
     private final BoardImageRepository boardImageRepository;
-    private final BoardRepository boardRepository;
+
+    //DB(BoardImage) 에 등록  & S3에서 업로드
+    @Transactional
+    public String saveBoardImage(Board newBoard, MultipartFile[] newMfList){
+        try{
+            for(MultipartFile mf: newMfList){
+                String storedName = uploadFile(mf);
+                String accessUrl = getAccessUrl(storedName);
+
+                BoardImage boardImage = BoardImage.builder()
+                        .board(newBoard)
+                        .accessUrl(accessUrl)
+                        .originName(mf.getOriginalFilename())
+                        .storedName(storedName)
+                        .build();
+
+                boardImageRepository.save(boardImage);
+            }
+            return "success";
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return e.getMessage();
+        }
+    }
 
     //MultipartFile을 받아서 Amazon S3에 업로드
     public String uploadFile(MultipartFile mf) {
@@ -47,7 +70,6 @@ public class BoardImageService {
             throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
         }
     }
-
     public String getAccessUrl(String fileName) {
         return s3Client.getUrl(bucketName, fileName).toString();
     }
@@ -57,7 +79,6 @@ public class BoardImageService {
         String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
         return UUID.randomUUID().toString() + extension;
     }
-
     //MultipartFile을 File객체로 변환
     private File convertMultipartFileToFile(MultipartFile file) throws IOException {
         File convertedFile = new File(file.getOriginalFilename());
@@ -66,63 +87,8 @@ public class BoardImageService {
         }
         return convertedFile;
     }
-
-  /*  //S3에서 수정
-    public String updateFile(Long boardId, MultipartFile[] mfList) {
-        try {
-            *//*Board oldBoard = boardRepository.findById(boardId)
-                    .orElseThrow(NoSuchElementException::new);*//*
-
-            List<BoardImage> boardImageList = boardImageRepository.findByBoard_BoardIdIs(boardId);
-
-            for(BoardImage boardImg: boardImageList) {
-                BoardImage oldBoardImage = boardImageRepository.findById(boardImg.getImgId()).get();
-                //boardId 7이였던 boardImageId가 1~3인 storedName(기존파일)을 삭제
-                deleteFile(oldBoardImage.getStoredName());
-            }
-            for(BoardImage boardImg: boardImageList){
-                BoardImage oldBoardImage = boardImageRepository.findById(boardImg.getImgId()).get();
-                for(MultipartFile mf: mfList){
-                    //새로운 파일 업로드
-                    String fileName = generateFileName(mf.getOriginalFilename());
-                    File convertedFile = convertMultipartFileToFile(mf); //MultipartFile → File
-                    s3Client.putObject(new PutObjectRequest(bucketName, fileName, convertedFile)
-                            .withCannedAcl(CannedAccessControlList.PublicRead));
-                    convertedFile.delete();
-                    //새로운 파일 저장
-                    String storedName = fileName;
-                    String accessUrl = getAccessUrl(storedName);
-                    oldBoardImage.updateFile(accessUrl, mf.getOriginalFilename(), storedName);
-                    boardImageRepository.save(oldBoardImage);
-
-                }
-            }
-            return "업로드 수정";
-        } catch (IOException e) {
-            throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
-        }
-    }*/
-
-    /*public String updateFile(Long boardImageId, MultipartFile mf) {
-        try {
-            BoardImage boardImage = boardImageRepository.findById(boardImageId)
-                    .orElseThrow(() -> new NotFoundException("이미지를 찾을 수 없음"));
-
-            //기존 파일 삭제
-            deleteFile(boardImage.getStoredName());
-
-            //새로운 파일 업로드
-            String fileName = generateFileName(mf.getOriginalFilename());
-            File convertedFile = convertMultipartFileToFile(mf); //MultipartFile → File
-            s3Client.putObject(new PutObjectRequest(bucketName, fileName, convertedFile)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-            convertedFile.delete();
-            return fileName;
-        } catch (IOException e) {
-            throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
-        }
-    }*/
-    //BoardImage 에서 삭제 & S3에서 삭제
+    //DB(BoardImage) 에서 삭제 & S3에서 삭제
+    @Transactional
     public void deleteBoardImage(long boardImgId){
         try{
             BoardImage boardImage = boardImageRepository.findById(boardImgId).get();
@@ -133,7 +99,6 @@ public class BoardImageService {
             log.error(e.getMessage());
         }
     }
-
     //Amazon S3에서 삭제
     public void deleteFile(String storedName){
         try{

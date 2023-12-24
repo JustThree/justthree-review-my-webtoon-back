@@ -2,6 +2,7 @@ package com.java.JustThree.service.board;
 
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardLike;
+import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.board.request.AddBoardLikeRequest;
 import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.board.BoardLikeRepository;
@@ -26,14 +27,15 @@ public class BoardLikeService {
 
     //게시글 좋아요 등록
     @Transactional
-    public Long addLike(AddBoardLikeRequest addBoardLikeReq){
+    public Long addLike(AddBoardLikeRequest addBoardLikeReq, String token){
+        Long usersId = jwtProvider.getUserId(token);
         Optional<Board> optionalBoard = boardRepository.findById(addBoardLikeReq.getBoardId());
         if(optionalBoard.isEmpty()){
             return null;
         }else {
             Board board = optionalBoard.get();
             BoardLike newBoardLike = BoardLike.builder()
-                    .users(addBoardLikeReq.getUsers())
+                    .users(Users.builder().usersId(usersId).build())
                     .board(board)
                     .build();
             boardLikeRepository.save(newBoardLike);

@@ -2,6 +2,7 @@ package com.java.JustThree.service.board;
 
 import com.java.JustThree.domain.Board;
 import com.java.JustThree.domain.BoardImage;
+import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.board.request.AddBoardRequest;
 import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.dto.board.response.GetBoardOneResponse;
@@ -14,10 +15,7 @@ import com.java.JustThree.service.board.BoardImageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,36 +46,25 @@ public class BoardService {
 
     //커뮤니티 글 등록
     @Transactional
-    public Long addBoard(AddBoardRequest addBoardRequest){
+    public Long addBoard(AddBoardRequest addBoardRequest, String token){
+        Long userId = jwtProvider.getUserId(token);
         Board newBoard = Board.builder()
                 .title(addBoardRequest.getTitle())
                 .content(addBoardRequest.getContent())
                 .noticeYn(addBoardRequest.getNoticeYn())
-                .users(addBoardRequest.getUsers())
+                .users(Users.builder().usersId(userId).build())
                 .build();
         boardRepository.save(newBoard);
         //첨부파일 있을 경우
         if(addBoardRequest.getImageFiles() != null && !addBoardRequest.getImageFiles()[0].isEmpty()){
-            for(MultipartFile imgFile: addBoardRequest.getImageFiles()){
-                String storedName = boardImageService.uploadFile(imgFile);
-                String accessUrl = boardImageService.getAccessUrl(storedName);
-
-                BoardImage boardImage = BoardImage.builder()
-                        .board(newBoard)
-                        .accessUrl(accessUrl)
-                        .originName(imgFile.getOriginalFilename())
-                        .storedName(storedName)
-                        .build();
-                boardImageRepository.save(boardImage);
-            }
+            String resSaveImg = boardImageService.saveBoardImage(newBoard, addBoardRequest.getImageFiles());
+           //log.info("resSaveImg  >>"+resSaveImg);
         }
         return newBoard.getBoardId();
     }
-    //커뮤니티 글 상세 조회(댓글, 좋아요 구현 후 보완 필요)
+    //커뮤니티 글 상세 조회
     @Transactional
-    public GetBoardOneResponse getBoardOne(long boardId, String token ){
-        //Board board = boardRepository.findById(boardId).orElseThrow(NoSuchElementException::new);
-
+    public GetBoardOneResponse getBoardOne(long boardId, String token){
         Optional<Board> optionalBoard = boardRepository.findById(boardId);
         if(optionalBoard.isEmpty()){
             return null;
@@ -86,12 +73,9 @@ public class BoardService {
 
             //해당 글에 대한 이미지  파일
             List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
-            //log.info("board1  >>"+board);
-            log.info("boardImgList  >>"+boardImageList);
 
             //조회수 증가
             boardRepository.updateViewCount(board.getViewCount()+1, boardId);
-            //log.info("board2  >>"+board);
 
             //해당 글에 대한 댓글
             List<GetBoardReplyResponse> boardReplyList = boardReplyService.getBoardReplyList(boardId);
@@ -100,14 +84,11 @@ public class BoardService {
             long boardLikeCount = boardLikeService.getBoardLikeCount(boardId);
 
             //해당 글에 대한 좋아요 여부 ( boardId, usersId 모두 필요)
-            log.info(token);
            if(token==null){
-                log.info("token"+token);
                 return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, false, boardLikeCount);
             }else{
                 Long userId = jwtProvider.getUserId(token);
                 boolean isBoardLIke = boardLikeService.getBoardLike(boardId, userId);
-                log.info("좋아요 여부  >>"+isBoardLIke);
                 return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, isBoardLIke, boardLikeCount);
             }
         }
@@ -125,22 +106,10 @@ public class BoardService {
         if(oldBoardImageList.isEmpty()){//기존 첨부파일 없을 경우
             //수정요청에 첨부파일 있을 경우
             if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
-                for(MultipartFile imgFile: updateBoardReq.getImageFiles()){
-                    String storedName = boardImageService.uploadFile(imgFile);
-                    String accessUrl = boardImageService.getAccessUrl(storedName);
-                    BoardImage boardImage = BoardImage.builder()
-                            .board(oldBoard)
-                            .accessUrl(accessUrl)
-                            .originName(imgFile.getOriginalFilename())
-                            .storedName(storedName)
-                            .build();
-                    boardImageRepository.save(boardImage);
-                }
+                String resSaveImg = boardImageService.saveBoardImage(oldBoard, updateBoardReq.getImageFiles());
+                log.info("resSaveImg  >>"+resSaveImg);
             }
         }else{ //기존 첨부파일 있을 경우
-            //log.info("기존 이미지파일  >>" + oldBoardImageList);
-            //log.info("수정요청 imgIdList "+updateBoardReq.getImageIdList());
-
             //수정 케이스1 - 기존 첨부파일 다 삭제한 경우
             if(updateBoardReq.getImageIdList() == null){
                 for(BoardImage oldBoardImage : oldBoardImageList){
@@ -162,17 +131,8 @@ public class BoardService {
             }
             //수정 요청에 첨부파일 있을 경우
             if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
-                for(MultipartFile imgFile: updateBoardReq.getImageFiles()){
-                    String storedName = boardImageService.uploadFile(imgFile);
-                    String accessUrl = boardImageService.getAccessUrl(storedName);
-                    BoardImage boardImage = BoardImage.builder()
-                            .board(oldBoard)
-                            .accessUrl(accessUrl)
-                            .originName(imgFile.getOriginalFilename())
-                            .storedName(storedName)
-                            .build();
-                    boardImageRepository.save(boardImage);
-                }
+                String resSaveImg = boardImageService.saveBoardImage(oldBoard, updateBoardReq.getImageFiles());
+                log.info("resSaveImg  >>"+resSaveImg);
             }
         }
         return updateBoardReq.getBoardId();
@@ -204,7 +164,7 @@ public class BoardService {
         }
     }
     //커뮤니티 글 목록 조회
-    public List<GetBoardListResponse> getBoardsByPage(int page, int size, String sortType, String keyword){
+   public Page<GetBoardListResponse> getBoardsByPage(int page, int size, String sortType, String keyword){
         // 정렬  기준(기본 최신순)
         Sort sortByDirection =Sort.by(Sort.Direction.DESC, "created");
 
@@ -235,10 +195,11 @@ public class BoardService {
         if(boardList.isEmpty()) {
             System.out.println(boardList);
         }
-
-        return boardList.stream()
+        List<GetBoardListResponse> responseList = boardList.stream()
                 .map(GetBoardListResponse::entityToDTO)
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(responseList, pageable, boardPage.getTotalElements());
     }
     //공지 글목록 조회
     public Page<GetBoardListResponse> getNoticesByPage(String keyword, Pageable pageable) {
@@ -255,41 +216,6 @@ public class BoardService {
         return noticeBoardPage.map(GetBoardListResponse::entityToDTO);
     }
 
-   /* //커뮤니티 글 검색
-    public List<GetBoardListResponse> searchBoardsByKeyword(String keyword, int page, int size) {
-        // 정렬 기준(기본 최신순)
-        Sort sortByDirection = Sort.by(Sort.Direction.DESC, "created");
-        *//*
-        if (sortings.equals("sortDesc")) {
-            sortByDirection = Sort.by(Sort.Direction.DESC, "created");
-        } else if (sortings.equals("sortAsc")) {
-            sortByDirection = Sort.by(Sort.Direction.ASC, "created");
-        } else if (sortings.equals("sortViewCntDesc")) {
-            sortByDirection = Sort.by(Sort.Direction.DESC, "viewCount")
-                    .and(Sort.by(Sort.Direction.DESC, "created")); // 조회수 → 최신순
-        }
-        *//*
-        System.out.println(keyword);
-        Pageable pageable = PageRequest.of(page - 1, size, sortByDirection);
 
-        // 검색어를 포함하는 게시글만 조회하는 쿼리 작성
-        Specification<Board> specification = (root, query, criteriaBuilder) ->
-                criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get("noticeYn"), 0), // noticeYn이 0인 게시글만 조회
-                        criteriaBuilder.or(
-                                criteriaBuilder.like(root.get("title"), "%" + keyword + "%"), // 제목에 검색어 포함
-                                criteriaBuilder.like(root.get("content"), "%" + keyword + "%") // 내용에 검색어 포함
-                        )
-                );
-
-        Page<Board> boardPage = boardRepository.findAll(specification, pageable);
-        List<Board> boardList = boardPage.getContent();
-        if(boardList.isEmpty()) {
-            System.out.println(boardList);
-        }
-        return boardList.stream()
-                .map(GetBoardListResponse::entityToDTO)
-                .collect(Collectors.toList());
-    }*/
 
 }
