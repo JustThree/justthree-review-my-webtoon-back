@@ -26,7 +26,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Entity
 @Setter
-public class Users implements UserDetails {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "users_id")
@@ -67,7 +67,7 @@ public class Users implements UserDetails {
                 .build();
     }
 
-    public List<String> getRoleList() {
+/*    public List<String> getRoleList() {
         System.out.println(getClass().getName());
         if (!this.usersRole.isEmpty()) {
             System.out.println(getClass().getName()+Arrays.asList(this.usersRole.split(",")));
@@ -81,14 +81,15 @@ public class Users implements UserDetails {
         Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         List<String> roles = getRoleList();
         for (String role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role));
+            authorities.add(new SimpleGrantedAuthority("ROLE_"+role));
         }
-        /*getRoleList().forEach(r -> {
+        *//*getRoleList().forEach(r -> {
             System.out.println("role : " + r);
             authorities.add(() -> {
                 return r;
             });
-        });*/
+        });*//*
+        System.out.println(authorities);
         return authorities;
     }
 
@@ -120,7 +121,7 @@ public class Users implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
+    }*/
 
     public void changePassword(String password) {
         this.usersPw = password;

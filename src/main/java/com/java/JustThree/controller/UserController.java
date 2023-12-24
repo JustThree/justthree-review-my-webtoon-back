@@ -132,7 +132,7 @@ public class UserController {
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/getUserList")
     public ResponseEntity<?> getUserList(@PageableDefault() Pageable pageable,@RequestParam(required = false) String search,@RequestParam(required = false,defaultValue = "All") String type){
         try{
@@ -144,7 +144,7 @@ public class UserController {
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/deleteUser")
     public ResponseEntity<String> deleteUserId(@RequestBody String UsersId){
         log.info("유저 삭제");

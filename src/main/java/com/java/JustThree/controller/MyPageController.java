@@ -48,6 +48,7 @@ public class MyPageController {
     //////////////////////////////////////////////////유저 정보 업뎃/////////////////////////////////////////////////////////////
     @PutMapping("/update")
     public ResponseEntity<CudResponse> updateUser(@RequestHeader(value="Authorization",required = false)String token, @RequestPart("newNickname") String newNickname){
+
         CudResponse response = new CudResponse();
         Long usersId = usersService.getUserInfo(token).getUsersId();
         boolean result = myPageService.updateUser(newNickname,usersId);

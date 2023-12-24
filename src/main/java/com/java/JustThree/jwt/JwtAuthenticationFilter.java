@@ -1,6 +1,7 @@
 package com.java.JustThree.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.java.JustThree.domain.UserDetailsImpl;
 import com.java.JustThree.domain.Users;
 import com.java.JustThree.dto.LoginRequest;
 import com.java.JustThree.dto.Token;
@@ -9,11 +10,13 @@ import com.java.JustThree.repository.UsersRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -21,7 +24,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import java.io.IOException;
 
 
-
+@Slf4j
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private final JwtProperties jwtProperties;
@@ -29,17 +32,13 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER =
             new AntPathRequestMatcher("/api/login", "POST");
 
-    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
-    private final UsersRepository usersRepository;
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtProperties jwtProperties, RefreshTokenRepository refreshTokenRepository, JwtProvider jwtProvider, UsersRepository usersRepository) {
         super(DEFAULT_ANT_PATH_REQUEST_MATCHER, authenticationManager);
         this.authenticationManager = authenticationManager;
         this.jwtProperties = jwtProperties;
-        this.refreshTokenRepository = refreshTokenRepository;
         this.jwtProvider = jwtProvider;
-        this.usersRepository = usersRepository;
     }
 
     @Override
@@ -59,7 +58,6 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         // UsernamePasswordAuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDTO.getUsersEmail(), loginDTO.getUsersPw());
-
        /*
        => AuthenticationManager 에게 인증 요청 (UserDetailsService 통해 DB에 존재하는 유저인지 확인)
        1. UserDetailsService 의 loadUserByUsername() 호출
@@ -68,7 +66,13 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
        3. 비밀번호가 일치하면 Authentication 객체를 만들어서 필터체인으로 리턴, 일치하지 않으면 AuthenticationException 발생
        */
 
-        return authenticationManager.authenticate(authenticationToken);
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            log.info("userEmail : " + userDetails.getUsers().getUsersEmail());
+            log.info("userEmail : " + userDetails.getUsers().getUsersPw());
+            log.info("========================================================");
+
+        return authentication;
     }
 
     // authenticate 성공
@@ -79,28 +83,32 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
         System.out.println("JwtAuthenticationFilter -- successfulAuthentication 진입");
 
-        Users userDetails = (Users) authentication.getPrincipal();
+        UserDetailsImpl userDetailsImpl = (UserDetailsImpl) authentication.getPrincipal();
 
-        String accessToken = jwtProvider.createAccessToken(userDetails);
-        String refreshToken = jwtProvider.createRefreshToken(userDetails);
+
+
+        String accessToken = jwtProvider.createAccessToken(userDetailsImpl.getUsers());
+        String refreshToken = jwtProvider.createRefreshToken(userDetailsImpl.getUsers());
 
         Token jwtToken = Token
                 .builder()
                 .accessToken(jwtProperties.getTOKEN_PREFIX() + accessToken)
                 .refreshToken(jwtProperties.getTOKEN_PREFIX() + refreshToken)
-                .key(userDetails.getUsersEmail())
+                .key(userDetailsImpl.getUsers().getUsersEmail())
                 .build();
         try {
-            jwtProvider.insertRefreshToken(userDetails, refreshToken);
+            jwtProvider.insertRefreshToken(userDetailsImpl.getUsers(), refreshToken);
         }catch (Exception e){
-            jwtProvider.deleteRefreshToken(userDetails);
-            jwtProvider.insertRefreshToken(userDetails, refreshToken);
+            jwtProvider.deleteRefreshToken(userDetailsImpl.getUsers());
+            jwtProvider.insertRefreshToken(userDetailsImpl.getUsers(), refreshToken);
         }
 
         String jwtJson = new ObjectMapper().writeValueAsString(jwtToken);
 
         response.addHeader(jwtProperties.getHEADER_STRING(), jwtJson); // String 으로 만들어라
-        setSuccessResponse(response, userDetails);
+        setSuccessResponse(response, userDetailsImpl.getUsers());
+
+
     }
 
     // authenticate 성공 시 Response Body 에 담을 데이터
