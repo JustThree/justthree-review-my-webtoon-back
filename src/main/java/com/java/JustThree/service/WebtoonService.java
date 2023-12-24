@@ -98,7 +98,7 @@ public class WebtoonService {
                 interested,
                 webtoon.getAgeGradCdNm().equals("19세 이상"));
     }
-    // webtoon 전체 조회
+    // webtoon 전체 조회 (페이지 네이션)
     public Page<WebtoonMainResponse> getWebtoonPage(Pageable pageable, String genre, String order){
         Page<WebtoonMainResponse> webtoonMainResponsePage;
         String orderVal;
@@ -168,7 +168,7 @@ public class WebtoonService {
         }
         return  webtoonMainResponsePage;
     }
-    // 웹툰 키워드로 리스트 조회
+    // 웹툰 키워드로 리스트 조회 <= 메인 페이지 조회 기능
     public List<WebtoonMainResponse> getWebtoonKeyword(Pageable pageable,String keyword){
         List<WebtoonMainResponse> webtoonMainResponseList = null;
         webtoonMainResponseList = switch (keyword) {
@@ -196,8 +196,7 @@ public class WebtoonService {
         };
         return webtoonMainResponseList;
     }
-
-
+    // 웹툰 검색
     public Page<WebtoonMainResponse> searchWebtoon(Pageable pageable, String type, String word) {
         Page<WebtoonMainResponse> webtoonMainResponsePage;
         if (type.equals("user")) {
@@ -230,6 +229,7 @@ public class WebtoonService {
         return  webtoonMainResponsePage;
 
     }
+    // 웹툰 별점 등록
     @Transactional
     public void ratingWebtoon(String token,Long masterId,Integer rating){
         // 있는지 확인
@@ -247,6 +247,7 @@ public class WebtoonService {
                     .build());
         }
     }
+    // 웹툰 리뷰 페이징 리스트 조회
     public Page<WebtoonDetailReviewResponse> getWebtoonReviewsPage(Long masterId,Pageable pageable){
         return reviewRepository.findByWebtoon_MasterIdIsAndRemoveIsNot(masterId, 1,pageable).
                 map((review -> WebtoonDetailReviewResponse.fromEntity(review,
@@ -257,6 +258,7 @@ public class WebtoonService {
                         reviewReplyRepository.countByReviewReviewIdIsAndNotRemoved(review.getReviewId(),1)
                 )));
     }
+    // 관심 웹툰 등록 및 삭제
     @Transactional
     public String modifyInterest(String token, Long masterId){
         if (token != null) {
@@ -275,6 +277,7 @@ public class WebtoonService {
         }
         return "로그인이 안되어 있어요.";
     }
+    // 리뷰 등록
     @Transactional
     public void writeReview(String token,Long masterId,String content){
         reviewRepository.save(Review.builder()
@@ -284,9 +287,9 @@ public class WebtoonService {
                 .build()
         );
     }
+    // 리뷰 단건 조회
     public ReviewDetailResponse getReview(Long reviewId, String token){
         boolean checkLike = false;
-        System.out.println(token);
         Review review = reviewRepository.findById(reviewId).orElseThrow(()
                 -> new IllegalArgumentException("해당 리뷰가 없어요"));
         if (token != null) {
@@ -300,10 +303,11 @@ public class WebtoonService {
                                 review.getWebtoon().getMasterId(),review.getUsers().getUsersId())
                         .orElse(Star.builder().starVal(0).build()), !(review.getRemove() == null || review.getRemove() == 0)
                 ,checkLike);}
-
+    // 리뷰 댓글 페이지 조회
     public Page<ReviewReplyResponse> getReviewReplyResponse(Pageable pageable,Long reviewId){
         return reviewReplyRepository.findByReviewReviewIdIsAndNotRemoved(reviewId,1,pageable).map(ReviewReplyResponse::fromEntity);
     }
+    // 리뷰 좋아요 수정
     @Transactional
     public String  modifyReviewLike(Long reviewId, String token){
         Optional<Review_Heart> byReviewReviewIdIs = reviewHeartRepository.findByReview_ReviewIdIsAndUsers_UsersIdIs(reviewId,jwtProvider.getUserId(token));
@@ -320,17 +324,7 @@ public class WebtoonService {
         }
 
     }
-    @Transactional
-    public String addReviewReply(Long reviewId, String token, String content){
-        reviewReplyRepository.save(
-                    Review_Reply.builder()
-                            .review(reviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("리뷰가 잘못됬어요")))
-                            .users(usersRepository.findById(jwtProvider.getUserId(token)).orElseThrow(() -> new IllegalArgumentException("토큰이 잘못됫어요")))
-                            .content(content)
-                            .build());
-        
-        return "저장 완료";
-    }
+    // 리뷰 삭제
     @Transactional
     public void removeReview(Long reviewId,String token) throws Exception{
         if (jwtProvider.getUserId(token).equals(reviewRepository.findById(reviewId).get().getUsers().getUsersId())) {
@@ -340,6 +334,7 @@ public class WebtoonService {
             throw new Exception("잘못된 요청입니다.");
         }
     }
+    // 리뷰 수정
     @Transactional
     public void fixReview(Long reviewId,String token,String content) throws Exception {
         if (jwtProvider.getUserId(token).equals(reviewRepository.findById(reviewId).get().getUsers().getUsersId())) {
@@ -349,6 +344,19 @@ public class WebtoonService {
             throw new Exception("잘못된 요청입니다.");
         }
     }
+    // 리뷰 댓글 추가
+    @Transactional
+    public String addReviewReply(Long reviewId, String token, String content){
+        reviewReplyRepository.save(
+                Review_Reply.builder()
+                        .review(reviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("리뷰가 잘못됬어요")))
+                        .users(usersRepository.findById(jwtProvider.getUserId(token)).orElseThrow(() -> new IllegalArgumentException("토큰이 잘못됫어요")))
+                        .content(content)
+                        .build());
+
+        return "저장 완료";
+    }
+    // 리뷰  댓글 삭제
     @Transactional
     public void removeReviewReply(Long reviewReplyId,String token) throws Exception{
         if (jwtProvider.getUserId(token).equals(reviewReplyRepository.findByReviewReplyIdIs(reviewReplyId).get().getUsers().getUsersId())) {
@@ -358,8 +366,7 @@ public class WebtoonService {
             throw new Exception("잘못된 요청입니다.");
         }
     }
-
-
+    // 리뷰 댓글 수정
     @Transactional
     public void fixReviewReply(Long reviewReplyId,String token,String content) throws Exception {
         if (jwtProvider.getUserId(token).equals(reviewReplyRepository.findByReviewReplyIdIs(reviewReplyId).get().getUsers().getUsersId())) {// 아이디 같은지 체크
@@ -378,6 +385,7 @@ public class WebtoonService {
         String prvKeyVal = gujang; // properties 적기
         String page = String.valueOf(idx);// 페이지를 viewItemCntVal 씩 늘려야댐..
         try {
+            // url 주소 초기화
             String openApiUrl = "https://kmas.or.kr/openapi/search/rgDtaMasterList";
             openApiUrl += "?";
             openApiUrl += "prvKey" + "=" + prvKeyVal + "&";
@@ -413,7 +421,7 @@ public class WebtoonService {
                 String 규장각Url = "https://www.kmas.or.kr/archive/book/" + js.get("mastrId");
                 String link = "";
                 String newLink = "";
-                // 필터
+                // 필터 => 19세인데 19세처리가 안된 api 필터로 한 번 더 거름
                 if (js.get("ageGradCdNm").equals("19세 이상") || js.get("ageGradCdNm").equals("확인필요")// 함수화해서 리팩토링 하기
                         || js.get("pltfomCdNm").equals("레알코믹스") || js.get("pltfomCdNm").equals("셀툰") || js.get("pltfomCdNm").equals("야툰")
                         || js.get("title").toString().contains("에로")||js.get("title").toString().contains("개정판") || js.get("title").toString().contains("섹스") || js.get("title").toString().contains("섹기") || js.get("title").toString().contains("섹파") ||js.get("title").toString().contains("색툰")|| js.get("title").toString().contains("야썰")
@@ -481,7 +489,6 @@ public class WebtoonService {
         }
         for (Webtoon webtoon:
              webtoons) {
-            //js.get("title").toString() + "_" + js.get("pictrWritrNm").toString() + "_" + js.get("sntncWritrNm").toString()
             if (setNotNormal.contains(webtoon.getTitle() + "_" + webtoon.getPictrWritrNm() + "_" + webtoon.getSntncWritrNm())){
                 Optional<Webtoon> byId = webtoonRepository.findById(webtoon.getMasterId());
             if (byId.isPresent()) {

@@ -1,5 +1,6 @@
 package com.java.JustThree.controller;
 
+import com.java.JustThree.dto.admin.FollowCount;
 import com.java.JustThree.dto.board.response.GetBoardListResponse;
 import com.java.JustThree.service.AdminBoardService;
 import com.java.JustThree.service.board.BoardService;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +23,6 @@ import java.util.List;
 public class AdminController {
 
     private final AdminBoardService adminBoardService;
-
     //커뮤니티 게시글 목록(noticeYn=0) 조회
     @GetMapping("/boardlist")
     Page<GetBoardListResponse> getBoardList(@RequestParam(name = "page", defaultValue = "1") int page,
@@ -52,4 +53,25 @@ public class AdminController {
         return adminBoardService.getNoticesByPage(searchWord, pageable);
     }
 
+    // top 5 유저 구하기
+    @GetMapping("/followtop")
+    public ResponseEntity<?> getTop5FollowCountUser(){
+        return ResponseEntity.ok()
+                .body(adminBoardService.top5FollowUser());
+    }
+    @GetMapping("/followingtop")
+    public ResponseEntity<?> getTop5FollowingCountUser(){
+        return ResponseEntity.ok()
+                .body(adminBoardService.top5FollowingUser());
+    }
+    @GetMapping("/webtoonratetop")
+    public ResponseEntity<?> getTop5RateWebtoon(){
+        return ResponseEntity.ok()
+                .body(adminBoardService.top5RateWebtoon());
+    }
+    @GetMapping("/webtoonliketop")
+    public ResponseEntity<?> getTop5likeWebtoon(){
+        return ResponseEntity.ok()
+                .body(adminBoardService.top5LikeWebtoon());
+    }
 }
