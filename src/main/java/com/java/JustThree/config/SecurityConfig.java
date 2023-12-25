@@ -56,7 +56,6 @@ public class SecurityConfig {
 //                .addFilterBefore(jwtExceptionFilter(), JwtAuthorizationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilter(jwtAuthorizationFilter())
-
                 .authorizeHttpRequests(
                         authorize -> authorize
 //                                .requestMatchers("/**").permitAll()
@@ -67,11 +66,15 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST,"/api/join","/api/verify-code","/api/logout","/api/email-verification").permitAll()
                                 .requestMatchers(HttpMethod.PUT,"/reset-password").permitAll()
                                 //권한 처리하는 주소
-                                .requestMatchers(HttpMethod.POST,"/api/webtoon/review/**").hasAnyRole("USER")
+                                .requestMatchers(HttpMethod.GET,"/api/auth/accessoken").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/webtoon/review/**").hasRole("USER")
                                 .requestMatchers(HttpMethod.DELETE,"/board/**").hasRole("USER")
                                 .requestMatchers(HttpMethod.PUT,"/mypage/update").hasAnyRole("USER","ADMIN")
                                 .requestMatchers("/api/getUserList","/api/getUserList/**","/admin/**","/admin").hasAnyRole("ADMIN")
-                                .anyRequest().authenticated());
+                                .anyRequest().authenticated())
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint()));
+
         return http.build();
     }
 
@@ -88,6 +91,10 @@ public class SecurityConfig {
     @Bean
     public JwtExceptionFilter jwtExceptionFilter() throws Exception{
         return new JwtExceptionFilter(objectMapper);
+    }
+
+    @Bean JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
+        return new JwtAuthenticationEntryPoint();
     }
 
 }
