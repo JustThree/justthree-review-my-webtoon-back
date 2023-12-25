@@ -2,19 +2,16 @@ package com.java.JustThree.jwt;
 
 import com.java.JustThree.domain.RefreshToken;
 import com.java.JustThree.domain.Users;
-import com.java.JustThree.dto.Token;
 import com.java.JustThree.repository.RefreshTokenRepository;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 
 @Configuration

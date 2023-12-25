@@ -5,8 +5,6 @@ import com.java.JustThree.domain.Webtoon;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 
 /*
 필요 한것

@@ -1,16 +1,12 @@
 package com.java.JustThree.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.web.ErrorResponse;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 

@@ -10,9 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ReviewReplyRepository extends JpaRepository<Review_Reply,Long> {
-    public Long countByReview_ReviewId(Long reviewId);
 
-    //
     @Query("SELECT count(rr) FROM Review_Reply rr " +
             "WHERE rr.review.reviewId = :reviewId AND (rr.remove IS NULL OR rr.remove != :remove)")
     Long countByReviewReviewIdIsAndNotRemoved(@Param("reviewId") Long reviewId, @Param("remove") Integer remove);

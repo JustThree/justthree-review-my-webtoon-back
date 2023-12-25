@@ -1,17 +1,13 @@
 package com.java.JustThree.repository;
 
-import com.java.JustThree.domain.Users;
+
 import com.java.JustThree.domain.Webtoon;
-import com.java.JustThree.dto.admin.WebtoonLikeCountResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 public interface WebtoonRepository extends JpaRepository<Webtoon,Long> {
@@ -88,13 +84,5 @@ public interface WebtoonRepository extends JpaRepository<Webtoon,Long> {
             "GROUP BY w.masterId, w.title " +
             "ORDER BY COALESCE(AVG(s.starVal), 0) DESC")
     Page<Webtoon> findByAgeGradCdNmIsNotAndTripleGenreIsOrderByPopularity(@Param("ageNm") String ageNm, @Param("genre1") String genre1, @Param("genre2") String genre2,@Param("genre3") String genre3,Pageable pageable);
-    // 좋아요 많이 된 웹툰 조회
-    @Query("select NEW com.java.JustThree.dto.admin.WebtoonLikeCountResponse(w.title, count(w))" +
-            "from Webtoon w " +
-            "right join Interest i " +
-            "on i.webtoon.masterId = w.masterId " +
-            "group by i.webtoon.masterId " +
-            "order by count(w) desc ")
-    Page<WebtoonLikeCountResponse> findTopByCountInterest(Pageable pageable);
 
 }

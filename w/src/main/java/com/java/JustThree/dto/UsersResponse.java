@@ -1,9 +1,10 @@
 package com.java.JustThree.dto;
 
 import com.java.JustThree.domain.Users;
-import lombok.*;
-
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder(toBuilder = true)

@@ -7,13 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review,Long> {
-
-    public List<Review> findByUsers_UsersIdIs(Long users_usersId);
-    public Long countByUsers_UsersId(Long usersID);
     @Query("SELECT r FROM Review r " +
             "WHERE r.webtoon.masterId = :webtoon_masterId  " +
             "AND (r.remove IS NULL OR r.remove != :remove)" +

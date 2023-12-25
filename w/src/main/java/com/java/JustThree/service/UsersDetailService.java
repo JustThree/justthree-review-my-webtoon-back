@@ -4,7 +4,6 @@ import com.java.JustThree.domain.UserDetailsImpl;
 import com.java.JustThree.domain.Users;
 import com.java.JustThree.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
