@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java.JustThree.jwt.*;
 import com.java.JustThree.repository.RefreshTokenRepository;
 import com.java.JustThree.repository.UsersRepository;
+import com.java.JustThree.service.UsersDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UsersRepository usersRepository;
+    private final UsersDetailService ud;
     private final RefreshTokenRepository refreshTokenRepository;
     private final CorsConfig corsConfig;
     private final AuthenticationConfiguration authenticationConfiguration;
@@ -51,36 +53,48 @@ public class SecurityConfig {
                 )
                 .formLogin(AbstractHttpConfigurer :: disable)
                 .httpBasic(AbstractHttpConfigurer :: disable)
+//                .addFilterBefore(jwtExceptionFilter(), JwtAuthorizationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtExceptionFilter(), JwtAuthorizationFilter.class)
-
+                .addFilter(jwtAuthorizationFilter())
                 .authorizeHttpRequests(
                         authorize -> authorize
-                                .requestMatchers("/**").permitAll()
-//                                .requestMatchers(HttpMethod.GET,"/api/verify-code","/api/reset-password",
-//                                        "/api/check-nickname","/api/check-nickname","/board/**","/board/notice"
-//                                        ,"chats/**","/api/webtoon/**").permitAll()
-//                                .requestMatchers(HttpMethod.POST,"/api/join","/api/logout","/api/email-verification").permitAll()
-//                                .requestMatchers(HttpMethod.PUT,"/reset-password").permitAll()
-//                                .requestMatchers("/admin/**").hasAnyRole("ADMIN")
+//                                .requestMatchers("/**").permitAll()
+                                //공통으로 허용되는 주소
+                                .requestMatchers(HttpMethod.GET,"/api/reset-password","/board/**","/board/notice",
+                                        "/api/check-nickname","/api/check-nickname","/api/auth/accessoken"
+                                        ,"/chat/**","/chats/**","/ws/**","/api/webtoon/**","/mypage/userinfo/**","/mypage/follow/**","/mypage/reviewed/**","/mypage/interested/**").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/join","/api/verify-code","/api/logout","/api/email-verification").permitAll()
+                                .requestMatchers(HttpMethod.PUT,"/reset-password").permitAll()
+                                //권한 처리하는 주소
+                                .requestMatchers(HttpMethod.GET,"/admin/**","/admin").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/api/webtoon/review/**").hasRole("USER")
+                                .requestMatchers(HttpMethod.DELETE,"/board/**").hasRole("USER")
+                                .requestMatchers(HttpMethod.PUT,"/mypage/update").hasAnyRole("USER","ADMIN")
+                                .requestMatchers("/api/getUserList","/api/getUserList/**").hasRole("ADMIN")
                                 .anyRequest().authenticated());
+//                .exceptionHandling(e -> e
+//                        .authenticationEntryPoint(jwtAuthenticationEntryPoint()));
+
         return http.build();
     }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        System.out.println("등록");
         return new JwtAuthenticationFilter(authenticationManagerBean(), jwtProperties, refreshTokenRepository, jwtProvider, usersRepository);
     }
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
-        return new JwtAuthorizationFilter(authenticationManagerBean(), usersRepository, jwtProperties, jwtProvider);
+        return new JwtAuthorizationFilter(authenticationManagerBean(), usersRepository, ud, jwtProperties, jwtProvider);
     }
 
     @Bean
     public JwtExceptionFilter jwtExceptionFilter() throws Exception{
         return new JwtExceptionFilter(objectMapper);
     }
+
+//    @Bean JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
+//        return new JwtAuthenticationEntryPoint();
+//    }
 
 }

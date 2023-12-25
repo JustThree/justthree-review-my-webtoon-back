@@ -10,6 +10,7 @@ import org.springframework.web.filter.CorsFilter;
 public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
+        System.out.println("CorsFilter 실행");
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://192.168.3.112:5173");//L3 시연용 컴퓨터 성수IP

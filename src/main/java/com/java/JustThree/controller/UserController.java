@@ -20,6 +20,17 @@ public class UserController {
 
     private final UsersService usersService;
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+        try {
+            usersService.usercheck(loginRequest);
+            return ResponseEntity.ok("로그인 성공");
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+
+    }
+
 
     @PostMapping(value = "/join")
     public Long join(@RequestBody JoinRequest joinDTO){
@@ -132,7 +143,6 @@ public class UserController {
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getUserList")
     public ResponseEntity<?> getUserList(@PageableDefault() Pageable pageable,@RequestParam(required = false) String search,@RequestParam(required = false,defaultValue = "All") String type){
         try{
@@ -144,7 +154,6 @@ public class UserController {
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/deleteUser")
     public ResponseEntity<String> deleteUserId(@RequestBody String UsersId){
         log.info("유저 삭제");
