@@ -1,14 +1,22 @@
 package com.java.JustThree.service;
 
 import com.java.JustThree.domain.Board;
+import com.java.JustThree.domain.Webtoon;
+import com.java.JustThree.dto.admin.FollowCount;
+import com.java.JustThree.dto.admin.WebtoonLikeCountResponse;
+import com.java.JustThree.dto.admin.WebtoonRateResponse;
 import com.java.JustThree.dto.board.response.GetBoardListResponse;
+import com.java.JustThree.repository.StarRepository;
+import com.java.JustThree.repository.WebtoonRepository;
 import com.java.JustThree.repository.board.BoardRepository;
+import com.java.JustThree.repository.mypage.FollowRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +24,9 @@ import org.springframework.stereotype.Service;
 public class AdminBoardService {
 
     private final BoardRepository boardRepository;
-
+    private final FollowRepository followRepository;
+    private final WebtoonRepository webtoonRepository;
+    private final StarRepository starRepository;
     //커뮤니티 글 목록 조회
     public Page<GetBoardListResponse> getBoardsByPage(int page, int size, String sortType, String keyword){
         // 정렬  기준(기본 최신순)
@@ -61,6 +71,30 @@ public class AdminBoardService {
 
         Page<Board> noticeBoardPage = boardRepository.findAll(specification, pageable);
         return noticeBoardPage.map(GetBoardListResponse::entityToDTO);
+    }
+    // 통계용 TOP 5개 팔로우 유저
+    public Page<FollowCount> top5FollowUser(){
+        Pageable pageable = PageRequest.of(0, 5);
+        return followRepository.topNFollowerUser(pageable);
+    }
+    // 통계용 TOP 5개 팔로윙 유저
+    public Page<FollowCount> top5FollowingUser(){
+        Pageable pageable = PageRequest.of(0, 5);
+        return followRepository.topNFollowingUser(pageable);
+    }
+    // 통계용 TOP 평점 웹툰
+    public Page<WebtoonRateResponse> top5RateWebtoon(){
+        Pageable pageable = PageRequest.of(0, 5);
+        return webtoonRepository.findByAgeGradCdNmIsNotAndOrderByPopularity
+                        ("19세 이상", pageable)
+                .map(webtoon -> WebtoonRateResponse.
+                        fromEntity(webtoon,
+                                starRepository.getAverageRatingForMasterId(webtoon.getMasterId())));
+    }
+    // 통계용 TOP 5개 관심 웹툰
+    public Page<WebtoonLikeCountResponse> top5LikeWebtoon(){
+        Pageable pageable = PageRequest.of(0, 5);
+        return webtoonRepository.findTopByCountInterest(pageable);
     }
 
 }
