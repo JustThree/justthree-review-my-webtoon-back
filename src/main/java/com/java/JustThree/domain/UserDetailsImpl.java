@@ -21,9 +21,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public List<String> getRoleList() {
-        System.out.println(getClass().getName());
         if (!this.users.getUsersRole().isEmpty()) {
-            System.out.println(getClass().getName()+ Arrays.asList(this.users.getUsersRole().split(",")));
             return Arrays.asList(this.users.getUsersRole().split(","));
         }
         return new ArrayList<>();

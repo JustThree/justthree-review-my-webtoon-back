@@ -61,19 +61,19 @@ public class SecurityConfig {
 //                                .requestMatchers("/**").permitAll()
                                 //공통으로 허용되는 주소
                                 .requestMatchers(HttpMethod.GET,"/api/reset-password","/board/**","/board/notice",
-                                        "/api/check-nickname","/api/check-nickname"
+                                        "/api/check-nickname","/api/check-nickname","/api/auth/accessoken"
                                         ,"/chat/**","/chats/**","/ws/**","/api/webtoon/**","/mypage/userinfo/**","/mypage/follow/**","/mypage/reviewed/**","/mypage/interested/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/join","/api/verify-code","/api/logout","/api/email-verification").permitAll()
                                 .requestMatchers(HttpMethod.PUT,"/reset-password").permitAll()
                                 //권한 처리하는 주소
-                                .requestMatchers(HttpMethod.GET,"/api/auth/accessoken").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/admin/**","/admin").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.POST,"/api/webtoon/review/**").hasRole("USER")
                                 .requestMatchers(HttpMethod.DELETE,"/board/**").hasRole("USER")
                                 .requestMatchers(HttpMethod.PUT,"/mypage/update").hasAnyRole("USER","ADMIN")
-                                .requestMatchers("/api/getUserList","/api/getUserList/**","/admin/**","/admin").hasAnyRole("ADMIN")
-                                .anyRequest().authenticated())
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint()));
+                                .requestMatchers("/api/getUserList","/api/getUserList/**").hasRole("ADMIN")
+                                .anyRequest().authenticated());
+//                .exceptionHandling(e -> e
+//                        .authenticationEntryPoint(jwtAuthenticationEntryPoint()));
 
         return http.build();
     }
@@ -93,8 +93,8 @@ public class SecurityConfig {
         return new JwtExceptionFilter(objectMapper);
     }
 
-    @Bean JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
-        return new JwtAuthenticationEntryPoint();
-    }
+//    @Bean JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
+//        return new JwtAuthenticationEntryPoint();
+//    }
 
 }

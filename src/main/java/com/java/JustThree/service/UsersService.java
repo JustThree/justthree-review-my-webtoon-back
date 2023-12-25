@@ -2,11 +2,8 @@ package com.java.JustThree.service;
 
 import com.java.JustThree.config.RedisUtil;
 import com.java.JustThree.domain.RefreshToken;
-import com.java.JustThree.dto.JoinRequest;
-import com.java.JustThree.dto.ResetPWRequest;
-import com.java.JustThree.dto.RoleType;
+import com.java.JustThree.dto.*;
 import com.java.JustThree.domain.Users;
-import com.java.JustThree.dto.UsersResponse;
 import com.java.JustThree.jwt.JwtProperties;
 import com.java.JustThree.jwt.JwtProvider;
 import com.java.JustThree.repository.RefreshTokenRepository;
@@ -154,5 +151,12 @@ public class UsersService {
     public void deleteUser(Long UsersId){
         Users user = ur.findById(UsersId).orElseThrow(() -> new IllegalStateException("없는 유저입니다."));
         user.disableUser();
+    }
+
+    public void usercheck(LoginRequest loginRequest) {
+        Users user = ur.findByUsersEmail(loginRequest.getUsersEmail()).orElseThrow(() -> new IllegalStateException("없는 유저입니다."));
+        if (user.getStatusCode() == 0){
+            throw new IllegalStateException("탈퇴된 회원입니다");
+        }
     }
 }
