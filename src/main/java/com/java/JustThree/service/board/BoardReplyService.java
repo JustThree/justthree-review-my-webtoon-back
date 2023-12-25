@@ -45,7 +45,6 @@ public class BoardReplyService {
                     .boardReplyContent(addReplyReq.getBoardReplyContent())
                     .board(board)
                     .users(Users.builder().usersId(userId).build())
-                    //.users(addReplyReq.getUsers())
                     .parentReplyId(addReplyReq.getParentReplyId()) //대댓글 등록 시 0이면 안됨
                     .build();
             boardReplyRepository.save(boardReply);
@@ -91,8 +90,6 @@ public class BoardReplyService {
     //댓글 조회
     public List<GetBoardReplyResponse> getBoardReplyList(long boardId){
         List<BoardReply> boardReplyList = boardReplyRepository.findByBoard_BoardIdIsOrderByCreatedDesc(boardId);
-        log.info("댓글 조회");
-
         return boardReplyList.stream().map(GetBoardReplyResponse::entityToDTO).collect(Collectors.toList());
     }
 

@@ -11,9 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddBoardReplyReqeust {
-    //private Long boardReplyId;
     private Long boardId;
-    //private Users users;
     private String boardReplyContent; //댓글 내용
     private long parentReplyId; //부모 댓글 아이디
 }

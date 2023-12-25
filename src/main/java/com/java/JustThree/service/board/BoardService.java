@@ -57,11 +57,11 @@ public class BoardService {
         boardRepository.save(newBoard);
         //첨부파일 있을 경우
         if(addBoardRequest.getImageFiles() != null && !addBoardRequest.getImageFiles()[0].isEmpty()){
-            String resSaveImg = boardImageService.saveBoardImage(newBoard, addBoardRequest.getImageFiles());
-           //log.info("resSaveImg  >>"+resSaveImg);
+           boardImageService.saveBoardImage(newBoard, addBoardRequest.getImageFiles());
         }
         return newBoard.getBoardId();
     }
+
     //커뮤니티 글 상세 조회
     @Transactional
     public GetBoardOneResponse getBoardOne(long boardId, String token){
@@ -70,20 +70,15 @@ public class BoardService {
             return null;
         }else {
             Board board = optionalBoard.get();
-
             //해당 글에 대한 이미지  파일
             List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
-
             //조회수 증가
             boardRepository.updateViewCount(board.getViewCount()+1, boardId);
-
             //해당 글에 대한 댓글
             List<GetBoardReplyResponse> boardReplyList = boardReplyService.getBoardReplyList(boardId);
-
             //해당 글에 대한 좋아요 수
             long boardLikeCount = boardLikeService.getBoardLikeCount(boardId);
-
-            //해당 글에 대한 좋아요 여부 ( boardId, usersId 모두 필요)
+            //해당 글에 대한 좋아요 여부(로그인 중)
            if(token==null){
                 return GetBoardOneResponse.entityToDTO(board, boardImageList, boardReplyList, false, boardLikeCount);
             }else{
@@ -94,7 +89,7 @@ public class BoardService {
         }
     }
 
-    //커뮤니티 글 수정 (추후 수정 필요)
+    //커뮤니티 글 수정
     @Transactional
     public Long updateBoard(UpdateBoardRequest updateBoardReq){
         Board oldBoard = boardRepository.findById(updateBoardReq.getBoardId())
@@ -103,11 +98,11 @@ public class BoardService {
         boardRepository.save(oldBoard);
 
         List<BoardImage> oldBoardImageList = boardImageRepository.findByBoard(oldBoard);
-        if(oldBoardImageList.isEmpty()){//기존 첨부파일 없을 경우
+        //기존 첨부파일 없을 경우
+        if(oldBoardImageList.isEmpty()){
             //수정요청에 첨부파일 있을 경우
             if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
-                String resSaveImg = boardImageService.saveBoardImage(oldBoard, updateBoardReq.getImageFiles());
-                log.info("resSaveImg  >>"+resSaveImg);
+                 boardImageService.saveBoardImage(oldBoard, updateBoardReq.getImageFiles());
             }
         }else{ //기존 첨부파일 있을 경우
             //수정 케이스1 - 기존 첨부파일 다 삭제한 경우
@@ -131,8 +126,7 @@ public class BoardService {
             }
             //수정 요청에 첨부파일 있을 경우
             if(updateBoardReq.getImageFiles() != null && !updateBoardReq.getImageFiles()[0].isEmpty()) {
-                String resSaveImg = boardImageService.saveBoardImage(oldBoard, updateBoardReq.getImageFiles());
-                log.info("resSaveImg  >>"+resSaveImg);
+                boardImageService.saveBoardImage(oldBoard, updateBoardReq.getImageFiles());
             }
         }
         return updateBoardReq.getBoardId();
@@ -149,13 +143,10 @@ public class BoardService {
                 Board board = boardOptional.get();
                 //S3에서 삭제
                 List<BoardImage> boardImageList = boardImageRepository.findByBoard(board);
-                //boardImageList.stream().forEach(System.out::println);
-                log.info("boardImageList 크기  >>"+boardImageList.size());
                 for(BoardImage boardImage: boardImageList){
                     String storedName = boardImage.getStoredName();
                     boardImageService.deleteFile(storedName);
                 }
-
                 boardRepository.delete(board);
                 return "success";
             }
@@ -167,7 +158,6 @@ public class BoardService {
    public Page<GetBoardListResponse> getBoardsByPage(int page, int size, String sortType, String keyword){
         // 정렬  기준(기본 최신순)
         Sort sortByDirection =Sort.by(Sort.Direction.DESC, "created");
-
         if(sortType.equals("sortDesc")){
             sortByDirection = Sort.by(Sort.Direction.DESC, "created");
         }else if(sortType.equals("sortAsc")) {
@@ -177,8 +167,6 @@ public class BoardService {
                     .and(Sort.by(Sort.Direction.DESC, "created"));//조회수 →최신순
         }
         Pageable pageable = PageRequest.of(page-1, size, sortByDirection);
-
-        System.out.println(keyword);
 
         // 검색어를 포함하는 게시글만 조회하는 쿼리 작성
         Specification<Board> specification = (root, query, criteriaBuilder) ->
@@ -201,6 +189,7 @@ public class BoardService {
 
         return new PageImpl<>(responseList, pageable, boardPage.getTotalElements());
     }
+
     //공지 글목록 조회
     public Page<GetBoardListResponse> getNoticesByPage(String keyword, Pageable pageable) {
         Specification<Board> specification = (root, query, criteriaBuilder) ->
