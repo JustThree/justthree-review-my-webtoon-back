@@ -29,13 +29,15 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BoardImageService {
 
+    //AWS S3 관련
     private final AmazonS3Client s3Client;
     private static String bucketName = "just-three";
+
     private final BoardImageRepository boardImageRepository;
 
     //DB(BoardImage) 에 등록  & S3에서 업로드
     @Transactional
-    public String saveBoardImage(Board newBoard, MultipartFile[] newMfList){
+    public void saveBoardImage(Board newBoard, MultipartFile[] newMfList){
         try{
             for(MultipartFile mf: newMfList){
                 String storedName = uploadFile(mf);
@@ -50,10 +52,9 @@ public class BoardImageService {
 
                 boardImageRepository.save(boardImage);
             }
-            return "success";
+            log.info( "success");
         }catch (Exception e){
             log.error(e.getMessage());
-            return e.getMessage();
         }
     }
 

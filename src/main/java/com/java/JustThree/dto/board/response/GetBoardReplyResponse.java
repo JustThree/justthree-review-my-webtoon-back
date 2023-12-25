@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter;
 public class GetBoardReplyResponse {
     private Long boardReplyId;
     private Long boardId;
-    //private Users users;
     private String boardReplyContent; //댓글 내용
     private String replyCreated;
     private String replyUpdated;

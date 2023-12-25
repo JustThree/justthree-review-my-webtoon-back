@@ -36,7 +36,6 @@ public class GetBoardListResponse {
         String formattedCreated = board.getCreated().format(formatter);
         String formattedUpdated = board.getUpdated().format(formatter);
 
-       // int cnt = boardReplyService.getBoardReplyList(board.getBoardId()).size()
 
         return GetBoardListResponse.builder()
                 .boardId(board.getBoardId())

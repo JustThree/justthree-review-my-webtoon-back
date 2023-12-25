@@ -34,8 +34,6 @@ public class BoardController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> saveBoard(@ModelAttribute AddBoardRequest addBoardRequest,
                                             @RequestHeader(value = "Authorization", required = false) String token){
-        System.out.println(addBoardRequest);
-        log.info(token);
         try{
             Long res = boardService.addBoard(addBoardRequest, token);
             log.info("글 등록 pk"+res);
@@ -48,13 +46,9 @@ public class BoardController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getBoardOne(@PathVariable("id") long id,
                                          @RequestHeader(value = "Authorization", required = false) String token){
-        log.info("찾아야할 id"+id);
-        log.info(token);
         try{
             GetBoardOneResponse boardOneRes = boardService.getBoardOne(id,token);
-
-            log.info("boardOne Result  >>"+boardOneRes);
-
+            //찾는 글 없을 때
             if( boardOneRes != null){
                 return ResponseEntity.status(HttpStatus.OK).body(boardOneRes);
             }else{
@@ -70,9 +64,7 @@ public class BoardController {
     public ResponseEntity<String> updateBoard(@PathVariable("id") long boardId,
                                               @ModelAttribute UpdateBoardRequest updateBoardRequest){
         updateBoardRequest.setBoardId(boardId);
-        log.info("수정요청  >>"+updateBoardRequest);
         try{
-            //Long res = 1L;
            Long res = boardService.updateBoard(updateBoardRequest);
             return ResponseEntity.ok().body("글 수정 "+res);
         }catch (Exception e){
@@ -82,7 +74,6 @@ public class BoardController {
     //커뮤니티 글 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<String> removeBoard(@PathVariable("id")long id){
-        log.info("id >>"+id);
         try{
             String res = boardService.removeBoard(id);
             return ResponseEntity.ok(id+"글 삭제 "+res);
@@ -97,9 +88,7 @@ public class BoardController {
                                             @RequestParam(name = "sortingType", defaultValue = "sortDesc") String sortingType,
                                             @RequestParam(name = "keyword", required = false) String keyword){
         String searchWord="";
-        if(keyword == null){
-            searchWord = "";
-        }else{
+        if(keyword != null){
             searchWord = keyword;
         }
         return boardService.getBoardsByPage(page, size, sortingType, searchWord);
@@ -110,9 +99,7 @@ public class BoardController {
                                              @RequestParam(name = "size", defaultValue = "10") int size,
                                              @RequestParam(name = "keyword", required = false) String keyword){
         String searchWord = "";
-        if(keyword == null){
-            searchWord = "";
-        }else{
+        if(keyword != null){
             searchWord = keyword;
         }
         Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "created"));
@@ -122,10 +109,8 @@ public class BoardController {
     @PostMapping("/likes")
     public ResponseEntity<?> addBoardLike(@RequestBody AddBoardLikeRequest addBoardLikeReq,
                                           @RequestHeader(value = "Authorization", required = false) String token){
-        log.info(token);
         try{
             Long res = boardLikeService.addLike(addBoardLikeReq, token);
-            log.info("좋아요 등록 pk"+res);
             return ResponseEntity.ok(res);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -135,8 +120,6 @@ public class BoardController {
     @DeleteMapping("/likes/{id}")
     public ResponseEntity<String> removeBoardLike(@PathVariable("id")long boardId,
                                                   @RequestHeader(value = "Authorization", required = false) String token){
-        log.info("id >>" + boardId);
-        log.info("remove board like >>"+token);
         try{
             String res = boardLikeService.removeBoardLike(boardId, token);
             return ResponseEntity.ok(boardId+"글 좋아요 취소 "+res);

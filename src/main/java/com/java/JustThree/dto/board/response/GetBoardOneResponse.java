@@ -49,8 +49,6 @@ public class GetBoardOneResponse {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String formattedCreated = board.getCreated().format(formatter);
         String formattedUpdated = board.getUpdated().format(formatter);
-        //System.out.println(formattedCreated);
-        //System.out.println(formattedUpdated);
 
         return GetBoardOneResponse.builder()
                 .boardId(board.getBoardId())
