@@ -16,25 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddBoardRequest {
-    //private Long boardId;
     private String title;
     private String content;
-    //private long viewCount;
-    //private LocalDateTime created;
-    //private LocalDateTime updated;
     private int noticeYn;
-    //private Users users;
-    //save image request dto
     private MultipartFile[] imageFiles;
-    //private List<MultipartFile> boardImgList = new ArrayList<>();
-
-   /* public static Board toEntity(AddBoardRequest addBoardReq, Users users){
-        return Board.builder()
-                .users(users)
-                .title(addBoardReq.getTitle())
-                .content(addBoardReq.getContent())
-                .noticeYn(addBoardReq.getNoticeYn())
-                .build();
-    }*/
-
 }
