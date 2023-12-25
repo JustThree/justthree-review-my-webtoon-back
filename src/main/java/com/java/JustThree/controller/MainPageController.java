@@ -262,8 +262,7 @@ public class MainPageController {
     public ResponseEntity<?> modifyReviewReply(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long reviewReplyId,
-            @Validated @RequestBody ModifyReviewReplyRequest modifyReviewReplyRequest
-            , Errors errors){
+            @Validated @RequestBody ModifyReviewReplyRequest modifyReviewReplyRequest){
         try {
             webtoonService.fixReviewReply(reviewReplyId,token,modifyReviewReplyRequest.getContent());
             return ResponseEntity.ok()
