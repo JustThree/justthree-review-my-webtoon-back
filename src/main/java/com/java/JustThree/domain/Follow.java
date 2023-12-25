@@ -28,6 +28,4 @@ public class Follow {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "follower_id" ,referencedColumnName = "users_id")
     private Users follower;//팔로우 하는 사람들.
-
-
 }
