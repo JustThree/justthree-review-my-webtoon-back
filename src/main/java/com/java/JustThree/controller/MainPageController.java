@@ -20,12 +20,10 @@ import org.springframework.web.bind.annotation.*;
 public class MainPageController {
     WebtoonService webtoonService;
 
-
-    // 단건 조회
-    // 성인웹툰 거르기...
+    // 웹툰 단건 조회 페이지
     @GetMapping("/{id}")
     public ResponseEntity<?> webtoonDetail(
-            @RequestHeader(value = "Authorization",required = false) String token,
+            @RequestHeader(value = "Authorization",required = false) String token, // 즐겨찾기 했는지 조회를 위한 토큰
             @PathVariable(name = "id") Long id) {
         try {
             return ResponseEntity.ok()
@@ -44,11 +42,11 @@ public class MainPageController {
                     .build();
         }
     }
-
+    // 메인 페이지 슬라이드용 api
     @GetMapping("/webtoonlist")
-    public ResponseEntity<?> webtoonKeywordList(@PageableDefault(size = 25) Pageable pageable, @RequestParam(name = "keyword") String keyword) {
+    public ResponseEntity<?> webtoonKeywordList(@PageableDefault(size = 25) Pageable pageable, // 기본 페이지 사이즈 25
+                                                @RequestParam(name = "keyword") String keyword) {
         try {
-
             return ResponseEntity.ok()
                     .body(webtoonService.getWebtoonKeyword(pageable, keyword));
         } catch (Exception e) {
@@ -57,7 +55,7 @@ public class MainPageController {
                     .build();
         }
     }
-
+    // 웹툰 전체 조회 페이징 api
     @GetMapping("")
     public ResponseEntity<?> webtoonList(@PageableDefault(size = 24) Pageable pageable, @RequestParam(name = "genre", required = false) String genre, @RequestParam(name = "order", required = false) String order) {
         try {
@@ -71,7 +69,7 @@ public class MainPageController {
         }
 
     }
-
+    // 웹툰 검색 api
     @GetMapping("/search")
     public ResponseEntity<?> searchList(@PageableDefault(size = 24) Pageable pageable, @RequestParam(name = "type") String type, @RequestParam(name = "word") String word) {
         try {
@@ -83,7 +81,20 @@ public class MainPageController {
                     .build();
         }
     }
+    // masterId인 웹툰 리뷰들 조회
+    @GetMapping("/reviews/{masterId}")
+    public ResponseEntity<?> reviewsWebtoon(@PathVariable(name = "masterId") Long masterId, @PageableDefault(size = 12) Pageable pageable) {
+        try {
+            return ResponseEntity.ok()
+                    .body(webtoonService.getWebtoonReviewsPage(masterId, pageable));
+        } catch (Exception e) {
 
+            return ResponseEntity.status(404)
+                    .header("error", e.getMessage())
+                    .build();
+        }
+    }
+    // 별점 조회 api, 만약이 이미 별점이 있으면 수정
     @PutMapping("/rating")
     public ResponseEntity<?> ratingWebtoon(@RequestHeader("Authorization") String token,
                                            @RequestParam(name = "masterId") Long masterId,
@@ -98,20 +109,7 @@ public class MainPageController {
                     .build();
         }
     }
-
-    @GetMapping("/reviews/{id}")
-    public ResponseEntity<?> reviewsWebtoon(@PathVariable(name = "id") Long id, @PageableDefault(size = 12) Pageable pageable) {
-        try {
-            return ResponseEntity.ok()
-                    .body(webtoonService.getWebtoonReviewsPage(id, pageable));
-        } catch (Exception e) {
-
-            return ResponseEntity.status(404)
-                    .header("error", e.getMessage())
-                    .build();
-        }
-    }
-
+    // 관심 웹툰 수정
     @PutMapping("/interest/{id}")
     public ResponseEntity<?> interestWebtoon(
             @RequestHeader("Authorization") String token
@@ -125,6 +123,7 @@ public class MainPageController {
                     .build();
         }
     }
+    // 리뷰 상세 조회 api
     @GetMapping("/review/{id}")
     public ResponseEntity<?> getReviewDetail(
             @RequestHeader(value = "Authorization", required = false) String token,
@@ -144,6 +143,7 @@ public class MainPageController {
                     .build();
         }
     }
+    // 리뷰 등록 api
     @PostMapping("/review/{id}")
     public ResponseEntity<?> PostWebtoonReview(
             @RequestHeader("Authorization") String token,
@@ -164,9 +164,9 @@ public class MainPageController {
                     .build();
         }
     }
-
-    @GetMapping("/review/reply/{id}")
-    public ResponseEntity<?> getReviewReplyPage(Pageable pageable, @PathVariable("id") Long reviewId){
+    // 리뷰의 댓글 조회 api
+    @GetMapping("/review/reply/{reviewId}")
+    public ResponseEntity<?> getReviewReplyPage(Pageable pageable, @PathVariable("reviewId") Long reviewId){
         try {
             return ResponseEntity.ok()
                     .body(webtoonService.getReviewReplyResponse(pageable,reviewId));
@@ -180,7 +180,8 @@ public class MainPageController {
                     .build();
         }
     }
-    @PatchMapping("/review/reply/like/{id}")
+    // 리뷰 좋아요 수정
+    @PatchMapping("/review/like/{id}")
     public ResponseEntity<?> modifyLike(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") Long reviewId){
@@ -197,6 +198,7 @@ public class MainPageController {
                     .build();
         }
     }
+    // 리뷰 댓글 등록
     @PostMapping("/review/reply/{id}")
     public ResponseEntity<?> addReviewReply(
             @RequestHeader("Authorization") String token,
@@ -216,6 +218,7 @@ public class MainPageController {
                     .build();
         }
     }
+    // 리뷰 수정
     @PatchMapping("/review/{id}")
     public ResponseEntity<?> modifyReview(
             @RequestHeader("Authorization") String token,
@@ -235,6 +238,7 @@ public class MainPageController {
                     .build();
         }
     }
+    // 리뷰 삭제
     @DeleteMapping("/review/{id}")
     public ResponseEntity<?> modifyReview(
             @RequestHeader("Authorization") String token,
@@ -253,6 +257,7 @@ public class MainPageController {
                     .build();
         }
     }
+    // 리뷰 댓글 수정
     @PatchMapping("/review/reply/{id}")
     public ResponseEntity<?> modifyReviewReply(
             @RequestHeader("Authorization") String token,
@@ -273,6 +278,7 @@ public class MainPageController {
                     .build();
         }
     }
+    // 리뷰 댓글 삭제
     @DeleteMapping("/review/reply/{id}")
     public ResponseEntity<?> removeReviewReply(
             @RequestHeader("Authorization") String token,
