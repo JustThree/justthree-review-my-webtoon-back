@@ -53,6 +53,8 @@ out/
 *.zip
 *.tar.gz
 *.rar
+*.yml
+!**/src/main/resources/application.yml
 
 ### Gradle Patch ###
 # Java heap dump
