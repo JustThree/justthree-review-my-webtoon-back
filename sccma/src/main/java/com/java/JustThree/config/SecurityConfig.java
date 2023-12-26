@@ -46,7 +46,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .addFilter(corsConfig.corsFilter())
+//                .addFilter(corsConfig.corsFilter())
                 .csrf(AbstractHttpConfigurer :: disable)
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -62,7 +62,7 @@ public class SecurityConfig {
                                 //공통으로 허용되는 주소
                                 .requestMatchers(HttpMethod.GET,"/api/reset-password","/board/**","/board/notice",
                                         "/api/check-nickname","/api/check-nickname","/api/auth/accessoken"
-                                        ,"/chat/**","/chats/**","/ws/**","/api/webtoon/**","/mypage/userinfo/**","/mypage/follow/**","/mypage/reviewed/**","/mypage/interested/**").permitAll()
+                                        ,"/chat/**","/chats/**","/ws/**","/webtoon/**","/mypage/userinfo/**","/mypage/follow/**","/mypage/reviewed/**","/mypage/interested/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/join","/api/verify-code","/api/logout","/api/email-verification").permitAll()
                                 .requestMatchers(HttpMethod.PUT,"/reset-password").permitAll()
                                 //권한 처리하는 주소

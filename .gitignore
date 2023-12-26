@@ -116,6 +116,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+/w/src/main/resources/application.yml
 /w/.gradle/8.5/dependencies-accessors/gc.properties
 /sccma/.gradle/buildOutputCleanup/buildOutputCleanup.lock
 /w/.gradle/buildOutputCleanup/buildOutputCleanup.lock
