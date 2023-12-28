@@ -5,6 +5,7 @@ import com.java.JustThree.domain.UserDetailsImpl;
 import com.java.JustThree.domain.Users;
 import com.java.JustThree.repository.UsersRepository;
 import com.java.JustThree.service.UsersDetailService;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -63,13 +64,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         try {
             jwtProvider.validateAceessToken(token);
 
-        }catch (Exception e){
+        }catch (JwtException e){
             ObjectMapper mapper = new ObjectMapper();
 
             ResponseStatusException responseStatusException = new ResponseStatusException(
                     HttpStatus.NOT_ACCEPTABLE, "토큰이 만료되었습니다.");
 
             mapper.writeValue(response.getWriter(), responseStatusException);
+//            response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+//            return;
 
         }
 
