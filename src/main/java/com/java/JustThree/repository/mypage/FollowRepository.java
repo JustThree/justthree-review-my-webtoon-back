@@ -20,6 +20,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     Optional<Follow> findByFollowerAndFollowing(Users follower, Users following);//
 
     boolean existsByFollowerAndFollowing(Users follower, Users following);
+
     boolean existsByFollower_UsersIdAndFollowing_UsersId(Long follower, Long following);
     // 탑 n개 팔로우 조회를 위한 쿼리
     @Query("select NEW com.java.JustThree.dto.admin.FollowCount(u.usersNickname, COUNT(f)) " +
@@ -29,6 +30,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
             "group by u.usersId " +
             "order by count(f) desc ")
     Page<FollowCount> topNFollowerUser(Pageable pageable);
+
     // 탑 n개 팔로윙 조회를 위한 쿼리
     @Query("select NEW com.java.JustThree.dto.admin.FollowCount(u.usersNickname, COUNT(f)) " +
             "from Users u " +

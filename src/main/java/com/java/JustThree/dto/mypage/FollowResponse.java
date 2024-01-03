@@ -31,7 +31,7 @@ public class FollowResponse{
         this.followingNickname=users.getUsersNickname();
     }
 
-//////////////////////////////////////////    팔로워와 팔로잉 정보를 받아옴
+//////////////////////////////////////////팔로워와 팔로잉 정보를 받아옴////////////////////
 public FollowResponse(Follow follow, int sortNum,boolean isFollowing) {
         this.followId=follow.getFollowId();
         this.isFollowing=isFollowing;

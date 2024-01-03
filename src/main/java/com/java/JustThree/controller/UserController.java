@@ -153,7 +153,6 @@ public class UserController {
         }
 
     }
-
     @PostMapping("/deleteUser")
     public ResponseEntity<String> deleteUserId(@RequestBody String UsersId){
         log.info("유저 삭제");
@@ -165,8 +164,4 @@ public class UserController {
         }
         return ResponseEntity.ok("삭제완료");
     }
-
-
-
-
 }
