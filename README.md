@@ -24,7 +24,7 @@
 - 소개 : 소개 추가좀
 <hr/>
 
-### <a href="https://github.com/kosaThirdJo/secondProjectVue.js/tree/dev">영상 링크 수정 </a>
+### <a href="https://github.com/kosaThirdJo/secondProjectVue.js/tree/dev">영상 링크 수정 해야 함</a>
 
 ### 기술 스택
 <h4>Frontend</h4>
@@ -66,7 +66,8 @@
 
 ### 화면 구성
 <hr/>
-화면 피그마 수정
+<a href="https://www.figma.com/file/s0gRRUjlve80xL5mebcuCh/%ED%99%94%EB%A9%B4-%EC%84%A4%EA%B3%84?type=design&node-id=5-2&mode=design">피그마 링크</a>
+
 
 
 
