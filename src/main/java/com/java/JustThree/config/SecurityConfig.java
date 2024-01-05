@@ -62,12 +62,12 @@ public class SecurityConfig {
                                 //공통으로 허용되는 주소
                                 .requestMatchers(HttpMethod.GET,"/api/reset-password","/board/**","/board/notice",
                                         "/api/check-nickname","/api/check-nickname","/api/auth/accessoken"
-                                        ,"/chat/**","/chats/**","/ws/**","/api/webtoon/**","/mypage/userinfo/**","/mypage/follow/**","/mypage/reviewed/**","/mypage/interested/**").permitAll()
+                                        ,"/chat/**","/chats/**","/ws/**","/webtoon/**","/mypage/userinfo/**","/mypage/follow/**","/mypage/reviewed/**","/mypage/interested/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/join","/api/verify-code","/api/logout","/api/email-verification").permitAll()
                                 .requestMatchers(HttpMethod.PUT,"/reset-password").permitAll()
                                 //권한 처리하는 주소
                                 .requestMatchers(HttpMethod.GET,"/admin/**","/admin").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.POST,"/api/webtoon/review/**").hasRole("USER")
+                                .requestMatchers(HttpMethod.POST,"/webtoon/review/**").hasRole("USER")
                                 .requestMatchers(HttpMethod.DELETE,"/board/**").hasRole("USER")
                                 .requestMatchers(HttpMethod.PUT,"/mypage/update").hasAnyRole("USER","ADMIN")
                                 .requestMatchers("/api/getUserList","/api/getUserList/**").hasRole("ADMIN")
