@@ -10,7 +10,7 @@
 
 ### 개발팀 소개 :+1: 
 
-| [팀장 전애림](https://github.com/tlagusejr) | [팀원 심현덕](https://github.com/tlagusejr) | [팀원 이성수](https://github.com/syeej) | [팀원 조성윤](https://github.com/syeej)  |[팀원 하동우](https://github.com/tlagusejr)  |
+| [팀장 전애림](https://github.com/jeon-aelim) | [팀원 심현덕](https://github.com/tlagusejr) | [팀원 이성수](https://github.com/tjdtn123) | [팀원 조성윤](https://github.com/syeej)  |[팀원 하동우](https://github.com/HAPALPAL)  |
 | -------- | -------- | -------- | ------- | ------ |
 | 채팅      | 웹툰 및 데이터 수집  | 로그인 회원가입, 시큐리티  |커뮤니티 / 문서, 회의록 작성  | 마이페이지  |
 
