@@ -1,8 +1,8 @@
 
-![텍스트](https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=SELECT_*)
+![텍스트](https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=WebTaku)
 
 
-## SELECT *  v2.0
+## WebTaku Monolith
 >채용연계형 MSA 기반 Full Stack 양성과정 3차
 >
 >개발 기간 : 2023.10.25 ~2023.11.23
