@@ -10,7 +10,7 @@
 
 ### 개발팀 소개 :+1: 
 
-| [팀장 전애림](https://github.com/tlagusejr) | [팀원 심현덕]([https://github.com/gossong](https://github.com/tlagusejr)) | [팀원 이성수](https://github.com/syeej) |[팀원 조성윤]([ttps://github.com/syeej](ttps://github.com/syeej))  |[팀원 하동우]([https://github.com/gossong](https://github.com/tlagusejr))  |
+| [팀장 전애림](https://github.com/tlagusejr) | [팀원 심현덕](https://github.com/tlagusejr)) | [팀원 이성수](https://github.com/syeej) |[팀원 조성윤](ttps://github.com/syeej))  |[팀원 하동우](https://github.com/tlagusejr))  |
 | -------- | -------- | -------- | ------- | ------ |
 | 모임 게시판 / Git     | 회원가입, 메인화면, 검색     | 마이페이지 / 문서, 회의록 작성     |마이페이지 / 문서, 회의록 작성  |마이페이지 / 문서, 회의록 작성  |
 
