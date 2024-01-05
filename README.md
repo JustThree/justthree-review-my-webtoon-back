@@ -32,9 +32,11 @@
 
 <hr/>
 
-### <a href="https://github.com/JustThree/justthree-review-my-webtoon-front/tree/main">영상 링크 수정 해야 함</a>
 
 ### 기술 스택
+
+![architecture(monolith)](https://github.com/JustThree/justthree-review-my-webtoon-back/assets/141565053/aa9bbe5e-9450-48c0-b5c7-15188977af4c)
+
 <h4>Frontend</h4>
 <div>
 <img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white">
@@ -70,17 +72,33 @@
   <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white">
 </div>
 
-### 화면 구성
 <hr/>
 <a href="https://www.figma.com/file/s0gRRUjlve80xL5mebcuCh/%ED%99%94%EB%A9%B4-%EC%84%A4%EA%B3%84?type=design&node-id=5-2&mode=design">피그마 링크</a>
 
 <hr/>
 
-### 주요 기능
+### 주요 기능 및 구현 이미지
+#### Ⅰ 웹툰 장르별 조회(메인), 웹툰 평가 및 리뷰
+##### 1. 메인화면
+  <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/141565053/adb5ab4a-5ad6-4baf-ae5a-699b7cde7a76"/>
+  
+#### Ⅱ 실시간 채팅
 
-+ 웹툰 평가 및 리뷰, 웹툰 장르별 조회(메인)
-+ 실시간 채팅
-+ 커뮤니티 및 공지사항(사용자) 게시판
-+ 유저 팔로우 및 마이페이지
-+ 회원가입 및 로그인, 관리자 페이지
+#### Ⅲ 커뮤니티 및 공지사항(사용자) 게시판
+##### 1. 커뮤니티 목록
+  <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/141565053/b43679d6-ed82-415f-88a9-d584b80479a8"/>
+
+##### 2. 커뮤니티 글 상세조회
+  <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/141565053/cc19f6c3-e630-4c93-b1ed-55026c60ebf2"/>
+
+##### 3. 커뮤니티 글 수정
+  <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/141565053/82aed08a-69c8-458f-a32a-e10af8fac4e2"/>
+
+##### 4. 공지 목록
+  <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/141565053/fb10e5f4-c25c-4987-9a43-1dff37f14680"/>
+
+
+#### Ⅳ 유저 팔로우 및 마이페이지
+
+#### Ⅴ 회원가입 및 로그인, 관리자 페이지
 
