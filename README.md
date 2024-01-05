@@ -56,11 +56,9 @@
   </div>
 <h4>ETC</h4>
 <div>
-
-
-<img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white">
-<img src="https://img.shields.io/badge/IntelliJ_IDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white">
-<img src="https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white">
+  <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white">
+  <img src="https://img.shields.io/badge/IntelliJ_IDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white">
+  <img src="https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white">
   <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white">
 </div>
 
@@ -68,17 +66,13 @@
 <hr/>
 <a href="https://www.figma.com/file/s0gRRUjlve80xL5mebcuCh/%ED%99%94%EB%A9%B4-%EC%84%A4%EA%B3%84?type=design&node-id=5-2&mode=design">피그마 링크</a>
 
-
-
-
 ### 주요 기능
 <hr/>
-기능 개인이 추가 어필 할 만한거
-+ 스프링 시큐리티, 회원가입, 로그인 - 성수
-+ 메인
-+ 모임 게시판, 모임 신청, 댓글 작성
-+ 개인정보 수정, 프로필 수정, 작성한 글 조회
 
++ 스프링 시큐리티, 회원가입, 로그인, 관리자 페이지 - 이성수
++ 메인 및 데이터 수집 - 심현덕
++ 커뮤니티 - 조성윤
++ 채팅 - 전애림
++ 마이페이지 - 하동우
 
 ### 보완해 나갔으면 하는 부분 어필
-
