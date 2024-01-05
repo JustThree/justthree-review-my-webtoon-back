@@ -24,7 +24,7 @@
 - 소개 : 소개 추가좀
 <hr/>
 
-### <a href="https://github.com/kosaThirdJo/secondProjectVue.js/tree/dev">링크 수정 </a>
+### <a href="https://github.com/kosaThirdJo/secondProjectVue.js/tree/dev">영상 링크 수정 </a>
 
 ### 기술 스택
 <h4>Frontend</h4>
