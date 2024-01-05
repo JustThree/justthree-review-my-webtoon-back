@@ -19,12 +19,12 @@
 ### 프로젝트 소개
 <hr/>
 
-- 프로젝트 진행 단체 : KOSA 팀프로젝트(<b>쓰리스타</b>)
-- 목적 : 개발자 간의 소통
-- 소개 : 스터디, 사이드프로젝트, 모각코 등 이용자 주변 지역에서 진행되는 개발자 모임 조회 및 생성
+- 프로젝트 진행 단체 : KOSA 팀프로젝트(<b>웹타쿠</b>)
+- 목적 : 웹툰.... 목적 추가좀
+- 소개 : 소개 추가좀
 <hr/>
 
-### <a href="https://github.com/kosaThirdJo/secondProjectVue.js/tree/dev">시연 영상 보기 </a>
+### <a href="https://github.com/kosaThirdJo/secondProjectVue.js/tree/dev">링크 수정 </a>
 
 ### 기술 스택
 <h4>Frontend</h4>
@@ -41,19 +41,18 @@
 
 ### 화면 구성
 <hr/>
-
-[Figma 화면](https://www.figma.com/file/aCfv5ApziovUHxqGiDRBhn/SELECT*?type=design&node-id=0-1&mode=design "Figma")
+화면 피그마 수정
 
 
 
 ### 주요 기능
 <hr/>
-
+기능 개인이 추가 어필 할 만한거
 + 스프링 시큐리티, 회원가입, 로그인 - 성수
 + 메인
 + 모임 게시판, 모임 신청, 댓글 작성
 + 개인정보 수정, 프로필 수정, 작성한 글 조회
 
 
-### 2차 보완점 
+### 보완해 나갔으면 하는 부분 어필
 
