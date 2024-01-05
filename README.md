@@ -3,16 +3,16 @@
 
 
 ## WebTaku Monolith
->채용연계형 MSA 기반 Full Stack 양성과정 3차
+>채용연계형 MSA 기반 Full Stack 양성과정 3차 Final
 >
->개발 기간 : 2023.10.25 ~2023.11.23
+>개발 기간 : 2023.11.24 ~2023.12.29
 
 
 ### 개발팀 소개 :+1: 
 
-| [팀장 심현덕](https://github.com/tlagusejr) | [팀원 송지오](https://github.com/gossong) | [팀원 조성윤](https://github.com/syeej) |
-| -------- | -------- | -------- |
-| 모임 게시판 / Git     | 회원가입, 메인화면, 검색     | 마이페이지 / 문서, 회의록 작성     |
+| [팀장 전애림](https://github.com/tlagusejr) | [팀원 심현덕]([https://github.com/gossong](https://github.com/tlagusejr)) | [팀원 이성수](https://github.com/syeej) |[팀원 조성윤]([ttps://github.com/syeej](ttps://github.com/syeej))  |[팀원 하동우]([https://github.com/gossong](https://github.com/tlagusejr))  |
+| -------- | -------- | -------- | ------- | ------ |
+| 모임 게시판 / Git     | 회원가입, 메인화면, 검색     | 마이페이지 / 문서, 회의록 작성     |마이페이지 / 문서, 회의록 작성  |마이페이지 / 문서, 회의록 작성  |
 
 
 
@@ -49,18 +49,11 @@
 ### 주요 기능
 <hr/>
 
-+ 회원가입, 로그인, 메인, 검색
++ 스프링 시큐리티, 회원가입, 로그인 - 성수
++ 메인
 + 모임 게시판, 모임 신청, 댓글 작성
 + 개인정보 수정, 프로필 수정, 작성한 글 조회
 
 
 ### 2차 보완점 
-<hr />
 
-+ MyBatis => <b>Spring Data Jpa</b>
-+ Thymeleaf => <b>Vue.js</b> <i>(Single Page Application)</i>
-+ 세션 방식 => <b>스프링 시큐리티</b>, <b>jwt토큰</b> 방식
-+ 서비스 계층 분리
-+ 스케줄러 적용
-+ 테스트 코드 적용
-+ dto entity 분리
