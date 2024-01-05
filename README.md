@@ -73,9 +73,6 @@
 </div>
 
 <hr/>
-<a href="https://www.figma.com/file/s0gRRUjlve80xL5mebcuCh/%ED%99%94%EB%A9%B4-%EC%84%A4%EA%B3%84?type=design&node-id=5-2&mode=design">피그마 링크</a>
-
-<hr/>
 
 ### 주요 기능 및 구현 이미지
 #### Ⅰ 웹툰 장르별 조회(메인), 웹툰 평가 및 리뷰
