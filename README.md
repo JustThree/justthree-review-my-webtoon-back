@@ -99,6 +99,16 @@
 
 
 #### Ⅳ 유저 팔로우 및 마이페이지
+##### 1. 내 정보 수정
+  <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/48d32bbd-40da-4f9f-a961-f3bc841612fb"/>
+
+##### 2.  
+  <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/67f97a93-bcbc-40c1-bbdc-37c578d4025d"/>
+#####
+  <img width="500"  src=""/>
+#####
+  <img width="500"  src=""/>
+
 
 #### Ⅴ 회원가입 및 로그인, 관리자 페이지
 ##### 1. 회원가입
