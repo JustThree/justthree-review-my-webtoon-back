@@ -108,6 +108,6 @@
   <img width="500" src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/a5802cc1-d5ee-4d1c-a1cf-10a1908b3f9b"/>
   
 ##### 3. 관리자 페이지
-  <img width="500" src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/b6c9278b-c8ec-4052-a461-9e70dd9dfa72"/>
+  <img width="500" src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/463a2414-d08b-44d3-b41d-cf284fdb57d9"/>
 
 
