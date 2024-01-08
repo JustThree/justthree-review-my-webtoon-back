@@ -102,12 +102,12 @@
 
 #### Ⅴ 회원가입 및 로그인, 관리자 페이지
 ##### 1. 회원가입
-  <img width="500" src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/18647506-e49a-45ea-a624-1891d37f2f24"/>
+  <img width="500" src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/13b10752-140d-44e3-94a3-b8623e95f69c"/>
 
 ##### 2. 로그인
-  <img width="500" src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/598b9427-de20-4382-ab5c-ce5388fdf075"/>
+  <img width="500" src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/a5802cc1-d5ee-4d1c-a1cf-10a1908b3f9b"/>
   
 ##### 3. 관리자 페이지
-  <img width="500" src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/0ab05ced-e7d4-4553-bc53-98c7440d490d"/>
+  <img width="500" src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/99237245/b6c9278b-c8ec-4052-a461-9e70dd9dfa72"/>
 
 
