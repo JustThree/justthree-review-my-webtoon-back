@@ -79,6 +79,11 @@
 ##### 1. 메인화면
   <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/141565053/adb5ab4a-5ad6-4baf-ae5a-699b7cde7a76"/>
   
+
+https://github.com/JustThree/justthree-review-my-webtoon-back/assets/52907198/e109de60-0f0d-443d-a4e6-cc5beeb93a5d
+
+
+
 #### Ⅱ 실시간 채팅
   <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/120872728/82fb1de5-8f4e-48d4-a1a3-4a107457cbfa"/>
   <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/120872728/7060e3b7-a575-4a0b-8394-9d1f0da963fe"/>
