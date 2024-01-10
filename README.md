@@ -100,7 +100,7 @@ https://github.com/JustThree/justthree-review-my-webtoon-back/assets/52907198/e1
   <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/141565053/82aed08a-69c8-458f-a32a-e10af8fac4e2"/>
 
 ##### 4. 공지 목록
-  <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/141565053/fb10e5f4-c25c-4987-9a43-1dff37f14680"/>
+  <img width="500"  src="https://github.com/JustThree/justthree-review-my-webtoon-back/assets/141565053/ce8790e5-0965-4859-8c69-800e829f4f11"/>
 
 
 #### Ⅳ 유저 팔로우 및 마이페이지
